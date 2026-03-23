@@ -24,3 +24,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "IB2026AlejandroLO"
 include(":app")
+include(":Domain")
