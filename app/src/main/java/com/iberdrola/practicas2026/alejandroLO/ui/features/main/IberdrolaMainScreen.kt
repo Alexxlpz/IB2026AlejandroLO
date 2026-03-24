@@ -45,13 +45,13 @@ fun IberdrolaMainScreen(modifier: Modifier = Modifier) {
                 mainViewModel.updateSelectedOption(it)
                 billsViewModel.updateSelectedOption(it)
             },
-            isSyncEnabled = billsUiState.value.isLocal,
+            isSyncEnabled = billsUiState.value.isOnline,
             onSyncToggle = { billsViewModel.updateDataBase(it) }
         )
 
         IberdrolaBillsScreen(
-            bills = bills,
-            lastBill = bill,
+            bills = billsUiState.value.billsList,
+            lastBill = billsUiState.value.lastBill,
             modifier = Modifier.weight(1f)
         )
     }

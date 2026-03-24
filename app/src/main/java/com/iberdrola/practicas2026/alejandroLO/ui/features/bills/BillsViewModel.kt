@@ -27,7 +27,7 @@ class BillsViewModel(
     }
 
     private fun refreshBills() {
-        val isLocal = _uiState.value.isLocal
+        val isLocal = _uiState.value.isOnline
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
@@ -64,8 +64,8 @@ class BillsViewModel(
         refreshBills()
     }
 
-    fun updateDataBase(isLocal: Boolean) {
-        _uiState.update { it.copy(isLocal = isLocal) }
+    fun updateDataBase(isOnline: Boolean) {
+        _uiState.update { it.copy(isOnline = isOnline) }
         refreshBills()
     }
 }

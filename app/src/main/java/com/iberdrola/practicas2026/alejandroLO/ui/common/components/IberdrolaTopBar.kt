@@ -64,12 +64,13 @@ fun IberdrolaBar(
     isSyncEnabled: Boolean,
     onSyncToggle: (Boolean) -> Unit
 ) {
-    Box(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(56.dp)
             .padding(horizontal = 16.dp),
-        contentAlignment = Alignment.CenterStart
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
     ){
         Row(
             verticalAlignment = Alignment.CenterVertically,

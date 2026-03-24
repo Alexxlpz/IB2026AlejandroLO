@@ -46,7 +46,7 @@ import java.util.Locale
 @Composable
 fun IberdrolaBillsScreen(
     bills: List<Bill>,
-    lastBill: Bill,
+    lastBill: Bill?,
     modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
@@ -56,7 +56,9 @@ fun IberdrolaBillsScreen(
             .fillMaxWidth()
             .verticalScroll(scrollState)
     ) {
-        IberdrolaLastBill(lastBill = lastBill)
+        if (lastBill != null) {
+            IberdrolaLastBill(lastBill = lastBill)
+        }
         IberdrolaBillList(bills = bills)
     }
 }
@@ -204,25 +206,30 @@ fun IberdrolaBillList(bills: List<Bill>) {
             // Lista de facturas
             // Usamos Column si los datos son pocos, o LazyColumn si es una lista larga.
             // Aquí lo haré dentro de la Column principal para simplificar el scroll
-            bills.forEach { bill ->
-                if (yearFormat.format(bill.date) != auxyear){
-                    auxyear = yearFormat.format(bill.date)
-                    Text(
-                        text = auxyear,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
-                    )
 
-                    Spacer(modifier = Modifier.height(8.dp))
-                    IberdrolaBillItem(bill = bill)
+            if(bills.isEmpty()){
+                Text("No hay facturas")
+            }else {
+                bills.forEach { bill ->
+                    if (yearFormat.format(bill.date) != auxyear){
+                        auxyear = yearFormat.format(bill.date)
+                        Text(
+                            text = auxyear,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
 
-                }else {
-                    IberdrolaBillItem(bill = bill)
-                    HorizontalDivider(
-                        modifier = Modifier.padding(vertical = 8.dp),
-                        thickness = 1.dp,
-                        color = Color(0xFFE0E0E0)
-                    )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        IberdrolaBillItem(bill = bill)
+
+                    }else {
+                        IberdrolaBillItem(bill = bill)
+                        HorizontalDivider(
+                            modifier = Modifier.padding(vertical = 8.dp),
+                            thickness = 1.dp,
+                            color = Color(0xFFE0E0E0)
+                        )
+                    }
                 }
             }
         }
