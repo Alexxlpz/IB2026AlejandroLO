@@ -3,11 +3,13 @@ package com.iberdrola.practicas2026.alejandroLO.data
 import android.content.Context
 import androidx.room.RoomDatabase
 import androidx.room.Database
+import androidx.room.TypeConverters
 import com.iberdrola.practicas2026.alejandroLO.data.model.Bill
 import com.iberdrola.practicas2026.alejandroLO.data.repository.Bill.BillsDao
 
 
 @Database(entities = [Bill::class], version = 1, exportSchema = false)
+@TypeConverters(Converters::class)
 abstract class BillDatabase : RoomDatabase() {
     abstract fun billDao(): BillsDao
 
