@@ -42,9 +42,10 @@ class BillsViewModel(
                 }
             }
 
-            billsRepository.getBillsByType(_uiState.value.selectedOption.name).collect { bills ->
+            billsRepository.getBillsByType(_uiState.value.selectedOption.title).collect { bills ->
                 _uiState.update {
-                    it.copy(billsList = bills,
+                    it.copy(
+                        billsList = bills,
                         lastBill = bills.lastOrNull(),
                         isLoading = false
                     )
