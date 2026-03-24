@@ -9,5 +9,6 @@ data class BillsUiState (
     val lastBill: Bill? = null,
     val selectedOption: BillType = BillType.LUZ,
     val isLoading: Boolean = false,
+    val isLocal: Boolean = true,
     val hasBills: Boolean = billsList.isNotEmpty()
 )
