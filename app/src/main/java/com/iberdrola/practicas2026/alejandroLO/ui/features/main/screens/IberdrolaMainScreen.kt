@@ -1,27 +1,17 @@
-package com.iberdrola.practicas2026.alejandroLO.ui.features.main
+package com.iberdrola.practicas2026.alejandroLO.ui.features.main.screens
 
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.iberdrola.practicas2026.alejandroLO.ui.common.components.IberdrolaTopBar
-import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.BillsViewModel
-import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.BillsViewModelFactory
-import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.IberdrolaBillsScreen
-import com.valentinilk.shimmer.ShimmerBounds
-import com.valentinilk.shimmer.rememberShimmer
-import com.valentinilk.shimmer.shimmer
-import androidx.compose.animation.core.*
-import com.valentinilk.shimmer.ShimmerTheme
-import com.valentinilk.shimmer.defaultShimmerTheme
+import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsViewModel
+import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsViewModelFactory
+import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.screens.IberdrolaBillsScreen
+import com.iberdrola.practicas2026.alejandroLO.ui.features.main.viewModel.MainViewModel
 
 // hay que hacer una UI que almacene selectedOption
 

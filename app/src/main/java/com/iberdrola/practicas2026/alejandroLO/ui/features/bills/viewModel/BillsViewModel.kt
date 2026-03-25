@@ -1,9 +1,11 @@
-package com.iberdrola.practicas2026.alejandroLO.ui.features.bills
+package com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.iberdrola.practicas2026.alejandroLO.data.repository.bill.BillsRepository
+import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsUiState
+import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeEnum
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

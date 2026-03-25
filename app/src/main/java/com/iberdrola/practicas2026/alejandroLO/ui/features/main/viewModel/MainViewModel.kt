@@ -1,7 +1,7 @@
-package com.iberdrola.practicas2026.alejandroLO.ui.features.main
+package com.iberdrola.practicas2026.alejandroLO.ui.features.main.viewModel
 
 import android.util.Log
-import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.BillTypeEnum
+import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeEnum
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

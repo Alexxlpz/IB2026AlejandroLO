@@ -1,4 +1,4 @@
-package com.iberdrola.practicas2026.alejandroLO.ui.features.bills
+package com.iberdrola.practicas2026.alejandroLO.ui.features.bills.screens
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
@@ -38,6 +38,8 @@ import com.iberdrola.practicas2026.alejandroLO.data.model.Bill
 import java.util.Date
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Tune
+import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillStatusEnum
+import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeEnum
 import com.valentinilk.shimmer.ShimmerBounds
 import com.valentinilk.shimmer.rememberShimmer
 import com.valentinilk.shimmer.shimmer
@@ -252,6 +254,7 @@ fun IberdrolaBillList(bills: List<Bill>) {
 fun IberdrolaBillItem(bill: Bill) {
     val isPaid = bill.status == BillStatusEnum.PAGADA.ordinal
     val dateFormat = SimpleDateFormat("d 'de' MMMM", Locale("es", "ES"))
+    val type: String = BillTypeEnum.entries.find { it.ordinal == bill.type }?.title ?: ""
 
     Row(
         modifier = Modifier
@@ -268,7 +271,7 @@ fun IberdrolaBillItem(bill: Bill) {
                 fontWeight = FontWeight.Bold
             )
             Text(
-                text = "Factura" /*${bill.type.lowercase().replaceFirstChar { it.uppercase() }}*/, // TODO TRAER EL TIPO POR PARAMETRO
+                text = "Factura ${type.lowercase().replaceFirstChar { it.uppercase() }}",
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.Gray
             )

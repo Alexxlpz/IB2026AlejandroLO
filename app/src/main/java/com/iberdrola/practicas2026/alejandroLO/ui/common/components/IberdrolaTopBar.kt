@@ -27,7 +27,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.iberdrola.practicas2026.alejandroLO.R
-import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.BillTypeEnum
+import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeEnum
 import java.util.Locale
 
 @Composable
