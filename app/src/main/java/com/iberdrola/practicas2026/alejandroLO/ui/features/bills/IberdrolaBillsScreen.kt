@@ -38,6 +38,9 @@ import com.iberdrola.practicas2026.alejandroLO.data.model.Bill
 import java.util.Date
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Tune
+import com.valentinilk.shimmer.ShimmerBounds
+import com.valentinilk.shimmer.rememberShimmer
+import com.valentinilk.shimmer.shimmer
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -47,19 +50,28 @@ import java.util.Locale
 fun IberdrolaBillsScreen(
     bills: List<Bill>,
     lastBill: Bill?,
+    isLoading: Boolean,
     modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
 
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .verticalScroll(scrollState)
-    ) {
-        if (lastBill != null) {
-            IberdrolaLastBill(lastBill = lastBill)
+    if (isLoading) {
+        val shimmer = rememberShimmer(
+            shimmerBounds = ShimmerBounds.Window,
+            theme = shimmerTheme()
+        )
+        SkeletonScreen(modifier = modifier.shimmer(shimmer))
+    }else {
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .verticalScroll(scrollState)
+        ) {
+            if (lastBill != null) {
+                IberdrolaLastBill(lastBill = lastBill)
+            }
+            IberdrolaBillList(bills = bills)
         }
-        IberdrolaBillList(bills = bills)
     }
 }
 
@@ -203,9 +215,9 @@ fun IberdrolaBillList(bills: List<Bill>) {
 
             var auxyear: String = ""
 
-            // Lista de facturas
-            // Usamos Column si los datos son pocos, o LazyColumn si es una lista larga.
-            // Aquí lo haré dentro de la Column principal para simplificar el scroll
+            /////////////////////////
+            /// Liata de facturas ///
+            /////////////////////////
 
             if(bills.isEmpty()){
                 Text("No hay facturas")
@@ -220,16 +232,15 @@ fun IberdrolaBillList(bills: List<Bill>) {
                         )
 
                         Spacer(modifier = Modifier.height(8.dp))
-                        IberdrolaBillItem(bill = bill)
-
-                    }else {
-                        IberdrolaBillItem(bill = bill)
-                        HorizontalDivider(
-                            modifier = Modifier.padding(vertical = 8.dp),
-                            thickness = 1.dp,
-                            color = Color(0xFFE0E0E0)
-                        )
                     }
+
+                    IberdrolaBillItem(bill = bill)
+                    HorizontalDivider(
+                        modifier = Modifier.padding(vertical = 8.dp),
+                        thickness = 1.dp,
+                        color = Color(0xFFE0E0E0)
+                    )
+
                 }
             }
         }
@@ -309,5 +320,5 @@ fun PreviewIberdrolaBillsScreen() {
     )
     val bills = listOf(bill, bill, bill)
 
-    IberdrolaBillsScreen(bills = bills, lastBill = bill)
+    IberdrolaBillsScreen(bills = bills, isLoading = false, lastBill = bill)
 }
