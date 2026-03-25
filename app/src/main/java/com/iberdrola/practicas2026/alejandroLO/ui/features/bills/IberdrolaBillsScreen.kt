@@ -149,7 +149,7 @@ fun IberdrolaLastBill(lastBill: Bill) {
             Spacer(modifier = Modifier.height(16.dp))
 
             // Badge de Estado (Pendiente de pago)
-            val isPaid = lastBill.status == BillStatusEnum.PAGADA.title // Lógica de estado
+            val isPaid = lastBill.status == BillStatusEnum.PAGADA.ordinal // Lógica de estado
 
             Surface(
                 color = if (isPaid) Color(0xFFD4EBD0) else Color(0xFFF2B3BA),
@@ -250,7 +250,7 @@ fun IberdrolaBillList(bills: List<Bill>) {
 @SuppressLint("DefaultLocale")
 @Composable
 fun IberdrolaBillItem(bill: Bill) {
-    val isPaid = bill.status == BillStatusEnum.PAGADA.title
+    val isPaid = bill.status == BillStatusEnum.PAGADA.ordinal
     val dateFormat = SimpleDateFormat("d 'de' MMMM", Locale("es", "ES"))
 
     Row(
@@ -268,7 +268,7 @@ fun IberdrolaBillItem(bill: Bill) {
                 fontWeight = FontWeight.Bold
             )
             Text(
-                text = "Factura ${bill.type.lowercase().replaceFirstChar { it.uppercase() }}",
+                text = "Factura" /*${bill.type.lowercase().replaceFirstChar { it.uppercase() }}*/, // TODO TRAER EL TIPO POR PARAMETRO
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.Gray
             )
@@ -312,9 +312,9 @@ fun IberdrolaBillItem(bill: Bill) {
 @Preview
 fun PreviewIberdrolaBillsScreen() {
     val bill = Bill(
-        type = BillTypeEnum.LUZ.title,
+        type = BillTypeEnum.LUZ.ordinal,
         price = 100.0,
-        status = BillStatusEnum.PENDIENTE.title,
+        status = BillStatusEnum.PENDIENTE.ordinal,
         date = Date(),
         dueDate = Date()
     )
