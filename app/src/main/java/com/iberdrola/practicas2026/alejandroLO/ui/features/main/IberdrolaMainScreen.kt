@@ -27,9 +27,9 @@ fun IberdrolaMainScreen(modifier: Modifier = Modifier) {
     val billsUiState = billsViewModel.uiState.collectAsState()
 
     val bill = Bill(
-        type = BillType.LUZ.name,
+        type = BillType.LUZ.title,
         price = 100.0,
-        status = BillStatus.PENDIENTE.name,
+        status = BillStatus.PENDIENTE.title,
         date = Date(),
         dueDate = Date()
     )
@@ -41,12 +41,17 @@ fun IberdrolaMainScreen(modifier: Modifier = Modifier) {
         IberdrolaTopBar(
             selectedOption = mainUiState.value.selectedOption,
             options = mainUiState.value.options,
-            billsViewModel = billsViewModel
+            onOptionSelected = {
+                mainViewModel.updateSelectedOption(it)
+                billsViewModel.updateSelectedOption(it)
+            },
+            isSyncEnabled = billsUiState.value.isOnline,
+            onSyncToggle = { billsViewModel.updateDataBase(it) }
         )
 
         IberdrolaBillsScreen(
-            bills = bills,
-            lastBill = bill,
+            bills = billsUiState.value.billsList,
+            lastBill = billsUiState.value.lastBill,
             modifier = Modifier.weight(1f)
         )
     }

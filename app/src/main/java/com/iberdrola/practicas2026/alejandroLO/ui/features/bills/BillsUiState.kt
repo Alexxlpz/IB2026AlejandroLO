@@ -5,9 +5,10 @@ import com.iberdrola.practicas2026.alejandroLO.data.model.Bill
 import java.util.Date
 
 data class BillsUiState (
-    val billsList: List<Bill?> = emptyList(),
+    val billsList: List<Bill> = emptyList(),
     val lastBill: Bill? = null,
     val selectedOption: BillType = BillType.LUZ,
     val isLoading: Boolean = false,
+    val isOnline: Boolean = false,
     val hasBills: Boolean = billsList.isNotEmpty()
 )

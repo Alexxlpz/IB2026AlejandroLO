@@ -1,0 +1,162 @@
+[
+  {
+    "id": 1,
+    "type": "Luz",
+    "price": 45.30,
+    "status": "Pendiente",
+    "date": 1709251200000,
+    "dueDate": 1711843200000
+  },
+  {
+    "id": 2,
+    "type": "Gas",
+    "price": 60.10,
+    "status": "Pagada",
+    "date": 1709337600000,
+    "dueDate": 1711929600000
+  },
+  {
+    "id": 3,
+    "type": "Luz",
+    "price": 32.99,
+    "status": "Pendiente",
+    "date": 1709424000000,
+    "dueDate": 1712016000000
+  },
+  {
+    "id": 4,
+    "type": "Gas",
+    "price": 75.50,
+    "status": "Pagada",
+    "date": 1709510400000,
+    "dueDate": 1712102400000
+  },
+  {
+    "id": 5,
+    "type": "Luz",
+    "price": 28.75,
+    "status": "Pagada",
+    "date": 1709596800000,
+    "dueDate": 1712188800000
+  },
+  {
+    "id": 6,
+    "type": "Gas",
+    "price": 90.20,
+    "status": "Pendiente",
+    "date": 1709683200000,
+    "dueDate": 1712275200000
+  },
+  {
+    "id": 7,
+    "type": "Luz",
+    "price": 55.60,
+    "status": "Pagada",
+    "date": 1709769600000,
+    "dueDate": 1712361600000
+  },
+  {
+    "id": 8,
+    "type": "Gas",
+    "price": 48.10,
+    "status": "Pendiente",
+    "date": 1709856000000,
+    "dueDate": 1712448000000
+  },
+  {
+    "id": 9,
+    "type": "Luz",
+    "price": 39.99,
+    "status": "Pagada",
+    "date": 1709942400000,
+    "dueDate": 1712534400000
+  },
+  {
+    "id": 10,
+    "type": "Gas",
+    "price": 82.45,
+    "status": "Pendiente",
+    "date": 1710028800000,
+    "dueDate": 1712620800000
+  },
+  {
+    "id": 11,
+    "type": "Luz",
+    "price": 29.99,
+    "status": "Pendiente",
+    "date": 1710115200000,
+    "dueDate": 1712707200000
+  },
+  {
+    "id": 12,
+    "type": "Gas",
+    "price": 66.70,
+    "status": "Pagada",
+    "date": 1710201600000,
+    "dueDate": 1712793600000
+  },
+  {
+    "id": 13,
+    "type": "Luz",
+    "price": 41.20,
+    "status": "Pagada",
+    "date": 1710288000000,
+    "dueDate": 1712880000000
+  },
+  {
+    "id": 14,
+    "type": "Gas",
+    "price": 77.35,
+    "status": "Pendiente",
+    "date": 1710374400000,
+    "dueDate": 1712966400000
+  },
+  {
+    "id": 15,
+    "type": "Luz",
+    "price": 35.80,
+    "status": "Pagada",
+    "date": 1710460800000,
+    "dueDate": 1713052800000
+  },
+  {
+    "id": 16,
+    "type": "Gas",
+    "price": 88.90,
+    "status": "Pendiente",
+    "date": 1710547200000,
+    "dueDate": 1713139200000
+  },
+  {
+    "id": 17,
+    "type": "Luz",
+    "price": 52.10,
+    "status": "Pagada",
+    "date": 1710633600000,
+    "dueDate": 1713225600000
+  },
+  {
+    "id": 18,
+    "type": "Gas",
+    "price": 61.40,
+    "status": "Pendiente",
+    "date": 1710720000000,
+    "dueDate": 1713312000000
+  },
+  {
+    "id": 19,
+    "type": "Luz",
+    "price": 47.75,
+    "status": "Pagada",
+    "date": 1710806400000,
+    "dueDate": 1713398400000
+  },
+  {
+    "id": 20,
+    "type": "Gas",
+    "price": 73.25,
+    "status": "Pendiente",
+    "date": 1710892800000,
+    "dueDate": 1713484800000
+  }
+]

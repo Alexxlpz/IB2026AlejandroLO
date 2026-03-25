@@ -46,7 +46,7 @@ import java.util.Locale
 @Composable
 fun IberdrolaBillsScreen(
     bills: List<Bill>,
-    lastBill: Bill,
+    lastBill: Bill?,
     modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
@@ -56,7 +56,9 @@ fun IberdrolaBillsScreen(
             .fillMaxWidth()
             .verticalScroll(scrollState)
     ) {
-        IberdrolaLastBill(lastBill = lastBill)
+        if (lastBill != null) {
+            IberdrolaLastBill(lastBill = lastBill)
+        }
         IberdrolaBillList(bills = bills)
     }
 }
@@ -69,7 +71,7 @@ fun IberdrolaLastBill(lastBill: Bill) {
             .padding(16.dp),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(1.dp,
+        border = BorderStroke(1.5.dp,
             Color(0xFF00833E).copy(alpha = 0.6f))
     ) {
         Column(
@@ -198,24 +200,37 @@ fun IberdrolaBillList(bills: List<Bill>) {
         val yearFormat = SimpleDateFormat("yyyy", Locale("es", "ES"))
 
         Column(modifier = Modifier.fillMaxWidth()) {
-            Text(
-                text = if (bills.isNotEmpty()) yearFormat.format(bills.first().date) else "ERROR",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            var auxyear: String = ""
 
             // Lista de facturas
             // Usamos Column si los datos son pocos, o LazyColumn si es una lista larga.
-            // Aquí lo haré dentro de la Column principal para simplificar el scroll.
-            bills.forEach { bill ->
-                IberdrolaBillItem(bill = bill)
-                HorizontalDivider(
-                    modifier = Modifier.padding(vertical = 8.dp),
-                    thickness = 1.dp,
-                    color = Color(0xFFE0E0E0)
-                )
+            // Aquí lo haré dentro de la Column principal para simplificar el scroll
+
+            if(bills.isEmpty()){
+                Text("No hay facturas")
+            }else {
+                bills.forEach { bill ->
+                    if (yearFormat.format(bill.date) != auxyear){
+                        auxyear = yearFormat.format(bill.date)
+                        Text(
+                            text = auxyear,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+                        IberdrolaBillItem(bill = bill)
+
+                    }else {
+                        IberdrolaBillItem(bill = bill)
+                        HorizontalDivider(
+                            modifier = Modifier.padding(vertical = 8.dp),
+                            thickness = 1.dp,
+                            color = Color(0xFFE0E0E0)
+                        )
+                    }
+                }
             }
         }
     }

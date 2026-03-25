@@ -1,4 +1,4 @@
-package com.iberdrola.practicas2026.alejandroLO.data.repository.Bill
+package com.iberdrola.practicas2026.alejandroLO.data.repository.bill
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -20,6 +20,9 @@ interface BillsDao {
     @Delete
     suspend fun delete(bill: Bill)
 
+    @Query("DELETE FROM bills")
+    suspend fun deleteAll()
+
     @Query("SELECT * from bills WHERE id = :id")
     fun getBill(id: Int): Flow<Bill>
 
@@ -28,4 +31,5 @@ interface BillsDao {
 
     @Query("SELECT * from bills ORDER BY date DESC")
     fun getAllBills(): Flow<List<Bill>>
+
 }

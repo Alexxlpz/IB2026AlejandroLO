@@ -2,6 +2,7 @@ package com.iberdrola.practicas2026.alejandroLO.ui.common.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,6 +17,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -26,16 +28,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.iberdrola.practicas2026.alejandroLO.R
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.BillType
-import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.BillsViewModel
+import java.util.Locale
 
 @Composable
 fun IberdrolaTopBar(selectedOption: BillType,
                     options: List<BillType>,
-                    billsViewModel: BillsViewModel,
+                    onOptionSelected: (BillType) -> Unit,
+                    isSyncEnabled: Boolean,
+                    onSyncToggle: (Boolean) -> Unit,
                     modifier: Modifier = Modifier){
     Column(modifier = modifier.fillMaxWidth()) {
+
         IberdrolaBar(
-            onBackClick = { /* Navegar atrás, se implementará mas adelante */ }
+            onBackClick = { /* Navegar atrás, se implementará mas adelante */ },
+            isSyncEnabled = isSyncEnabled,
+            onSyncToggle = onSyncToggle
         )
         IberdrolaTitleAndDescription(
             description = "Esta es la descripción de tus facturas",
@@ -44,21 +51,26 @@ fun IberdrolaTopBar(selectedOption: BillType,
         ServiceSelector(
             selectedOption = selectedOption.title,
             options = options.map { it.title },
-            onOptionSelected = { billsViewModel.updateSelectedOption(BillType.valueOf(it)) }
+            onOptionSelected = {
+                onOptionSelected(BillType.valueOf(it.uppercase(Locale.getDefault())))
+            }
         )
     }
 }
 
 @Composable
 fun IberdrolaBar(
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    isSyncEnabled: Boolean,
+    onSyncToggle: (Boolean) -> Unit
 ) {
-    Box(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(56.dp)
             .padding(horizontal = 16.dp),
-        contentAlignment = Alignment.CenterStart
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
     ){
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -74,6 +86,21 @@ fun IberdrolaBar(
             Text(text = " Atrás",
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.primary
+            )
+        }
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = if (isSyncEnabled) "Online" else "Offline",
+                style = MaterialTheme.typography.labelMedium,
+                color = if (isSyncEnabled) Color(0xFF008F39) else Color.Gray
+            )
+            Switch(
+                checked = isSyncEnabled,
+                onCheckedChange = onSyncToggle
             )
         }
     }
