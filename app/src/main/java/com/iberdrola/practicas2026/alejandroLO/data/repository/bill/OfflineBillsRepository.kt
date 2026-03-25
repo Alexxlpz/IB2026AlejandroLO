@@ -29,13 +29,12 @@ class OfflineBillsRepository(
     override suspend fun refreshBillsOnline() {
         try {
             val remoteBills = apiService.getBills()
-            // Podrías guardarlas en Room para tener caché offline
             billDao.deleteAll()
             Log.d(TAG, "refreshBillsOnline: vamos a insertar los datos en la base de datos: $remoteBills")
             remoteBills.forEach { billDao.insert(it) }
             Log.d(TAG, "refreshBillsOnline: se han insertado los datos en la base de datos")
         } catch (e: Exception) {
-            // Manejar error de conexión
+            Log.e(TAG, "Error al conectar con Mockoon: ${e.message}, COMPRUEBA SI LE HAS DADO AL PLAY")
         }
     }
 

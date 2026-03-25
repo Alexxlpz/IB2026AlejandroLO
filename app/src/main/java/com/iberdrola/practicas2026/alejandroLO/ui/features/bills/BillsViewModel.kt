@@ -27,19 +27,20 @@ class BillsViewModel(
     }
 
     private fun refreshBills() {
-        val isLocal = _uiState.value.isOnline
+        val isOnline = _uiState.value.isOnline
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
-            if (isLocal) {
-                billsRepository.insertMockBillsFromAssets()
-                delay((1000 + (random() * 2000)).toLong()) // delay entre 1 y 3 seg
-            }else {
+            if (isOnline) {
                 try {
                     billsRepository.refreshBillsOnline()
+                    //delay(1000) // debido a que se carga demasiado rapido y ves aparecer las bills mientras se cargan
                 } catch (e: Exception) {
                     Log.e(TAG, "Error al conectar con Mockoon: ${e.message}")
                 }
+            }else {
+                billsRepository.insertMockBillsFromAssets()
+                delay((1000 + (random() * 2000)).toLong()) // delay entre 1 y 3 seg
             }
 
             billsRepository.getBillsByType(_uiState.value.selectedOption.title).collect { bills ->
