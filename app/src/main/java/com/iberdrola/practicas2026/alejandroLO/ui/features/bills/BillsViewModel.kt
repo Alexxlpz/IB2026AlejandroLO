@@ -31,10 +31,21 @@ class BillsViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
+            val observator = launch {
+                billsRepository.getBillsByType(_uiState.value.selectedOption.title).collect { bills ->
+                    _uiState.update {
+                        it.copy(
+                            billsList = bills,
+                            lastBill = bills.lastOrNull()
+                        )
+                    }
+                }
+            }
+
             if (isOnline) {
                 try {
                     billsRepository.refreshBillsOnline()
-                    //delay(1000) // debido a que se carga demasiado rapido y ves aparecer las bills mientras se cargan
+                    delay(1000) // debido a que se carga demasiado rapido y ves aparecer las bills mientras se cargan
                 } catch (e: Exception) {
                     Log.e(TAG, "Error al conectar con Mockoon: ${e.message}")
                 }
@@ -42,16 +53,9 @@ class BillsViewModel(
                 billsRepository.insertMockBillsFromAssets()
                 delay((1000 + (random() * 2000)).toLong()) // delay entre 1 y 3 seg
             }
+            _uiState.update { it.copy(isLoading = false) }
 
-            billsRepository.getBillsByType(_uiState.value.selectedOption.title).collect { bills ->
-                _uiState.update {
-                    it.copy(
-                        billsList = bills,
-                        lastBill = bills.lastOrNull(),
-                        isLoading = false
-                    )
-                }
-            }
+            observator.cancel()
         }
     }
 

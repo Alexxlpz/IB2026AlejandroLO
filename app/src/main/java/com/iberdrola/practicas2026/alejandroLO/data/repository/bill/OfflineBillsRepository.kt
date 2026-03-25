@@ -9,11 +9,15 @@ import kotlinx.coroutines.flow.Flow
 import com.google.gson.JsonDeserializer
 import java.util.Date
 import android.util.Log
+import com.google.gson.Gson
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class OfflineBillsRepository(
     private val billDao: BillsDao,
     private val apiService: BillsApiService,
-    private val context: Context
+    private val context: Context,
+    private val gson: Gson
 ) : BillsRepository {
 
     val TAG: String = "OfflineBillsRepository"
@@ -26,7 +30,7 @@ class OfflineBillsRepository(
     override suspend fun update(bill: Bill) = billDao.update(bill)
     override suspend fun deleteAll() { billDao.deleteAll() }
 
-    override suspend fun refreshBillsOnline() {
+    override suspend fun refreshBillsOnline(): Unit = withContext(Dispatchers.IO) {
         try {
             val remoteBills = apiService.getBills()
             billDao.deleteAll()
@@ -38,23 +42,28 @@ class OfflineBillsRepository(
         }
     }
 
-    override suspend fun insertMockBillsFromAssets() {
+    override suspend fun insertMockBillsFromAssets(): Unit = withContext(Dispatchers.IO) {
         val jsonString = context.assets.open("bills_mock.json").bufferedReader().use { it.readText() }
 
-        // Configuración especial para leer Timestamps (milisegundos) como Date
-        val gson = GsonBuilder()
-            .registerTypeAdapter(Date::class.java, JsonDeserializer { json, _, _ ->
-                Date(json.asJsonPrimitive.asLong)
-            })
-            .create()
+        val bills = JsonToBill(jsonString)
 
-        val listType = object : TypeToken<List<Bill>>() {}.type
-        val bills: List<Bill> = gson.fromJson(jsonString, listType)
 
         // Limpiamos e insertamos
         billDao.deleteAll()
         Log.d(TAG, "insertMockBillsFromAssets: vamos a insertar los datos en la base de datos: $bills")
         bills.forEach { billDao.insert(it) }
         Log.d(TAG, "insertMockBillsFromAssets: se han insertado los datos en la base de datos")
+    }
+
+    /*
+    Convierte un string json a una lista de bills, convirtiendo mediante un TypeConverter los
+    timestamp en tipos date.
+     */
+    private fun JsonToBill(jsonString: String): List<Bill> {
+
+        val listType = object : TypeToken<List<Bill>>() {}.type
+        val bills: List<Bill> = gson.fromJson(jsonString, listType)
+
+        return bills
     }
 }

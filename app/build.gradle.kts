@@ -45,6 +45,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true // para poder coger MOCKOON_URL
     }
     kotlinOptions {
         jvmTarget = "11"
