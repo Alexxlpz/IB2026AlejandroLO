@@ -1,7 +1,9 @@
 package com.iberdrola.practicas2026.alejandroLO.data.repository.bill
 
 import com.iberdrola.practicas2026.alejandroLO.data.model.Bill
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 
 interface BillsRepository {
     suspend fun insert(bill: Bill) // AÑADIR UNA FACTURA

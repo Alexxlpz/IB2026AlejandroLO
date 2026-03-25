@@ -10,6 +10,8 @@ import com.google.gson.JsonDeserializer
 import java.util.Date
 import android.util.Log
 import com.google.gson.Gson
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class OfflineBillsRepository(
     private val billDao: BillsDao,
@@ -28,7 +30,7 @@ class OfflineBillsRepository(
     override suspend fun update(bill: Bill) = billDao.update(bill)
     override suspend fun deleteAll() { billDao.deleteAll() }
 
-    override suspend fun refreshBillsOnline() {
+    override suspend fun refreshBillsOnline(): Unit = withContext(Dispatchers.IO) {
         try {
             val remoteBills = apiService.getBills()
             billDao.deleteAll()
@@ -40,7 +42,7 @@ class OfflineBillsRepository(
         }
     }
 
-    override suspend fun insertMockBillsFromAssets() {
+    override suspend fun insertMockBillsFromAssets(): Unit = withContext(Dispatchers.IO) {
         val jsonString = context.assets.open("bills_mock.json").bufferedReader().use { it.readText() }
 
         val bills = JsonToBill(jsonString)
