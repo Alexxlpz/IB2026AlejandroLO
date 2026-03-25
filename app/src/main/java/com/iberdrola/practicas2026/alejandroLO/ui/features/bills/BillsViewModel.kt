@@ -1,7 +1,6 @@
 package com.iberdrola.practicas2026.alejandroLO.ui.features.bills
 
 import android.util.Log
-import androidx.compose.runtime.referentialEqualityPolicy
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.iberdrola.practicas2026.alejandroLO.data.repository.bill.BillsRepository
@@ -59,7 +58,7 @@ class BillsViewModel(
         }
     }
 
-    fun updateSelectedOption(option: BillType) {
+    fun updateSelectedOption(option: BillTypeEnum) {
         Log.d(TAG, "BILLS -> updateSelectedOption: $option")
         _uiState.update {
             it.copy(

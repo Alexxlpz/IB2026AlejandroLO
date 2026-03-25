@@ -1,26 +1,37 @@
 package com.iberdrola.practicas2026.alejandroLO.data.model
 
 import androidx.annotation.NonNull
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.BillStatus
-import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.BillType
-import java.sql.Struct
 import java.util.Date
+import androidx.room.ForeignKey
 
-// TODO: HACER UNA BASE DE DATOS OCN LOS TIPOS DE FACTURAS Y
-//  LOS ESTADOS POSIBLES PARA EVITAR ERROR POR STRING
-
-@Entity(tableName = "bills")
+@Entity(
+    tableName = "bills",
+    foreignKeys = [
+        ForeignKey(
+            entity = BillType::class,
+            parentColumns = ["id"],
+            childColumns = ["typeId"]
+        ),
+        ForeignKey(
+            entity = BillStatus::class,
+            parentColumns = ["id"],
+            childColumns = ["statusId"]
+        )
+    ])
 data class Bill(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     @NonNull
-    val type: String = BillType.LUZ.title,
+    @ColumnInfo(name = "typeId")
+    val type: Int = 0,
     @NonNull
     val price: Double = 0.0,
     @NonNull
-    val status: String = BillStatus.PENDIENTE.title,
+    @ColumnInfo(name = "statusId")
+    val status: Int = 0,
     @NonNull
     val date: Date = Date(),
     @NonNull
