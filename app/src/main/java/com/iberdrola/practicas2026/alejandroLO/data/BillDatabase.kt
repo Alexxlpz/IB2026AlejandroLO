@@ -15,10 +15,6 @@ import com.iberdrola.practicas2026.alejandroLO.data.repository.billStatus.BillSt
 import com.iberdrola.practicas2026.alejandroLO.data.repository.billType.BillTypeDao
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillStatusEnum
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeEnum
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.forEach
-import kotlinx.coroutines.launch
 
 
 @Database(
