@@ -13,6 +13,6 @@ interface BillsRepository {
     suspend fun refreshBillsOnline() // Mete los datos de la API en la base de datos
     suspend fun insertMockBillsFromAssets() // Mete los datos de un json que tenemos en local
     fun getBillById(id: Int): Flow<Bill> // OBTENER LA FACTURA CON EL ID DEL PARAMETRO ORDENADAS POR FECHA DE MANERA DESCENDIENTE
-    fun getBillsByType(type: String): Flow<List<Bill>> // OBTENER LA FACTURA CON EL TIPO DEL PARAMETRO ORDENADAS POR FECHA DE MANERA DESCENDIENTE
+    fun getBillsByType(typeId: Int): Flow<List<Bill>> // OBTENER LA FACTURA CON EL TIPO DEL PARAMETRO ORDENADAS POR FECHA DE MANERA DESCENDIENTE
     fun getAllBills(): Flow<List<Bill>> // OBTENER TODAS LAS FACTURAS ORDENADAS POR FECHA DE MANERA DESCENDIENTE
 }

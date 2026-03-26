@@ -23,7 +23,7 @@ class OfflineBillsRepository(
     val TAG: String = "OfflineBillsRepository"
 
     override fun getAllBills(): Flow<List<Bill>> = billDao.getAllBills()
-    override fun getBillsByType(type: String): Flow<List<Bill>> = billDao.getBillsByType(type)
+    override fun getBillsByType(typeId: Int): Flow<List<Bill>> = billDao.getBillsByType(typeId)
     override fun getBillById(id: Int): Flow<Bill> = billDao.getBill(id)
     override suspend fun insert(bill: Bill) = billDao.insert(bill)
     override suspend fun delete(bill: Bill) = billDao.delete(bill)

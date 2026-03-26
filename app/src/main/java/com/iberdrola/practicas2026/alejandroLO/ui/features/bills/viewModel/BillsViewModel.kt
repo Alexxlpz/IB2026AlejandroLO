@@ -33,7 +33,7 @@ class BillsViewModel(
             _uiState.update { it.copy(isLoading = true) }
 
             val observator = launch {
-                billsRepository.getBillsByType(_uiState.value.selectedOption.title).collect { bills ->
+                billsRepository.getBillsByType(_uiState.value.selectedOption.ordinal).collect { bills ->
                     _uiState.update {
                         it.copy(
                             billsList = bills,

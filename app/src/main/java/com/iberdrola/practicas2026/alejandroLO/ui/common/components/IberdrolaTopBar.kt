@@ -51,8 +51,9 @@ fun IberdrolaTopBar(selectedOption: BillTypeEnum,
         ServiceSelector(
             selectedOption = selectedOption.title,
             options = options.map { it.title },
-            onOptionSelected = {
-                onOptionSelected(BillTypeEnum.valueOf(it.uppercase(Locale.getDefault())))
+            onOptionSelected = { selectedOptionTitle ->
+                val selectedOption = BillTypeEnum.entries.find { it.title == selectedOptionTitle } ?: BillTypeEnum.LUZ
+                onOptionSelected(selectedOption)
             }
         )
     }

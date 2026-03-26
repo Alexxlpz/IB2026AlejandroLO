@@ -24,14 +24,12 @@ import androidx.room.ForeignKey
 data class Bill(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    @NonNull
     @ColumnInfo(name = "typeId")
-    val type: Int = 0,
+    val typeId: Int = 0,
     @NonNull
     val price: Double = 0.0,
-    @NonNull
     @ColumnInfo(name = "statusId")
-    val status: Int = 0,
+    val statusId: Int = 0,
     @NonNull
     val date: Date = Date(),
     @NonNull
