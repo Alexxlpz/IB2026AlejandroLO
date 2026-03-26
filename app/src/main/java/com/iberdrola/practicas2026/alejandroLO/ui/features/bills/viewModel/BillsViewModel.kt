@@ -1,10 +1,11 @@
-package com.iberdrola.practicas2026.alejandroLO.ui.features.bills
+package com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel
 
 import android.util.Log
-import androidx.compose.runtime.referentialEqualityPolicy
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.iberdrola.practicas2026.alejandroLO.data.repository.bill.BillsRepository
+import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsUiState
+import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeEnum
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,7 +33,7 @@ class BillsViewModel(
             _uiState.update { it.copy(isLoading = true) }
 
             val observator = launch {
-                billsRepository.getBillsByType(_uiState.value.selectedOption.title).collect { bills ->
+                billsRepository.getBillsByType(_uiState.value.selectedOption.ordinal).collect { bills ->
                     _uiState.update {
                         it.copy(
                             billsList = bills,
@@ -59,7 +60,7 @@ class BillsViewModel(
         }
     }
 
-    fun updateSelectedOption(option: BillType) {
+    fun updateSelectedOption(option: BillTypeEnum) {
         Log.d(TAG, "BILLS -> updateSelectedOption: $option")
         _uiState.update {
             it.copy(

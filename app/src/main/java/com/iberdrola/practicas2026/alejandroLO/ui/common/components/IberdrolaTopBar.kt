@@ -27,13 +27,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.iberdrola.practicas2026.alejandroLO.R
-import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.BillType
+import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeEnum
 import java.util.Locale
 
 @Composable
-fun IberdrolaTopBar(selectedOption: BillType,
-                    options: List<BillType>,
-                    onOptionSelected: (BillType) -> Unit,
+fun IberdrolaTopBar(selectedOption: BillTypeEnum,
+                    options: List<BillTypeEnum>,
+                    onOptionSelected: (BillTypeEnum) -> Unit,
                     isSyncEnabled: Boolean,
                     onSyncToggle: (Boolean) -> Unit,
                     modifier: Modifier = Modifier){
@@ -51,8 +51,9 @@ fun IberdrolaTopBar(selectedOption: BillType,
         ServiceSelector(
             selectedOption = selectedOption.title,
             options = options.map { it.title },
-            onOptionSelected = {
-                onOptionSelected(BillType.valueOf(it.uppercase(Locale.getDefault())))
+            onOptionSelected = { selectedOptionTitle ->
+                val selectedOption = BillTypeEnum.entries.find { it.title == selectedOptionTitle } ?: BillTypeEnum.LUZ
+                onOptionSelected(selectedOption)
             }
         )
     }

@@ -1,4 +1,4 @@
-package com.iberdrola.practicas2026.alejandroLO.ui.features.bills
+package com.iberdrola.practicas2026.alejandroLO.ui.features.bills.screens
 
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode

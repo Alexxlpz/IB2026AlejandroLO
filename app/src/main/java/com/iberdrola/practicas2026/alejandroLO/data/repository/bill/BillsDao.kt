@@ -26,8 +26,8 @@ interface BillsDao {
     @Query("SELECT * from bills WHERE id = :id")
     fun getBill(id: Int): Flow<Bill>
 
-    @Query("SELECT * from bills WHERE type = :type ORDER BY date DESC")
-    fun getBillsByType(type: String): Flow<List<Bill>>
+    @Query("SELECT * from bills WHERE typeId = :typeId ORDER BY date DESC")
+    fun getBillsByType(typeId: Int): Flow<List<Bill>>
 
     @Query("SELECT * from bills ORDER BY date DESC")
     fun getAllBills(): Flow<List<Bill>>

@@ -1,9 +1,11 @@
-package com.iberdrola.practicas2026.alejandroLO.ui.features.bills
+package com.iberdrola.practicas2026.alejandroLO.ui.features.bills.screens
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -38,6 +40,18 @@ import com.iberdrola.practicas2026.alejandroLO.data.model.Bill
 import java.util.Date
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material.icons.outlined.GasMeter
+import androidx.compose.material.icons.outlined.LocalFireDepartment
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.iberdrola.practicas2026.alejandroLO.data.model.BillStatus
+import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillStatusEnum
+import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeEnum
 import com.valentinilk.shimmer.ShimmerBounds
 import com.valentinilk.shimmer.rememberShimmer
 import com.valentinilk.shimmer.shimmer
@@ -51,28 +65,34 @@ fun IberdrolaBillsScreen(
     bills: List<Bill>,
     lastBill: Bill?,
     isLoading: Boolean,
+    onclick: (Bill) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
 
-    if (isLoading) {
-        val shimmer = rememberShimmer(
-            shimmerBounds = ShimmerBounds.Window,
-            theme = shimmerTheme()
-        )
-        SkeletonScreen(modifier = modifier.shimmer(shimmer))
-    }else {
-        Column(
-            modifier = modifier
-                .fillMaxWidth()
-                .verticalScroll(scrollState)
-        ) {
-            if (lastBill != null) {
-                IberdrolaLastBill(lastBill = lastBill)
+
+    Box(modifier = modifier.fillMaxWidth()) {
+
+        if (isLoading) {
+            val shimmer = rememberShimmer(
+                shimmerBounds = ShimmerBounds.Window,
+                theme = shimmerTheme()
+            )
+            SkeletonScreen(modifier = modifier.shimmer(shimmer))
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(scrollState)
+            ) {
+                if (lastBill != null) {
+                    IberdrolaLastBill(lastBill = lastBill)
+                }
+                IberdrolaBillList(bills = bills, onclick = onclick)
             }
-            IberdrolaBillList(bills = bills)
         }
     }
+
 }
 
 @Composable
@@ -104,19 +124,29 @@ fun IberdrolaLastBill(lastBill: Bill) {
                         color = Color(0xFF1A1A1A)
                     )
                     Text(
-                        text = "Factura ${lastBill.type}", // Ej: "Factura Luz"
+                        text = "Factura ${BillTypeEnum.entries[lastBill.typeId].title}", // Ej: "Factura Luz"
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.Gray
                     )
                 }
 
-                // Icono de bombilla (Luz)
-                Icon(
-                    imageVector = Icons.Outlined.Lightbulb,
-                    contentDescription = null,
-                    modifier = Modifier.size(32.dp),
-                    tint = Color(0xFF004D3F) // Verde oscuro
-                )
+                if(lastBill.typeId == 0) {
+                    // Icono de bombilla (Luz)
+                    Icon(
+                        imageVector = Icons.Outlined.Lightbulb,
+                        contentDescription = null,
+                        modifier = Modifier.size(32.dp),
+                        tint = Color(0xFF004D3F) // Verde oscuro
+                    )
+                }else if(lastBill.typeId == 1) {
+                    // Icono de bombilla (Gas)
+                    Icon(
+                        imageVector = Icons.Outlined.LocalFireDepartment,
+                        contentDescription = null,
+                        modifier = Modifier.size(32.dp),
+                        tint = Color(0xFF004D3F) // Verde oscuro
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -143,20 +173,20 @@ fun IberdrolaLastBill(lastBill: Bill) {
             HorizontalDivider(
                 modifier = Modifier.fillMaxWidth(),
                 thickness = 1.dp,
-                color = Color(0xFFEEEEEE)
+                color = Color(0xFF9B9696)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // Badge de Estado (Pendiente de pago)
-            val isPaid = lastBill.status == BillStatus.PAGADA.title // Lógica de estado
+            val isPaid = lastBill.statusId == BillStatusEnum.PAGADA.ordinal // Lógica de estado
 
             Surface(
                 color = if (isPaid) Color(0xFFD4EBD0) else Color(0xFFF2B3BA),
                 shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
             ) {
                 Text(
-                    text = lastBill.status.toString(),
+                    text = BillStatusEnum.entries[lastBill.statusId].title,
                     modifier = Modifier.padding(
                         horizontal = 12.dp,
                         vertical = 6.dp
@@ -171,7 +201,10 @@ fun IberdrolaLastBill(lastBill: Bill) {
 }
 
 @Composable
-fun IberdrolaBillList(bills: List<Bill>) {
+fun IberdrolaBillList(
+    bills: List<Bill>,
+    onclick: (Bill) -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -210,10 +243,9 @@ fun IberdrolaBillList(bills: List<Bill>) {
         Spacer(modifier = Modifier.height(24.dp))
 
         val yearFormat = SimpleDateFormat("yyyy", Locale("es", "ES"))
+        var auxyear: String = ""
 
         Column(modifier = Modifier.fillMaxWidth()) {
-
-            var auxyear: String = ""
 
             /////////////////////////
             /// Liata de facturas ///
@@ -234,7 +266,7 @@ fun IberdrolaBillList(bills: List<Bill>) {
                         Spacer(modifier = Modifier.height(8.dp))
                     }
 
-                    IberdrolaBillItem(bill = bill)
+                    IberdrolaBillItem(bill = bill, onclick = onclick)
                     HorizontalDivider(
                         modifier = Modifier.padding(vertical = 8.dp),
                         thickness = 1.dp,
@@ -249,15 +281,19 @@ fun IberdrolaBillList(bills: List<Bill>) {
 
 @SuppressLint("DefaultLocale")
 @Composable
-fun IberdrolaBillItem(bill: Bill) {
-    val isPaid = bill.status == BillStatus.PAGADA.title
+fun IberdrolaBillItem(
+    bill: Bill,
+    onclick: (Bill) -> Unit
+) {
+    val isPaid = bill.statusId == BillStatusEnum.PAGADA.ordinal
     val dateFormat = SimpleDateFormat("d 'de' MMMM", Locale("es", "ES"))
+    val type: String = BillTypeEnum.entries.find { it.ordinal == bill.typeId }?.title ?: ""
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
-            .clickable { /* TODO: Ver detalle */ },
+            .clickable { onclick(bill) },
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Información de la factura (Izquierda)
@@ -268,7 +304,7 @@ fun IberdrolaBillItem(bill: Bill) {
                 fontWeight = FontWeight.Bold
             )
             Text(
-                text = "Factura ${bill.type.lowercase().replaceFirstChar { it.uppercase() }}",
+                text = "Factura ${type.lowercase().replaceFirstChar { it.uppercase() }}",
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.Gray
             )
@@ -308,17 +344,50 @@ fun IberdrolaBillItem(bill: Bill) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AlertOnBillClick(showDialog: Boolean, selectedBill: Bill?, leaveAlert: () -> Unit){
+    if(showDialog && selectedBill != null){
+        BasicAlertDialog(
+            onDismissRequest = { leaveAlert() }
+        ) {
+            Surface(
+                shape = RoundedCornerShape(16.dp),
+                color = Color.White
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = "La factura aún no está disponible",
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text("Estamos procesando los datos de su factura. Inténtelo más tarde.")
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    OutlinedButton(onClick = { leaveAlert() }) {
+                        Text("Aceptar", color = Color(0xFF00833E))
+                    }
+                }
+            }
+        }
+        Log.d("AlertOnBillClick", "estamos en el alert")
+    }
+}
+
 @Composable
 @Preview
 fun PreviewIberdrolaBillsScreen() {
     val bill = Bill(
-        type = BillType.LUZ.title,
+        typeId = BillTypeEnum.LUZ.ordinal,
         price = 100.0,
-        status = BillStatus.PENDIENTE.title,
+        statusId = BillStatusEnum.PENDIENTE.ordinal,
         date = Date(),
         dueDate = Date()
     )
     val bills = listOf(bill, bill, bill)
 
-    IberdrolaBillsScreen(bills = bills, isLoading = false, lastBill = bill)
+    IberdrolaBillsScreen(bills = bills, isLoading = false, onclick = {}, lastBill = bill)
 }

@@ -11,6 +11,8 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import com.iberdrola.practicas2026.alejandroLO.BuildConfig
 import com.iberdrola.practicas2026.alejandroLO.data.model.Bill
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import java.util.Date
 
 
@@ -20,6 +22,8 @@ interface AppContainer {
 
 class AppDataContainer(private val context: Context) : AppContainer {
     private val baseUrl = BuildConfig.MOCKOON_URL // url para conectarnos con mockoon
+//    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
+
 
     // convierte el json a bill aplicando las operaciones necesarias sobre el timestamp para convertirlo en date
     private val gson = GsonBuilder()

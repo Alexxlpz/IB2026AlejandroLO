@@ -1,7 +1,7 @@
-package com.iberdrola.practicas2026.alejandroLO.ui.features.main
+package com.iberdrola.practicas2026.alejandroLO.ui.features.main.viewModel
 
 import android.util.Log
-import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.BillType
+import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeEnum
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,9 +20,9 @@ class MainViewModel() : ViewModel() {
     }
 
     fun load_options(){
-        _uiState.update { it.copy(options = BillType.entries.toTypedArray().toList()) }
+        _uiState.update { it.copy(options = BillTypeEnum.entries.toTypedArray().toList()) }
     }
-    fun updateSelectedOption(option: BillType) {
+    fun updateSelectedOption(option: BillTypeEnum) {
         Log.d(TAG, "MAIN -> updateSelectedOption: $option")
 
         _uiState.update {

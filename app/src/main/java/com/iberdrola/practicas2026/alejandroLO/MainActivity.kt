@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import com.iberdrola.practicas2026.alejandroLO.ui.features.main.IberdrolaMainScreen
+import com.iberdrola.practicas2026.alejandroLO.ui.features.main.screens.IberdrolaMainScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
