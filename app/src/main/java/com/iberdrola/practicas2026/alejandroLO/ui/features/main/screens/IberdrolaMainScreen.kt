@@ -1,5 +1,7 @@
 package com.iberdrola.practicas2026.alejandroLO.ui.features.main.screens
 
+import android.app.AlertDialog
+import android.content.Context
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.iberdrola.practicas2026.alejandroLO.data.model.Bill
@@ -38,12 +41,19 @@ fun IberdrolaMainScreen(modifier: Modifier = Modifier) {
 
     val billsUiState = billsViewModel.uiState.collectAsState()
 
-    var selectedBill by remember { mutableStateOf<Bill?>(null) }
+    var showAlert by remember { mutableStateOf<Boolean>(false) }
     val selectingBill: (Bill) -> Unit = remember {
         {
-            selectedBill = it
+            showAlert = true
         }
     }
+    val closeAlert: () -> Unit = remember {
+        {
+            showAlert = false
+        }
+    }
+    val alertDialog = alertDialogOnBillClick(LocalContext.current, closeAlert)
+
 
     val pagerState = rememberPagerState(
         initialPage = if (mainUiState.value.selectedOption == BillTypeEnum.LUZ) 0 else 1,
@@ -102,37 +112,25 @@ fun IberdrolaMainScreen(modifier: Modifier = Modifier) {
                 )
             }
         }
-//        AlertOnBillClick(
-//            selectedBill = selectedBill,
-//            leaveAlert = { selectedBill = null }
-//        )
+        if(showAlert) {
+            alertDialog.show()
+        }
     }
 }
 
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//fun AlertOnBillClick(selectedBill: Bill?, leaveAlert: () -> Unit){
-//    if(selectedBill != null){
-//        AlertDialog(
-//            onDismissRequest = { leaveAlert() },
-//            confirmButton = {
-//                OutlinedButton(onClick = { leaveAlert() }) {
-//                    Text("Aceptar", color = Color(0xFF00833E))
-//                }
-//            },
-//            title = {
-//                Text(
-//                    text = "La factura aún no está disponible",
-//                    fontWeight = FontWeight.Bold
-//                )
-//            },
-//            text = {
-//                Text("Estamos procesando los datos de su factura. Inténtelo más tarde.")
-//            }
-//        )
-//        Log.d("AlertOnBillClick", "estamos en el alert")
-//    }
-//}
+private fun alertDialogOnBillClick(context: Context, closeAlert: () -> Unit): AlertDialog{
+    val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+    builder
+        .setMessage("Esta funcionalidad aun no esta implementada, " +
+                "mantente alerta a futuras actualizaciones")
+        .setTitle("Funcionalidad aun no implementada")
+        .setNegativeButton("Cerrar") { _, _ ->
+            closeAlert()
+        }
+
+   return builder.create()
+
+}
 
 @Composable
 @Preview
