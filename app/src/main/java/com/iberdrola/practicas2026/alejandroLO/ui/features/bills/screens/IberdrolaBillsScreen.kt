@@ -49,12 +49,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
+import com.iberdrola.practicas2026.alejandroLO.R
 import com.iberdrola.practicas2026.alejandroLO.data.model.BillStatus
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillStatusEnum
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeEnum
 import com.valentinilk.shimmer.ShimmerBounds
 import com.valentinilk.shimmer.rememberShimmer
 import com.valentinilk.shimmer.shimmer
+import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -66,9 +69,11 @@ fun IberdrolaBillsScreen(
     lastBill: Bill?,
     isLoading: Boolean,
     onclick: (Bill) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    locale: Locale = Locale("es", "ES")
 ) {
     val scrollState = rememberScrollState()
+    val numberFormat = NumberFormat.getCurrencyInstance(locale)
 
 
     Box(modifier = modifier.fillMaxWidth()) {
@@ -86,9 +91,9 @@ fun IberdrolaBillsScreen(
                     .verticalScroll(scrollState)
             ) {
                 if (lastBill != null) {
-                    IberdrolaLastBill(lastBill = lastBill)
+                    IberdrolaLastBill(lastBill = lastBill,numberFormat = numberFormat)
                 }
-                IberdrolaBillList(bills = bills, onclick = onclick)
+                IberdrolaBillList(bills = bills, onclick = onclick, numberFormat = numberFormat)
             }
         }
     }
@@ -96,7 +101,10 @@ fun IberdrolaBillsScreen(
 }
 
 @Composable
-fun IberdrolaLastBill(lastBill: Bill) {
+fun IberdrolaLastBill(
+    lastBill: Bill,
+    numberFormat: NumberFormat
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -118,13 +126,16 @@ fun IberdrolaLastBill(lastBill: Bill) {
             ) {
                 Column {
                     Text(
-                        text = "Última factura",
+                        text = stringResource(R.string.ultima_factura),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF1A1A1A)
                     )
-                    Text(
-                        text = "Factura ${BillTypeEnum.entries[lastBill.typeId].title}", // Ej: "Factura Luz"
+                    Text( // TODO: aqui tambien tendra sentido el stringResource???
+                        text = stringResource(
+                            R.string.factura,
+                            BillTypeEnum.entries[lastBill.typeId].title
+                        ), // Ej: "Factura Luz"
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.Gray
                     )
@@ -153,7 +164,7 @@ fun IberdrolaLastBill(lastBill: Bill) {
 
             // Importe
             Text(
-                text = "${lastBill.price} €", // Ej: "20,00 €"
+                text = numberFormat.format(lastBill.price), // Ej: "20,00 €" // TODO PONER COMAS EN VEZ DE PUNTOS
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.ExtraBold,
                 color = Color.Black
@@ -203,7 +214,8 @@ fun IberdrolaLastBill(lastBill: Bill) {
 @Composable
 fun IberdrolaBillList(
     bills: List<Bill>,
-    onclick: (Bill) -> Unit
+    onclick: (Bill) -> Unit,
+    numberFormat: NumberFormat
 ) {
     Column(
         modifier = Modifier
@@ -217,7 +229,7 @@ fun IberdrolaBillList(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Histórico de facturas",
+                text = stringResource(R.string.historico_de_facturas),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -252,7 +264,7 @@ fun IberdrolaBillList(
             /////////////////////////
 
             if(bills.isEmpty()){
-                Text("No hay facturas")
+                Text(stringResource(R.string.no_hay_facturas))
             }else {
                 bills.forEach { bill ->
                     if (yearFormat.format(bill.date) != auxyear){
@@ -266,7 +278,7 @@ fun IberdrolaBillList(
                         Spacer(modifier = Modifier.height(8.dp))
                     }
 
-                    IberdrolaBillItem(bill = bill, onclick = onclick)
+                    IberdrolaBillItem(bill = bill, onclick = onclick, numberFormat = numberFormat)
                     HorizontalDivider(
                         modifier = Modifier.padding(vertical = 8.dp),
                         thickness = 1.dp,
@@ -283,7 +295,8 @@ fun IberdrolaBillList(
 @Composable
 fun IberdrolaBillItem(
     bill: Bill,
-    onclick: (Bill) -> Unit
+    onclick: (Bill) -> Unit,
+    numberFormat: NumberFormat
 ) {
     val isPaid = bill.statusId == BillStatusEnum.PAGADA.ordinal
     val dateFormat = SimpleDateFormat("d 'de' MMMM", Locale("es", "ES"))
@@ -304,7 +317,7 @@ fun IberdrolaBillItem(
                 fontWeight = FontWeight.Bold
             )
             Text(
-                text = "Factura ${type.lowercase().replaceFirstChar { it.uppercase() }}",
+                text = stringResource(R.string.factura, type),
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.Gray
             )
@@ -329,7 +342,7 @@ fun IberdrolaBillItem(
         // Precio e Icono (Derecha)
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                text = String.format("%.2f €", bill.price),
+                text = numberFormat.format(bill.price),
                 style = MaterialTheme.typography.bodyLarge,
                 color = Color.Gray,
                 fontWeight = FontWeight.Medium
@@ -341,39 +354,6 @@ fun IberdrolaBillItem(
                 tint = Color.Gray
             )
         }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun AlertOnBillClick(showDialog: Boolean, selectedBill: Bill?, leaveAlert: () -> Unit){
-    if(showDialog && selectedBill != null){
-        BasicAlertDialog(
-            onDismissRequest = { leaveAlert() }
-        ) {
-            Surface(
-                shape = RoundedCornerShape(16.dp),
-                color = Color.White
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = "La factura aún no está disponible",
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Text("Estamos procesando los datos de su factura. Inténtelo más tarde.")
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    OutlinedButton(onClick = { leaveAlert() }) {
-                        Text("Aceptar", color = Color(0xFF00833E))
-                    }
-                }
-            }
-        }
-        Log.d("AlertOnBillClick", "estamos en el alert")
     }
 }
 
