@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.iberdrola.practicas2026.alejandroLO.data.repository.bill.BillsRepository
-import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsUiState
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeEnum
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,11 +32,10 @@ class BillsViewModel(
             _uiState.update { it.copy(isLoading = true) }
 
             val observator = launch {
-                billsRepository.getBillsByType(_uiState.value.selectedOption.ordinal).collect { bills ->
+                billsRepository.getAllBills().collect { bills ->
                     _uiState.update {
                         it.copy(
-                            billsList = bills,
-                            lastBill = bills.lastOrNull()
+                            billsList = bills
                         )
                     }
                 }
@@ -64,11 +62,9 @@ class BillsViewModel(
         Log.d(TAG, "BILLS -> updateSelectedOption: $option")
         _uiState.update {
             it.copy(
-                selectedOption = option,
-                billsList = emptyList()
+                selectedOption = option
             )
         }
-        refreshBills()
     }
 
     fun updateDataBase(isOnline: Boolean) {
