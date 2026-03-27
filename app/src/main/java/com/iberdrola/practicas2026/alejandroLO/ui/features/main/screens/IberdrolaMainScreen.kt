@@ -29,12 +29,14 @@ import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.Bills
 import com.iberdrola.practicas2026.alejandroLO.ui.features.main.viewModel.MainViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 // hay que hacer una UI que almacene selectedOption
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun IberdrolaMainScreen(modifier: Modifier = Modifier) {
+fun IberdrolaMainScreen(modifier: Modifier = Modifier,
+                        locale: Locale = Locale("es", "ES")) {
     val billsViewModel: BillsViewModel = viewModel(factory = BillsViewModelFactory.Factory)
     val mainViewModel: MainViewModel = viewModel()
     val mainUiState = mainViewModel.uiState.collectAsState()
@@ -108,7 +110,8 @@ fun IberdrolaMainScreen(modifier: Modifier = Modifier) {
                     lastBill = lastBill,
                     isLoading = billsUiState.value.isLoading,
                     onclick = { selectingBill(it) },
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
+                    locale = locale
                 )
             }
         }

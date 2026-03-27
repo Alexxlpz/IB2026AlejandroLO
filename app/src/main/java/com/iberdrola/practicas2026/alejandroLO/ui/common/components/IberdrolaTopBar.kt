@@ -7,9 +7,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -28,7 +30,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.iberdrola.practicas2026.alejandroLO.R
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeEnum
-import java.util.Locale
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.tooling.preview.Preview
+import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaGreen
 
 @Composable
 fun IberdrolaTopBar(selectedOption: BillTypeEnum,
@@ -75,18 +79,24 @@ fun IberdrolaBar(
     ){
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            //horizontalArrangement = Alignment.Start,
-            modifier = Modifier.clickable { onBackClick() }
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier
+                .clickable { onBackClick() }
+                .padding(vertical = 8.dp)
         ) {
-            IconButton(onClick = {} /*onBackClick*/) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = stringResource(R.string.back_button)
-                )
-            }
-            Text(text = " Atrás",
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = stringResource(R.string.back_button),
+                modifier = Modifier.size(23.dp),
+                tint = IberdrolaGreen
+            )
+
+            Text(
+                text = stringResource(R.string.atras),
                 style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.primary
+                color = IberdrolaGreen,
+                fontWeight = FontWeight.Bold,
+                textDecoration = TextDecoration.Underline
             )
         }
 
@@ -95,7 +105,7 @@ fun IberdrolaBar(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
-                text = if (isSyncEnabled) "Online" else "Offline",
+                text = if (isSyncEnabled) stringResource(R.string.online) else stringResource(R.string.offline),
                 style = MaterialTheme.typography.labelMedium,
                 color = if (isSyncEnabled) Color(0xFF008F39) else Color.Gray
             )
@@ -114,7 +124,7 @@ fun IberdrolaTitleAndDescription(
 ) {
     Column(modifier = modifier) {
         Text(
-            text = "Mis facturas",
+            text = stringResource(R.string.mis_facturas),
             style = MaterialTheme.typography.titleLarge
         )
         Text(
@@ -181,4 +191,17 @@ fun ServiceOption(
                 )
         )
     }
+}
+
+@Composable
+@Preview(showBackground = true)
+fun PreviewIberdrolaTopBar() {
+    IberdrolaTopBar(
+        selectedOption = BillTypeEnum.LUZ,
+        options = BillTypeEnum.entries,
+        onOptionSelected = {  },
+        isSyncEnabled = false,
+        onSyncToggle = {  },
+        modifier = Modifier
+    )
 }

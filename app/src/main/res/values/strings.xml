@@ -1,4 +1,5 @@
 <resources>
+    <!--APP-->
     <string name="app_name">IB2026AlejandroLO</string>
     <string name="back_button">Back</string>
     <string name="cancel">Cancel</string>
@@ -7,4 +8,12 @@
     <string name="tax">Tax: %s</string>
     <string name="total">Total: %s</string>
     <string name="submit">Submit</string>
+    <string name="atras"><u>Atrás</u></string>
+    <string name="ultima_factura">Última factura</string>
+    <string name="online">Online</string>
+    <string name="offline">Offline</string>
+    <string name="mis_facturas">Mis facturas</string>
+    <string name="factura">Factura %1$s</string>
+    <string name="historico_de_facturas">Histórico de facturas</string>
+    <string name="no_hay_facturas">No hay facturas</string>
 </resources>
