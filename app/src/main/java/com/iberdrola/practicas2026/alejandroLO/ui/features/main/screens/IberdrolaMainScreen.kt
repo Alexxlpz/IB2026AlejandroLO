@@ -1,26 +1,35 @@
 package com.iberdrola.practicas2026.alejandroLO.ui.features.main.screens
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.iberdrola.practicas2026.alejandroLO.data.model.Bill
 import com.iberdrola.practicas2026.alejandroLO.ui.common.components.IberdrolaTopBar
+import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeEnum
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.screens.IberdrolaBillsScreen
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsViewModel
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsViewModelFactory
 import com.iberdrola.practicas2026.alejandroLO.ui.features.main.viewModel.MainViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 // hay que hacer una UI que almacene selectedOption
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun IberdrolaMainScreen(modifier: Modifier = Modifier) {
     val billsViewModel: BillsViewModel = viewModel(factory = BillsViewModelFactory.Factory)
@@ -36,6 +45,20 @@ fun IberdrolaMainScreen(modifier: Modifier = Modifier) {
         }
     }
 
+    val pagerState = rememberPagerState(
+        initialPage = if (mainUiState.value.selectedOption == BillTypeEnum.LUZ) 0 else 1,
+        pageCount = { 2 }
+    )
+
+    LaunchedEffect(pagerState.currentPage) {
+        val option = if (pagerState.currentPage == 0) BillTypeEnum.LUZ else BillTypeEnum.GAS
+        mainViewModel.updateSelectedOption(option)
+        billsViewModel.updateSelectedOption(option)
+    }
+
+    val scope: CoroutineScope = rememberCoroutineScope()
+
+
 //    val bill = Bill(
 //        type = BillType.LUZ.title,
 //        price = 100.0,
@@ -46,28 +69,38 @@ fun IberdrolaMainScreen(modifier: Modifier = Modifier) {
 //    val bills = listOf(bill, bill, bill, bill, bill, bill, bill, bill, bill, bill)
 
     Box() {
-        Column(
-            modifier = modifier.fillMaxSize()
-        ) {
+        Column(modifier = modifier.fillMaxSize()) {
+
             IberdrolaTopBar(
                 selectedOption = mainUiState.value.selectedOption,
                 options = mainUiState.value.options,
-                onOptionSelected = {
-                    mainViewModel.updateSelectedOption(it)
-                    billsViewModel.updateSelectedOption(it)
+                onOptionSelected = { option ->
+                    val page = if (option == BillTypeEnum.LUZ) 0 else 1
+                    scope.launch { pagerState.animateScrollToPage(page) }
                 },
                 isSyncEnabled = billsUiState.value.isOnline,
                 onSyncToggle = { billsViewModel.updateDataBase(it) }
             )
 
-            IberdrolaBillsScreen(
-                bills = billsUiState.value.billsList,
-                lastBill = billsUiState.value.lastBill,
-                isLoading = billsUiState.value.isLoading,
-                onclick = { selectingBill(it) },
+            HorizontalPager(
+                state = pagerState,
                 modifier = Modifier.weight(1f)
-            )
+            ) { page ->
 
+                val filteredBills = billsUiState.value.billsList.filter {
+                    it.typeId == page // 0 = Luz, 1 = Gas
+                }
+
+                val lastBill = filteredBills.maxByOrNull { it.date.time }
+
+                IberdrolaBillsScreen(
+                    bills = filteredBills,
+                    lastBill = lastBill,
+                    isLoading = billsUiState.value.isLoading,
+                    onclick = { selectingBill(it) },
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
         }
 //        AlertOnBillClick(
 //            selectedBill = selectedBill,

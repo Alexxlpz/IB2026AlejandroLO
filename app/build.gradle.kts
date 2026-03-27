@@ -76,6 +76,7 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     //implementation(libs.skeletonlayout) // dependecia que convierte la vista de una pantalla en un skeleton de carga
     implementation("com.valentinilk.shimmer:compose-shimmer:1.2.0")
+    implementation("androidx.compose.foundation:foundation") // para cambiar de pantalla arrasatrando hacia los lados
 //    implementation(libs.androidx.room3.common.jvm)v
 //    implementation(libs.androidx.room3.runtime)
 
