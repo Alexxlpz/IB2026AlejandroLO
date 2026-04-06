@@ -14,23 +14,24 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.iberdrola.practicas2026.alejandroLO.R
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeEnum
-import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaGreen
+import com.iberdrola.practicas2026.alejandroLO.ui.theme.IB2026AlejandroLOTheme
+import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
 
 @Composable
 fun IberdrolaTopBar(selectedOption: BillTypeEnum,
@@ -48,9 +49,10 @@ fun IberdrolaTopBar(selectedOption: BillTypeEnum,
             onSyncToggle = onSyncToggle
         )
         IberdrolaTitleAndDescription(
-            description = "Esta es la descripción de tus facturas",
-            modifier = Modifier.padding(16.dp)
+            description = "Descripcion de la calle de facturacion, a implementar",
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
         )
+        Spacer(modifier = Modifier.height(18.dp))
         ServiceSelector(
             selectedOption = selectedOption.title,
             options = options.map { it.title },
@@ -84,17 +86,16 @@ fun IberdrolaBar(
                 .padding(vertical = 8.dp)
         ) {
             Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                imageVector = Icons.Default.ChevronLeft,
                 contentDescription = stringResource(R.string.back_button),
-                modifier = Modifier.size(23.dp),
-                tint = IberdrolaGreen
+                modifier = Modifier.size(27.dp),
+                tint = IberdrolaTheme.colors.primary
             )
 
             Text(
                 text = stringResource(R.string.atras),
-                style = MaterialTheme.typography.titleSmall,
-                color = IberdrolaGreen,
-                fontWeight = FontWeight.Bold,
+                style = IberdrolaTheme.typography.tituloPeque,
+                color = IberdrolaTheme.colors.primary,
                 textDecoration = TextDecoration.Underline
             )
         }
@@ -105,12 +106,16 @@ fun IberdrolaBar(
         ) {
             Text(
                 text = if (isSyncEnabled) stringResource(R.string.online) else stringResource(R.string.offline),
-                style = MaterialTheme.typography.labelMedium,
-                color = if (isSyncEnabled) Color(0xFF008F39) else Color.Gray
+                style = IberdrolaTheme.typography.etiquetaPeque,
+                color = if (isSyncEnabled) IberdrolaTheme.colors.primary else IberdrolaTheme.colors.onSurfaceVariant
             )
             Switch(
                 checked = isSyncEnabled,
-                onCheckedChange = onSyncToggle
+                onCheckedChange = onSyncToggle,
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = Color.White,
+                    checkedTrackColor = IberdrolaTheme.colors.primary
+                )
             )
         }
     }
@@ -124,11 +129,13 @@ fun IberdrolaTitleAndDescription(
     Column(modifier = modifier) {
         Text(
             text = stringResource(R.string.mis_facturas),
-            style = MaterialTheme.typography.titleLarge
+            style = IberdrolaTheme.typography.tituloGrande,
+            color = IberdrolaTheme.colors.onSurface
         )
         Text(
             text = description,
-            style = MaterialTheme.typography.titleMedium
+            style = IberdrolaTheme.typography.tituloMedio,
+            color = IberdrolaTheme.colors.onSurface
         )
     }
 }
@@ -159,7 +166,7 @@ fun ServiceSelector(
     ) {
         HorizontalDivider(
             thickness = 2.5.dp,
-            color = Color.LightGray.copy(alpha = 0.5f)
+            color = IberdrolaTheme.colors.border.copy(alpha = 0.5f)
         )
     }
 }
@@ -176,9 +183,8 @@ fun ServiceOption(
     ) {
         Text(
             text = text,
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-            color = if (isSelected) Color.Black else Color.Gray,
+            style = IberdrolaTheme.typography.tituloMedio,
+            color = if (isSelected) IberdrolaTheme.colors.onSurface else IberdrolaTheme.colors.onSurfaceVariant,
             modifier = Modifier.padding(bottom = 8.dp)
         )
         Box(
@@ -186,7 +192,7 @@ fun ServiceOption(
                 .width(40.dp)
                 .height(4.dp)
                 .background(
-                    color = if (isSelected) Color(0xFF008F39) else Color.Transparent
+                    color = if (isSelected) IberdrolaTheme.colors.primary else Color.Transparent
                 )
         )
     }
@@ -195,13 +201,15 @@ fun ServiceOption(
 @Composable
 @Preview(showBackground = true)
 fun PreviewIberdrolaTopBar() {
-    IberdrolaTopBar(
-        selectedOption = BillTypeEnum.LUZ,
-        options = BillTypeEnum.entries,
-        onOptionSelected = {  },
-        onBackButtonClick = {  },
-        isSyncEnabled = false,
-        onSyncToggle = {  },
-        modifier = Modifier
-    )
+    IB2026AlejandroLOTheme { // <--- Usa el nombre de la función Composable definida en Theme.kt
+        IberdrolaTopBar(
+            selectedOption = BillTypeEnum.LUZ,
+            options = BillTypeEnum.entries,
+            onOptionSelected = { },
+            onBackButtonClick = { },
+            isSyncEnabled = false,
+            onSyncToggle = { },
+            modifier = Modifier
+        )
+    }
 }
