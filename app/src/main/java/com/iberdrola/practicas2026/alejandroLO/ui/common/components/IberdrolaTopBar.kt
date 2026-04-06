@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -17,7 +16,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -27,24 +25,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.iberdrola.practicas2026.alejandroLO.R
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeEnum
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.tooling.preview.Preview
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaGreen
 
 @Composable
 fun IberdrolaTopBar(selectedOption: BillTypeEnum,
                     options: List<BillTypeEnum>,
                     onOptionSelected: (BillTypeEnum) -> Unit,
+                    onBackButtonClick: () -> Unit,
                     isSyncEnabled: Boolean,
                     onSyncToggle: (Boolean) -> Unit,
                     modifier: Modifier = Modifier){
     Column(modifier = modifier.fillMaxWidth()) {
 
         IberdrolaBar(
-            onBackClick = { /* Navegar atrás, se implementará mas adelante */ },
+            onBackButtonClick = onBackButtonClick,
             isSyncEnabled = isSyncEnabled,
             onSyncToggle = onSyncToggle
         )
@@ -65,7 +64,7 @@ fun IberdrolaTopBar(selectedOption: BillTypeEnum,
 
 @Composable
 fun IberdrolaBar(
-    onBackClick: () -> Unit,
+    onBackButtonClick: () -> Unit,
     isSyncEnabled: Boolean,
     onSyncToggle: (Boolean) -> Unit
 ) {
@@ -81,7 +80,7 @@ fun IberdrolaBar(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier
-                .clickable { onBackClick() }
+                .clickable { onBackButtonClick() }
                 .padding(vertical = 8.dp)
         ) {
             Icon(
@@ -200,6 +199,7 @@ fun PreviewIberdrolaTopBar() {
         selectedOption = BillTypeEnum.LUZ,
         options = BillTypeEnum.entries,
         onOptionSelected = {  },
+        onBackButtonClick = {  },
         isSyncEnabled = false,
         onSyncToggle = {  },
         modifier = Modifier
