@@ -35,8 +35,11 @@ import java.util.Locale
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun IberdrolaMainScreen(modifier: Modifier = Modifier,
-                        locale: Locale = Locale("es", "ES")) {
+fun IberdrolaMainScreen(
+    onBackButtonClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    locale: Locale = Locale("es", "ES")
+) {
     val billsViewModel: BillsViewModel = viewModel(factory = BillsViewModelFactory.Factory)
     val mainViewModel: MainViewModel = viewModel()
     val mainUiState = mainViewModel.uiState.collectAsState()
@@ -90,6 +93,7 @@ fun IberdrolaMainScreen(modifier: Modifier = Modifier,
                     val page = if (option == BillTypeEnum.LUZ) 0 else 1
                     scope.launch { pagerState.animateScrollToPage(page) }
                 },
+                onBackButtonClick = onBackButtonClick,
                 isSyncEnabled = billsUiState.value.isOnline,
                 onSyncToggle = { billsViewModel.updateDataBase(it) }
             )
@@ -138,5 +142,9 @@ private fun alertDialogOnBillClick(context: Context, closeAlert: () -> Unit): Al
 @Composable
 @Preview
 fun PreviewIberdrolaMainScreen() {
-    IberdrolaMainScreen(modifier = Modifier)
+    IberdrolaMainScreen(
+        modifier = Modifier,
+        onBackButtonClick = { },
+        locale = Locale("es", "ES")
+    )
 }

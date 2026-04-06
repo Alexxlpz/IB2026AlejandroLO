@@ -1,5 +1,6 @@
 package com.iberdrola.practicas2026.alejandroLO.ui.navigation
 
 enum class IberdrolaScreens( val title: String) {
-    EJEMPLO(title = "ejemplo")
+    HOME(title = "Pagina de inicio"),
+    MAIN(title = "Pagina principal")
 }

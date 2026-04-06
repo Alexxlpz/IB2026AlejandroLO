@@ -16,4 +16,10 @@
     <string name="factura">Factura %1$s</string>
     <string name="historico_de_facturas">Histórico de facturas</string>
     <string name="no_hay_facturas">No hay facturas</string>
+    <string name="gestiona_tus_contratos_y_facturas">Gestiona tus contratos y facturas</string>
+    <string name="selecciona_un_punto_de_suministro">Selecciona un punto de suministro</string>
+    <string name="informacion">i</string>
+    <string name="iberdrola_clientes">Iberdrola Clientes</string>
+    <string name="atencion_al_cliente_24h">"Atención al cliente 24h: "</string>
+    <string name="hola">"Hola, "</string>
 </resources>
