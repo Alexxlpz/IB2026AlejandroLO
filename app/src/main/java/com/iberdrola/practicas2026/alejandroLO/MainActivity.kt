@@ -4,10 +4,19 @@ import com.iberdrola.practicas2026.alejandroLO.ui.theme.IB2026AlejandroLOTheme
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.iberdrola.practicas2026.alejandroLO.ui.navigation.IberdrolaNavGraph
 import java.util.Locale
@@ -21,6 +30,32 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             IB2026AlejandroLOTheme {
+                var showExitDialog by remember { mutableStateOf(false) }
+
+                BackHandler(enabled = true) {
+                    showExitDialog = true
+                }
+
+                if (showExitDialog) {
+                    AlertDialog(
+                        onDismissRequest = { showExitDialog = false },
+                        title = { Text("Salir de la app") },
+                        text = { Text("¿Seguro que quieres salir de la aplicación?") },
+                        confirmButton = {
+                            Button(
+                                onClick = { finish() } // cerramos la Activity
+                            ) {
+                                Text("Aceptar")
+                            }
+                        },
+                        dismissButton = {
+                            TextButton(onClick = { showExitDialog = false }) {
+                                Text("Cancelar")
+                            }
+                        }
+                    )
+                }
+
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     IberdrolaNavGraph(
                         innerPadding = innerPadding
