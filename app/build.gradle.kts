@@ -57,6 +57,10 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.14"
     }
+
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+    }
 }
 
 dependencies {
@@ -80,6 +84,11 @@ dependencies {
 //    implementation(libs.androidx.room3.common.jvm)v
 //    implementation(libs.androidx.room3.runtime)
 
+    // DEPENDENCIAS PARA LOS TEST
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.mockk)
+    testImplementation(libs.junit)
+    testImplementation(libs.turbine)
 
 
     implementation(libs.androidx.room.runtime)
