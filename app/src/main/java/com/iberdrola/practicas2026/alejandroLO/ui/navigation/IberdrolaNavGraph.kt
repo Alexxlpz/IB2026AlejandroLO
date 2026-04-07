@@ -69,7 +69,7 @@ fun IberdrolaNavGraph(
                         // veces antes de que cambie de pantalla llegamos a la base de
                         // la pila de navController
                     }
-                                                                                                                },
+                },
                 modifier = Modifier.padding(innerPadding)
             )
         }

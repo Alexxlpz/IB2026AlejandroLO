@@ -2,6 +2,7 @@ package com.iberdrola.practicas2026.alejandroLO.ui.features.main.screens
 
 import android.app.AlertDialog
 import android.content.Context
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -46,7 +47,7 @@ fun IberdrolaMainScreen(
 
     val billsUiState = billsViewModel.uiState.collectAsState()
 
-    var showAlert by remember { mutableStateOf<Boolean>(false) }
+    var showAlert by remember { mutableStateOf(false) }
     val selectingBill: (Bill) -> Unit = remember {
         {
             showAlert = true
@@ -69,6 +70,10 @@ fun IberdrolaMainScreen(
         val option = if (pagerState.currentPage == 0) BillTypeEnum.LUZ else BillTypeEnum.GAS
         mainViewModel.updateSelectedOption(option)
         billsViewModel.updateSelectedOption(option)
+    }
+
+    BackHandler { // quiero que tambien cuente el contador si le das al boton back
+        onBackButtonClick()
     }
 
     val scope: CoroutineScope = rememberCoroutineScope()
