@@ -1,9 +1,18 @@
-package com.iberdrola.practicas2026.alejandroLO
+package com.iberdrola.practicas2026.alejandroLO.billsViewModel
 
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.MutableCreationExtras
 import app.cash.turbine.test
+import com.iberdrola.practicas2026.alejandroLO.IberdrolaApplication
+import com.iberdrola.practicas2026.alejandroLO.MainDispatcherRule
+import com.iberdrola.practicas2026.alejandroLO.data.AppContainer
 import com.iberdrola.practicas2026.alejandroLO.data.model.Bill
+import com.iberdrola.practicas2026.alejandroLO.data.repository.bill.BillsRepository
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeEnum
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsViewModel
+import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsViewModelFactory
+import io.mockk.every
+import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -74,5 +83,28 @@ class BillsViewModelTest {
             assertTrue(emission.billsList.any { it.id == 1 && it.price == 50.0 && it.typeId == 1 })
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun givenFactory_whenCreateViewModel_thenReturnsBillsViewModelWithRepository() {
+        // Arrangle
+        val mockApplication = mockk<IberdrolaApplication>(relaxed = true)
+        val mockContainer = mockk<AppContainer>()
+        val mockRepository = mockk<BillsRepository>()
+
+        every { mockApplication.container } returns mockContainer
+        every { mockContainer.billsRepository } returns mockRepository
+
+        val extras = MutableCreationExtras().apply {
+            set(ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY, mockApplication)
+        }
+
+        // Act
+        val factory = BillsViewModelFactory.Factory
+        val createdViewModel = factory.create(BillsViewModel::class.java, extras)
+
+        // Assert
+        assertNotNull(createdViewModel)
+        assertTrue(createdViewModel is BillsViewModel)
     }
 }

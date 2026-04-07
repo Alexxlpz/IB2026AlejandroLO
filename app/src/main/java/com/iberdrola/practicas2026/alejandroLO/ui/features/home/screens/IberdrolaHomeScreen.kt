@@ -1,7 +1,6 @@
 package com.iberdrola.practicas2026.alejandroLO.ui.features.home.screens
 
 import android.util.Log
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -35,6 +34,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -62,7 +62,11 @@ fun IberdrolaHomeScreen(
         HomeUiState("PASEO DE LA CASTELLANA 250", "PLANTA 12 - MADRID")
     )
 
-    Box(modifier = Modifier.fillMaxSize().background(IberdrolaTheme.colors.background)) {
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .background(IberdrolaTheme.colors.background)
+        .testTag("home_screen")
+    ) {
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -92,35 +96,32 @@ fun IberdrolaHomeScreen(
         }
 
         if (mostrarSheet) {
-            BackHandler {
-                scope.launch { sheetState.hide() }.invokeOnCompletion {
-                    setCont(1)
-                }
-            }
+            Box(){
 
-            IberdrolaFeedbackDialog(
-                sheetState = sheetState,
-                onDismiss = {
-                    Log.d(TAG, "IberdrolaHomeScreen: dismiss alert")
-                    scope.launch {
-                        sheetState.hide()
-                    }.invokeOnCompletion {
-                        if (!sheetState.isVisible) {
-                            setCont(1)
+                IberdrolaFeedbackDialog(
+                    sheetState = sheetState,
+                    onDismiss = {
+                        Log.d(TAG, "IberdrolaHomeScreen: dismiss alert")
+                        scope.launch {
+                            sheetState.hide()
+                        }.invokeOnCompletion {
+                            if (!sheetState.isVisible) {
+                                setCont(1)
+                            }
                         }
-                    }
-                },
-                onAskLater = {
-                    scope.launch { sheetState.hide() }.invokeOnCompletion {
-                        setCont(3)
-                    }
-                },
-                onRatingSelected = {
-                    scope.launch { sheetState.hide() }.invokeOnCompletion {
-                        setCont(10)
-                    }
-                },
-            )
+                    },
+                    onAskLater = {
+                        scope.launch { sheetState.hide() }.invokeOnCompletion {
+                            setCont(3)
+                        }
+                    },
+                    onRatingSelected = {
+                        scope.launch { sheetState.hide() }.invokeOnCompletion {
+                            setCont(10)
+                        }
+                    },
+                )
+            }
         }
     }
 }
@@ -181,7 +182,8 @@ fun SuministroItem(suministro: HomeUiState, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
-            .clickable { onClick() },
+            .clickable { onClick() }
+            .testTag("home_address_item"),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = IberdrolaTheme.colors.surface),
         border = BorderStroke(1.5.dp, IberdrolaTheme.colors.border)

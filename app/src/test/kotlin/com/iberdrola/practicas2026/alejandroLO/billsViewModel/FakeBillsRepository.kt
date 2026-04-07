@@ -1,4 +1,4 @@
-package com.iberdrola.practicas2026.alejandroLO
+package com.iberdrola.practicas2026.alejandroLO.billsViewModel
 
 import com.iberdrola.practicas2026.alejandroLO.data.model.Bill
 import com.iberdrola.practicas2026.alejandroLO.data.repository.bill.BillsRepository
@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.map
 
 class FakeBillsRepository : BillsRepository {
 
-    private val billsFlow = MutableStateFlow<List<Bill>>(kotlin.collections.emptyList())
+    private val billsFlow = MutableStateFlow<List<Bill>>(emptyList())
 
     suspend fun emit(bills: List<Bill>) {
         billsFlow.emit(bills)
