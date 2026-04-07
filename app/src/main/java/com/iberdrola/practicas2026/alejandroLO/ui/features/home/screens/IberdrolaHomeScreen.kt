@@ -28,7 +28,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -36,15 +35,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.iberdrola.practicas2026.alejandroLO.R
 import com.iberdrola.practicas2026.alejandroLO.ui.common.components.IberdrolaFeedbackDialog
 import com.iberdrola.practicas2026.alejandroLO.ui.features.home.viewModel.HomeUiState
+import com.iberdrola.practicas2026.alejandroLO.ui.theme.IB2026AlejandroLOTheme
+import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -56,7 +54,6 @@ fun IberdrolaHomeScreen(
 ) {
     val TAG = "IberdrolaHomeScreen"
     val sheetState = rememberModalBottomSheetState()
-
     val scope = rememberCoroutineScope()
 
     val listaSuministros = listOf(
@@ -65,21 +62,18 @@ fun IberdrolaHomeScreen(
         HomeUiState("PASEO DE LA CASTELLANA 250", "PLANTA 12 - MADRID")
     )
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize().background(IberdrolaTheme.colors.background)) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.White)
+            modifier = Modifier.fillMaxSize()
         ) {
-
             IberdrolaHomeHeader()
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
                 text = stringResource(R.string.selecciona_un_punto_de_suministro),
-                style = MaterialTheme.typography.titleMedium,
-                color = Color.Gray,
+                style = IberdrolaTheme.typography.tituloMedio,
+                color = IberdrolaTheme.colors.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
 
@@ -98,8 +92,7 @@ fun IberdrolaHomeScreen(
         }
 
         if (mostrarSheet) {
-            BackHandler { // si pulso el boton de back quiero que tenga el
-                          // mismo comportamiento que dismiss
+            BackHandler {
                 scope.launch { sheetState.hide() }.invokeOnCompletion {
                     setCont(1)
                 }
@@ -135,7 +128,7 @@ fun IberdrolaHomeScreen(
 @Composable
 fun IberdrolaHomeHeader() {
     Surface(
-        color = Color(0xFF00833E),
+        color = IberdrolaTheme.colors.primary,
         shape = RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -149,7 +142,7 @@ fun IberdrolaHomeHeader() {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Surface(
-                    color = Color.White.copy(alpha = 0.2f),
+                    color = IberdrolaTheme.colors.background.copy(alpha = 0.2f),
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.size(52.dp)
                 ) {
@@ -157,7 +150,7 @@ fun IberdrolaHomeHeader() {
                         Icon(
                             imageVector = Icons.Default.Person,
                             contentDescription = null,
-                            tint = Color.White,
+                            tint = IberdrolaTheme.colors.background,
                             modifier = Modifier.size(28.dp)
                         )
                     }
@@ -167,16 +160,14 @@ fun IberdrolaHomeHeader() {
 
                 Column {
                     Text(
-                        text = stringResource(R.string.hola) + " Alejandro", // TODO HAGO USUARIOS AUNQUE NO HAYA LOGIN????
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = Color.White
+                        text = stringResource(R.string.hola) + " Alejandro",
+                        style = IberdrolaTheme.typography.tituloGrande, // O un headline si prefieres
+                        color = IberdrolaTheme.colors.background
                     )
                     Text(
                         text = stringResource(R.string.gestiona_tus_contratos_y_facturas),
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Medium,
-                        color = Color.White.copy(alpha = 0.8f)
+                        style = IberdrolaTheme.typography.cuerpoMedio,
+                        color = IberdrolaTheme.colors.background.copy(alpha = 0.8f)
                     )
                 }
             }
@@ -192,8 +183,8 @@ fun SuministroItem(suministro: HomeUiState, onClick: () -> Unit) {
             .padding(horizontal = 16.dp)
             .clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(1.5.dp, Color(0xFFE0E6E2))
+        colors = CardDefaults.cardColors(containerColor = IberdrolaTheme.colors.surface),
+        border = BorderStroke(1.5.dp, IberdrolaTheme.colors.border)
     ) {
         Column {
             Row(
@@ -203,7 +194,7 @@ fun SuministroItem(suministro: HomeUiState, onClick: () -> Unit) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Surface(
-                    color = Color(0xFFD4EBD0),
+                    color = IberdrolaTheme.colors.primaryLight,
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.size(48.dp)
                 ) {
@@ -211,7 +202,7 @@ fun SuministroItem(suministro: HomeUiState, onClick: () -> Unit) {
                         Icon(
                             imageVector = Icons.Default.Home,
                             contentDescription = null,
-                            tint = Color(0xFF00833E),
+                            tint = IberdrolaTheme.colors.primary,
                             modifier = Modifier.size(24.dp)
                         )
                     }
@@ -222,21 +213,20 @@ fun SuministroItem(suministro: HomeUiState, onClick: () -> Unit) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = suministro.direccion,
-                        fontWeight = FontWeight.ExtraBold,
-                        fontSize = 16.sp,
-                        color = Color(0xFF1A1A1A)
+                        style = IberdrolaTheme.typography.cuerpoGrande,
+                        color = IberdrolaTheme.colors.onSurface
                     )
                     Text(
                         text = suministro.ciudad,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.Gray
+                        style = IberdrolaTheme.typography.cuerpoMedio,
+                        color = IberdrolaTheme.colors.onSurfaceVariant
                     )
                 }
 
                 Icon(
                     imageVector = Icons.AutoMirrored.Default.KeyboardArrowRight,
                     contentDescription = null,
-                    tint = Color(0xFF00833E)
+                    tint = IberdrolaTheme.colors.primary
                 )
             }
 
@@ -244,7 +234,7 @@ fun SuministroItem(suministro: HomeUiState, onClick: () -> Unit) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(5.dp)
-                    .background(Color(0xFF00833E))
+                    .background(IberdrolaTheme.colors.primary)
             )
         }
     }
@@ -255,21 +245,20 @@ fun IberdrolaHomeFoot(){
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color(0xFFF9F9F9))
+            .background(IberdrolaTheme.colors.surfaceVariant)
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
             modifier = Modifier
                 .size(40.dp)
-                .background(Color(0xFFD4EBD0), shape = RoundedCornerShape(10.dp)),
+                .background(IberdrolaTheme.colors.primaryLight, shape = RoundedCornerShape(10.dp)),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = stringResource(R.string.informacion),
-                color = Color(0xFF00833E),
-                fontWeight = FontWeight.Black,
-                fontSize = 20.sp
+                color = IberdrolaTheme.colors.primary,
+                style = IberdrolaTheme.typography.tituloGrande
             )
         }
 
@@ -277,15 +266,14 @@ fun IberdrolaHomeFoot(){
 
         Text(
             text = stringResource(R.string.iberdrola_clientes),
-            style = MaterialTheme.typography.titleMedium,
-            color = Color(0xFF00833E),
-            fontWeight = FontWeight.Bold
+            style = IberdrolaTheme.typography.tituloMedio,
+            color = IberdrolaTheme.colors.primary
         )
 
         Text(
             text = stringResource(R.string.atencion_al_cliente_24h) + "123 456 789",
-            style = MaterialTheme.typography.bodySmall,
-            color = Color.Gray
+            style = IberdrolaTheme.typography.cuerpoPeque,
+            color = IberdrolaTheme.colors.onSurfaceVariant
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -295,7 +283,7 @@ fun IberdrolaHomeFoot(){
                 .width(140.dp)
                 .height(8.dp)
                 .background(
-                    color = Color(0xFF00833E),
+                    color = IberdrolaTheme.colors.primary,
                     shape = RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp)
                 )
         )
@@ -305,19 +293,23 @@ fun IberdrolaHomeFoot(){
 @Composable
 @Preview(showBackground = true)
 fun PreviewIberdrolaHomeScreen() {
-    IberdrolaHomeScreen(
-        onAddressClick = { },
-        setCont = { },
-        mostrarSheet = false
-    )
+    IB2026AlejandroLOTheme {
+        IberdrolaHomeScreen(
+            onAddressClick = { },
+            setCont = { },
+            mostrarSheet = false
+        )
+    }
 }
 
 @Composable
 @Preview(showBackground = true)
 fun PreviewIberdrolaHomeScreenWithAlert() {
-    IberdrolaHomeScreen(
-        onAddressClick = { },
-        setCont = { },
-        mostrarSheet = true
-    )
+    IB2026AlejandroLOTheme {
+        IberdrolaHomeScreen(
+            onAddressClick = { },
+            setCont = { },
+            mostrarSheet = true
+        )
+    }
 }
