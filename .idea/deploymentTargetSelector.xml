@@ -13,19 +13,19 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="IberdrolaNavGraphTest">
+      <SelectionState runConfigName="IberdrolaMainScreenTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="givenCounterFlow_whenNavigateBackWithAtras_thenBottomSheetIsVisible()">
+      <SelectionState runConfigName="givenMainScreen_whenBackButtonClicked_thenCallbackIsTriggered()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="givenCounterFlow_whenNavigateBackWithBackButton_thenBottomSheetIsVisible()">
+      <SelectionState runConfigName="givenMainScreen_whenLoaded_thenIsDisplayed()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="Tests in 'com.iberdrola.practicas2026.alejandroLO'">
+      <SelectionState runConfigName="givenMainScreen_whenOptionSelected_thenPagerChanges()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="IberdrolaHomeScreenTest">
+      <SelectionState runConfigName="givenMainScreen_whenBillClicked_thenAlertIsShown()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

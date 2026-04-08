@@ -131,7 +131,9 @@ fun IberdrolaHomeHeader() {
     Surface(
         color = IberdrolaTheme.colors.primary,
         shape = RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag("home_header")
     ) {
         Column(
             modifier = Modifier
@@ -248,7 +250,8 @@ fun IberdrolaHomeFoot(){
         modifier = Modifier
             .fillMaxWidth()
             .background(IberdrolaTheme.colors.surfaceVariant)
-            .padding(24.dp),
+            .padding(24.dp)
+            .testTag("home_footer"),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(

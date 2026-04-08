@@ -41,7 +41,9 @@ fun IberdrolaTopBar(selectedOption: BillTypeEnum,
                     isSyncEnabled: Boolean,
                     onSyncToggle: (Boolean) -> Unit,
                     modifier: Modifier = Modifier){
-    Column(modifier = modifier.fillMaxWidth()) {
+    Column(modifier = modifier
+        .fillMaxWidth()
+        .testTag("top_bar")) {
 
         IberdrolaBar(
             onBackButtonClick = onBackButtonClick,
@@ -142,7 +144,7 @@ fun IberdrolaTitleAndDescription(
 }
 
 @Composable
-fun ServiceSelector(
+    fun ServiceSelector(
     selectedOption: String,
     options: List<String>,
     onOptionSelected: (String) -> Unit
@@ -179,7 +181,9 @@ fun ServiceOption(
     onClick: () -> Unit
 ) {
     Column(
-        modifier = Modifier.clickable(onClick = onClick),
+        modifier = Modifier
+            .clickable(onClick = onClick)
+            .testTag("service_option_$text"),
         horizontalAlignment = Alignment.Start
     ) {
         Text(
