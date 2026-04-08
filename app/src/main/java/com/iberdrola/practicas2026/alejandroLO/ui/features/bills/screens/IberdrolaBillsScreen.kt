@@ -33,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -74,6 +75,7 @@ fun IberdrolaBillsScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .verticalScroll(scrollState)
+                    .testTag("bills_screen")
             ) {
                 if (lastBill != null) {
                     IberdrolaLastBill(lastBill = lastBill, numberFormat = numberFormat)
@@ -92,7 +94,8 @@ fun IberdrolaLastBill(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(16.dp)
+            .testTag("last_bill_item"),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = IberdrolaTheme.colors.surface),
         border = BorderStroke(2.dp, IberdrolaTheme.colors.primary.copy(alpha = 0.6f))
@@ -128,7 +131,9 @@ fun IberdrolaLastBill(
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    modifier = Modifier.size(32.dp),
+                    modifier = Modifier
+                        .size(32.dp)
+                        .testTag("type_${lastBill.typeId}_icon"),
                     tint = IberdrolaTheme.colors.iconLuzGas
                 )
             }
@@ -255,6 +260,7 @@ fun IberdrolaBillItem(
     onclick: (Bill) -> Unit,
     numberFormat: NumberFormat
 ) {
+    val billStatus = BillStatusEnum.entries[bill.statusId].title
     val isPaid = bill.statusId == BillStatusEnum.PAGADA.ordinal
     val dateFormat = SimpleDateFormat("d 'de' MMMM", Locale("es", "ES"))
     val type = BillTypeEnum.entries.find { it.ordinal == bill.typeId }?.title ?: ""
@@ -263,7 +269,8 @@ fun IberdrolaBillItem(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
-            .clickable { onclick(bill) },
+            .clickable { onclick(bill) }
+            .testTag("bill_item"),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(modifier = Modifier.weight(1f)) {
@@ -282,10 +289,11 @@ fun IberdrolaBillItem(
 
             Surface(
                 color = if (isPaid) IberdrolaTheme.colors.successContainer else IberdrolaTheme.colors.errorContainer,
-                shape = RoundedCornerShape(8.dp)
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.testTag("bill_status_$billStatus")
             ) {
                 Text(
-                    text = if (isPaid) "Pagada" else "Pendiente de Pago",
+                    text = billStatus,
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
                     style = IberdrolaTheme.typography.etiquetaPeque,
                     color = if (isPaid) IberdrolaTheme.colors.onSuccessContainer else IberdrolaTheme.colors.onErrorContainer

@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -24,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,7 +41,9 @@ fun IberdrolaTopBar(selectedOption: BillTypeEnum,
                     isSyncEnabled: Boolean,
                     onSyncToggle: (Boolean) -> Unit,
                     modifier: Modifier = Modifier){
-    Column(modifier = modifier.fillMaxWidth()) {
+    Column(modifier = modifier
+        .fillMaxWidth()
+        .testTag("top_bar")) {
 
         IberdrolaBar(
             onBackButtonClick = onBackButtonClick,
@@ -84,6 +86,7 @@ fun IberdrolaBar(
             modifier = Modifier
                 .clickable { onBackButtonClick() }
                 .padding(vertical = 8.dp)
+                .testTag("main_back_button")
         ) {
             Icon(
                 imageVector = Icons.Default.ChevronLeft,
@@ -141,7 +144,7 @@ fun IberdrolaTitleAndDescription(
 }
 
 @Composable
-fun ServiceSelector(
+    fun ServiceSelector(
     selectedOption: String,
     options: List<String>,
     onOptionSelected: (String) -> Unit
@@ -178,7 +181,9 @@ fun ServiceOption(
     onClick: () -> Unit
 ) {
     Column(
-        modifier = Modifier.clickable(onClick = onClick),
+        modifier = Modifier
+            .clickable(onClick = onClick)
+            .testTag("service_option_$text"),
         horizontalAlignment = Alignment.Start
     ) {
         Text(

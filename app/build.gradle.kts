@@ -57,6 +57,10 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.14"
     }
+
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+    }
 }
 
 dependencies {
@@ -76,10 +80,17 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     //implementation(libs.skeletonlayout) // dependecia que convierte la vista de una pantalla en un skeleton de carga
     implementation("com.valentinilk.shimmer:compose-shimmer:1.2.0")
-    implementation("androidx.compose.foundation:foundation") // para cambiar de pantalla arrasatrando hacia los lados
+    implementation("androidx.compose.foundation:foundation")
+    androidTestImplementation(libs.androidx.navigation.testing) // para cambiar de pantalla arrasatrando hacia los lados
 //    implementation(libs.androidx.room3.common.jvm)v
 //    implementation(libs.androidx.room3.runtime)
 
+    // DEPENDENCIAS PARA LOS TEST
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.mockk)
+    testImplementation(libs.junit)
+    testImplementation(libs.turbine)
+    implementation(libs.androidx.tracing)
 
 
     implementation(libs.androidx.room.runtime)

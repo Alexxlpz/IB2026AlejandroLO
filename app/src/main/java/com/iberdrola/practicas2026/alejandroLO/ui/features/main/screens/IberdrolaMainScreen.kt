@@ -19,6 +19,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.iberdrola.practicas2026.alejandroLO.data.model.Bill
@@ -89,7 +90,10 @@ fun IberdrolaMainScreen(
 //    val bills = listOf(bill, bill, bill, bill, bill, bill, bill, bill, bill, bill)
 
     Box() {
-        Column(modifier = modifier.fillMaxSize()) {
+        Column(modifier = modifier
+            .fillMaxSize()
+            .testTag("main_screen")
+        ) {
 
             IberdrolaTopBar(
                 selectedOption = mainUiState.value.selectedOption,
