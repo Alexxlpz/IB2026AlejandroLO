@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -62,7 +61,6 @@ fun IberdrolaFeedbackDialog(
         containerColor = Color(0xFFE8F5E9),
         shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
         scrimColor = Color.Black.copy(alpha = 0.4f),
-        windowInsets = WindowInsets(0),
         dragHandle = { BottomSheetDefaults.DragHandle() },
         modifier = Modifier.testTag("bottom_sheet")
     ) {
