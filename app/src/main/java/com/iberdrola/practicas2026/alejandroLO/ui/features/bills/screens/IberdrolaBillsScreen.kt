@@ -260,6 +260,7 @@ fun IberdrolaBillItem(
     onclick: (Bill) -> Unit,
     numberFormat: NumberFormat
 ) {
+    val billStatus = BillStatusEnum.entries[bill.statusId].title
     val isPaid = bill.statusId == BillStatusEnum.PAGADA.ordinal
     val dateFormat = SimpleDateFormat("d 'de' MMMM", Locale("es", "ES"))
     val type = BillTypeEnum.entries.find { it.ordinal == bill.typeId }?.title ?: ""
@@ -288,10 +289,11 @@ fun IberdrolaBillItem(
 
             Surface(
                 color = if (isPaid) IberdrolaTheme.colors.successContainer else IberdrolaTheme.colors.errorContainer,
-                shape = RoundedCornerShape(8.dp)
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.testTag("bill_status_$billStatus")
             ) {
                 Text(
-                    text = if (isPaid) "Pagada" else "Pendiente de Pago",
+                    text = billStatus,
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
                     style = IberdrolaTheme.typography.etiquetaPeque,
                     color = if (isPaid) IberdrolaTheme.colors.onSuccessContainer else IberdrolaTheme.colors.onErrorContainer
