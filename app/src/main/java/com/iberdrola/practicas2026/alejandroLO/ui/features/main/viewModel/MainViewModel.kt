@@ -29,4 +29,12 @@ class MainViewModel() : ViewModel() {
             it.copy(selectedOption = option)
         }
     }
+
+    fun updateIsOnline(isOnline: Boolean){
+        Log.d(TAG, "MAINVIEWMODEL -> updateIsOnline: $isOnline")
+
+        _uiState.update {
+            it.copy(isOnline = isOnline)
+        }
+    }
 }

@@ -1,7 +1,6 @@
 package com.iberdrola.practicas2026.alejandroLO.ui.features.main.screens
 
-import android.app.AlertDialog
-import android.content.Context
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
@@ -42,10 +41,15 @@ import java.util.Locale
 fun IberdrolaMainScreen(
     onBackButtonClick: () -> Unit,
     modifier: Modifier = Modifier,
-    locale: Locale = Locale.forLanguageTag("es-ES")
+    locale: Locale = Locale.forLanguageTag("es-ES"),
+    billsViewModel: BillsViewModel = viewModel(factory = BillsViewModelFactory.Factory),
+    mainViewModel: MainViewModel = viewModel()
 ) {
-    val billsViewModel: BillsViewModel = viewModel(factory = BillsViewModelFactory.Factory)
-    val mainViewModel: MainViewModel = viewModel()
+
+    LaunchedEffect(Unit) {
+        billsViewModel.updateDataBase(mainViewModel.uiState.value.isOnline)
+    }
+
     val mainUiState = mainViewModel.uiState.collectAsState()
 
     val billsUiState = billsViewModel.uiState.collectAsState()
@@ -89,7 +93,7 @@ fun IberdrolaMainScreen(
             .fillMaxSize()
             .testTag("main_screen")
         ) {
-
+            Log.d("MainScreen", "is sync enabled: ${mainUiState.value.isOnline}")
             IberdrolaTopBar(
                 selectedOption = mainUiState.value.selectedOption,
                 options = mainUiState.value.options,
@@ -98,8 +102,11 @@ fun IberdrolaMainScreen(
                     scope.launch { pagerState.animateScrollToPage(page) }
                 },
                 onBackButtonClick = onBackButtonClick,
-                isSyncEnabled = billsUiState.value.isOnline,
-                onSyncToggle = { billsViewModel.updateDataBase(it) }
+                isSyncEnabled = mainUiState.value.isOnline,
+                onSyncToggle = {
+                    billsViewModel.updateDataBase(it)
+                    mainViewModel.updateIsOnline(it)
+                }
             )
 
             HorizontalPager(

@@ -19,7 +19,7 @@
       <SelectionState runConfigName="IberdrolaBillsScreenTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="givenPaidBill_whenDisplayed_thenShowPagadaStatus()">
+      <SelectionState runConfigName="bottomSheet_isVisible_whenMostrarSheetTrue()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
