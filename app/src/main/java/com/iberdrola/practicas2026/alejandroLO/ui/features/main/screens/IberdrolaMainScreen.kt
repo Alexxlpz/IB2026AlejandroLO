@@ -9,6 +9,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -18,7 +21,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -40,7 +42,7 @@ import java.util.Locale
 fun IberdrolaMainScreen(
     onBackButtonClick: () -> Unit,
     modifier: Modifier = Modifier,
-    locale: Locale = Locale("es", "ES")
+    locale: Locale = Locale.forLanguageTag("es-ES")
 ) {
     val billsViewModel: BillsViewModel = viewModel(factory = BillsViewModelFactory.Factory)
     val mainViewModel: MainViewModel = viewModel()
@@ -54,13 +56,6 @@ fun IberdrolaMainScreen(
             showAlert = true
         }
     }
-    val closeAlert: () -> Unit = remember {
-        {
-            showAlert = false
-        }
-    }
-    val alertDialog = alertDialogOnBillClick(LocalContext.current, closeAlert)
-
 
     val pagerState = rememberPagerState(
         initialPage = if (mainUiState.value.selectedOption == BillTypeEnum.LUZ) 0 else 1,
@@ -123,29 +118,25 @@ fun IberdrolaMainScreen(
                     lastBill = lastBill,
                     isLoading = billsUiState.value.isLoading,
                     onclick = { selectingBill(it) },
+                    refresh = { billsViewModel.refreshBills() },
                     modifier = Modifier.fillMaxSize(),
                     locale = locale
                 )
             }
         }
         if(showAlert) {
-            alertDialog.show()
+            AlertDialog(
+                onDismissRequest = { showAlert = false },
+                confirmButton = {
+                    TextButton(onClick = { showAlert = false }) {
+                        Text("Cerrar")
+                    }
+                },
+                title = { Text("Funcionalidad aún no implementada") },
+                text = { Text("Esta funcionalidad aún no está implementada, mantente alerta a futuras actualizaciones") }
+            )
         }
     }
-}
-
-private fun alertDialogOnBillClick(context: Context, closeAlert: () -> Unit): AlertDialog{
-    val builder: AlertDialog.Builder = AlertDialog.Builder(context)
-    builder
-        .setMessage("Esta funcionalidad aun no esta implementada, " +
-                "mantente alerta a futuras actualizaciones")
-        .setTitle("Funcionalidad aun no implementada")
-        .setNegativeButton("Cerrar") { _, _ ->
-            closeAlert()
-        }
-
-   return builder.create()
-
 }
 
 @Composable
@@ -154,6 +145,6 @@ fun PreviewIberdrolaMainScreen() {
     IberdrolaMainScreen(
         modifier = Modifier,
         onBackButtonClick = { },
-        locale = Locale("es", "ES")
+        locale = Locale.forLanguageTag("es-ES")
     )
 }

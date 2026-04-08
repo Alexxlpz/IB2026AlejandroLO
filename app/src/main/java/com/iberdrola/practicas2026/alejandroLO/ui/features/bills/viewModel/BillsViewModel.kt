@@ -26,7 +26,7 @@ class BillsViewModel(
         refreshBills()
     }
 
-    private fun refreshBills() {
+    fun refreshBills() {
         val isOnline = _uiState.value.isOnline
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }

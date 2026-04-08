@@ -4,11 +4,11 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -50,6 +50,10 @@ import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
+import androidx.compose.material3.pulltorefresh.PullToRefreshState
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 
 @Composable
 fun IberdrolaBillsScreen(
@@ -58,12 +62,30 @@ fun IberdrolaBillsScreen(
     isLoading: Boolean,
     onclick: (Bill) -> Unit,
     modifier: Modifier = Modifier,
-    locale: Locale = Locale("es", "ES")
+    refresh: () -> Unit = {},
+    locale: Locale = Locale.forLanguageTag("es-ES")
 ) {
     val scrollState = rememberScrollState()
     val numberFormat = NumberFormat.getCurrencyInstance(locale)
 
-    Box(modifier = modifier.fillMaxWidth()) {
+    val refreshingState: PullToRefreshState = rememberPullToRefreshState()
+
+    PullToRefreshBox( // para refrescar las facturas
+        modifier = Modifier.fillMaxSize(),
+        isRefreshing = isLoading,
+        onRefresh = refresh,
+        state = refreshingState,
+        contentAlignment = Alignment.TopStart,
+        indicator = {
+            PullToRefreshDefaults.Indicator(
+                state = refreshingState,
+                isRefreshing = isLoading,
+                modifier = Modifier.align(Alignment.TopCenter),
+                containerColor = IberdrolaTheme.colors.surface,
+                color = IberdrolaTheme.colors.primary
+            )
+        }
+    ){
         if (isLoading) {
             val shimmer = rememberShimmer(
                 shimmerBounds = ShimmerBounds.Window,
@@ -146,7 +168,7 @@ fun IberdrolaLastBill(
                 color = IberdrolaTheme.colors.onSurface
             )
 
-            val dateFormat = SimpleDateFormat("dd MMM. yyyy", Locale("es", "ES"))
+            val dateFormat = SimpleDateFormat("dd MMM. yyyy", Locale.forLanguageTag("es-ES"))
             Text(
                 text = "${dateFormat.format(lastBill.date)} - ${dateFormat.format(lastBill.dueDate)}",
                 style = IberdrolaTheme.typography.cuerpoPeque,
@@ -220,7 +242,7 @@ fun IberdrolaBillList(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        val yearFormat = SimpleDateFormat("yyyy", Locale("es", "ES"))
+        val yearFormat = SimpleDateFormat("yyyy", Locale.forLanguageTag("es-ES"))
         var auxyear = ""
 
         if (bills.isEmpty()) {
@@ -262,7 +284,7 @@ fun IberdrolaBillItem(
 ) {
     val billStatus = BillStatusEnum.entries[bill.statusId].title
     val isPaid = bill.statusId == BillStatusEnum.PAGADA.ordinal
-    val dateFormat = SimpleDateFormat("d 'de' MMMM", Locale("es", "ES"))
+    val dateFormat = SimpleDateFormat("d 'de' MMMM", Locale.forLanguageTag("es-ES"))
     val type = BillTypeEnum.entries.find { it.ordinal == bill.typeId }?.title ?: ""
 
     Row(
