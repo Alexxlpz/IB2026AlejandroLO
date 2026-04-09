@@ -1,6 +1,5 @@
 package com.iberdrola.practicas2026.alejandroLO.ui.features.main.screens
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
@@ -88,9 +87,10 @@ fun IberdrolaMainScreen(
             .fillMaxSize()
             .testTag("main_screen")
         ) {
-            Log.d("MainScreen", "is sync enabled: ${billsUiState.value.isOnline}")
+//            Log.d("MainScreen", "is sync enabled: ${billsUiState.value.isOnline}")
             IberdrolaTopBar(
                 selectedOption = billsUiState.value.selectedOption,
+                streetName = billsUiState.value.directionStreet,
                 options = billsUiState.value.options,
                 onOptionSelected = { option ->
                     val page = if (option == BillTypeEnum.LUZ) 0 else 1

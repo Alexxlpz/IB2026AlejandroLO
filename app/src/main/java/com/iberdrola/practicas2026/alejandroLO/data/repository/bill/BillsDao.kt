@@ -23,6 +23,10 @@ interface BillsDao {
     @Query("DELETE FROM bills")
     suspend fun deleteAll()
 
+    @Query("DELETE FROM bills")
+    fun deleteAllSync()
+
+
     @Query("SELECT * from bills WHERE id = :id")
     fun getBill(id: Int): Flow<Bill>
 
@@ -32,4 +36,6 @@ interface BillsDao {
     @Query("SELECT * from bills ORDER BY date DESC")
     fun getAllBills(): Flow<List<Bill>>
 
+    @Query("SELECT * from bills WHERE directionId = :directionId ORDER BY date DESC")
+    fun getAllBillsByDirectionId(directionId: Int): Flow<List<Bill>>
 }

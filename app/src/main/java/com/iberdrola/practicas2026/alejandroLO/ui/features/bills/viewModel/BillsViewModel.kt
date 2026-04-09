@@ -24,6 +24,7 @@ class BillsViewModel(
 
     init {
         load_options()
+        refreshBills()
     }
 
     fun load_options(){
@@ -32,11 +33,12 @@ class BillsViewModel(
 
     fun refreshBills() {
         val isOnline = _uiState.value.isOnline
+        val directionId = _uiState.value.directionId
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
-            val observator = launch {
-                billsRepository.getAllBills().collect { bills ->
+            val observator = launch {// solo coger aquellas que coincidan con la calle
+                billsRepository.getAllBillsByDirectionId(directionId).collect { bills ->
                     _uiState.update {
                         it.copy(
                             billsList = bills
@@ -74,5 +76,14 @@ class BillsViewModel(
     fun updateDataBase(isOnline: Boolean) {
         _uiState.update { it.copy(isOnline = isOnline) }
         refreshBills()
+    }
+
+    fun updateDirection(directionId: Int, directionStreet: String){
+        _uiState.update {
+            it.copy(
+                directionId = directionId,
+                directionStreet = directionStreet
+            )
+        }
     }
 }

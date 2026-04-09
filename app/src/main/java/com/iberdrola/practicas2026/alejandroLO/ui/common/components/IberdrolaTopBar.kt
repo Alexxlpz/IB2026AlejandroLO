@@ -35,6 +35,7 @@ import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
 
 @Composable
 fun IberdrolaTopBar(selectedOption: BillTypeEnum,
+                    streetName: String,
                     options: List<BillTypeEnum>,
                     onOptionSelected: (BillTypeEnum) -> Unit,
                     onBackButtonClick: () -> Unit,
@@ -51,7 +52,7 @@ fun IberdrolaTopBar(selectedOption: BillTypeEnum,
             onSyncToggle = onSyncToggle
         )
         IberdrolaTitleAndDescription(
-            description = "Descripcion de la calle de facturacion, a implementar",
+            description = streetName,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
         )
         Spacer(modifier = Modifier.height(18.dp))
@@ -209,6 +210,7 @@ fun PreviewIberdrolaTopBar() {
     IB2026AlejandroLOTheme { // <--- Usa el nombre de la función Composable definida en Theme.kt
         IberdrolaTopBar(
             selectedOption = BillTypeEnum.LUZ,
+            streetName = "Calle Falsa 123",
             options = BillTypeEnum.entries,
             onOptionSelected = { },
             onBackButtonClick = { },

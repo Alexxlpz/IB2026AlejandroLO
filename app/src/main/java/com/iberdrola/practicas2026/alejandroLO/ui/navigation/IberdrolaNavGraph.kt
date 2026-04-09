@@ -18,6 +18,8 @@ import androidx.navigation.compose.rememberNavController
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsViewModel
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsViewModelFactory
 import com.iberdrola.practicas2026.alejandroLO.ui.features.home.screens.IberdrolaHomeScreen
+import com.iberdrola.practicas2026.alejandroLO.ui.features.home.viewModel.HomeViewModel
+import com.iberdrola.practicas2026.alejandroLO.ui.features.home.viewModel.HomeViewModelFactory
 import com.iberdrola.practicas2026.alejandroLO.ui.features.main.screens.IberdrolaMainScreen
 import java.util.Locale
 
@@ -47,6 +49,7 @@ fun IberdrolaNavGraph(
     }
 
    val billsViewModel: BillsViewModel = viewModel(factory = BillsViewModelFactory.Factory)
+   val homeViewModel: HomeViewModel = viewModel(factory = HomeViewModelFactory.Factory)
 
 
     NavHost(
@@ -55,11 +58,16 @@ fun IberdrolaNavGraph(
     ) {
         composable(IberdrolaScreens.HOME.title) {
             IberdrolaHomeScreen(
-                onAddressClick = {
+                onAddressClick = { id, street ->
+                    billsViewModel.updateDirection (
+                        directionId = id,
+                        directionStreet = street
+                    )
                     navController.navigate(IberdrolaScreens.MAIN.title)
                 },
                 setCont = setCont,
-                mostrarSheet = mostrarSheet
+                mostrarSheet = mostrarSheet,
+                homeViewModel = homeViewModel
             )
         }
         composable(IberdrolaScreens.MAIN.title) {
