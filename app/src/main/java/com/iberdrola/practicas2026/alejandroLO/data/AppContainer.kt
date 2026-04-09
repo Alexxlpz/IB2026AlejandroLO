@@ -3,21 +3,21 @@ package com.iberdrola.practicas2026.alejandroLO.data
 import android.content.Context
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializer
-import com.google.gson.reflect.TypeToken
+import com.iberdrola.practicas2026.alejandroLO.BuildConfig
 import com.iberdrola.practicas2026.alejandroLO.data.network.bill.BillsApiService
+import com.iberdrola.practicas2026.alejandroLO.data.network.direction.DirectionApiService
 import com.iberdrola.practicas2026.alejandroLO.data.repository.bill.BillsRepository
 import com.iberdrola.practicas2026.alejandroLO.data.repository.bill.OfflineBillsRepository
+import com.iberdrola.practicas2026.alejandroLO.data.repository.direction.DirectionRepository
+import com.iberdrola.practicas2026.alejandroLO.data.repository.direction.OfflineDirectionRepository
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import com.iberdrola.practicas2026.alejandroLO.BuildConfig
-import com.iberdrola.practicas2026.alejandroLO.data.model.Bill
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import java.util.Date
 
 
 interface AppContainer {
     val billsRepository: BillsRepository
+    val directionsRepository: DirectionRepository
 }
 
 class AppDataContainer(private val context: Context) : AppContainer {
@@ -36,17 +36,30 @@ class AppDataContainer(private val context: Context) : AppContainer {
         .baseUrl(baseUrl)                                       // para crear los objetos bill
         .build()
 
-    private val retrofitService: BillsApiService by lazy {
+    private val billsRetrofitService: BillsApiService by lazy {
         retrofit.create(BillsApiService::class.java)
+    }
+
+    private val directionRetrofitService: DirectionApiService by lazy {
+        retrofit.create(DirectionApiService::class.java)
     }
 
     override val billsRepository: BillsRepository by lazy {
         OfflineBillsRepository(
             billDao = BillDatabase.getDatabase(context).billDao(),
-            apiService = retrofitService,
+            apiService = billsRetrofitService,
             context = context,
-            gson = gson // se lo pasamos para que no lo tenga que crear otra vez si carga los datos
+            gson = gson, // se lo pasamos para que no lo tenga que crear otra vez si carga los datos
                         // localmente
+            directionsRepository = directionsRepository
+        )
+    }
+
+    override val directionsRepository: DirectionRepository by lazy {
+        OfflineDirectionRepository(
+            directionDao = BillDatabase.getDatabase(context).directionDao(),
+            apiService = directionRetrofitService,
+            context = context
         )
     }
 }

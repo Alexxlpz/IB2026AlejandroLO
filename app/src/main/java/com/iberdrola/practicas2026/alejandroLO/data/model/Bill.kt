@@ -6,6 +6,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.util.Date
 import androidx.room.ForeignKey
+import androidx.room.Index
 
 @Entity(
     tableName = "bills",
@@ -19,8 +20,20 @@ import androidx.room.ForeignKey
             entity = BillStatus::class,
             parentColumns = ["id"],
             childColumns = ["statusId"]
+        ),
+        ForeignKey(
+            entity = Direction::class,
+            parentColumns = ["id"],
+            childColumns = ["directionId"],
+            onDelete = ForeignKey.CASCADE
         )
-    ])
+    ],
+    indices = [
+        Index(value = ["typeId"]),
+        Index(value = ["statusId"]),
+        Index(value = ["directionId"])
+    ]
+)
 data class Bill(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
@@ -30,6 +43,8 @@ data class Bill(
     val price: Double = 0.0,
     @ColumnInfo(name = "statusId")
     val statusId: Int = 0,
+    @ColumnInfo(name = "directionId")
+    val directionId: Int = 0,
     @NonNull
     val date: Date = Date(),
     @NonNull

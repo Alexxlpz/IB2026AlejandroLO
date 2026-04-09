@@ -41,86 +41,95 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.iberdrola.practicas2026.alejandroLO.R
 import com.iberdrola.practicas2026.alejandroLO.ui.common.components.IberdrolaFeedbackDialog
-import com.iberdrola.practicas2026.alejandroLO.ui.features.home.viewModel.HomeUiState
+import com.iberdrola.practicas2026.alejandroLO.ui.features.home.viewModel.HomeViewModel
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IB2026AlejandroLOTheme
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
 import kotlinx.coroutines.launch
+import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.iberdrola.practicas2026.alejandroLO.data.model.Direction
+import com.iberdrola.practicas2026.alejandroLO.ui.features.home.screensimport.IberdrolaHomeLoadingScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IberdrolaHomeScreen(
     onAddressClick: () -> Unit,
     setCont: (Int) -> Unit,
-    mostrarSheet: Boolean = false
+    mostrarSheet: Boolean = false,
+    homeViewModel: HomeViewModel
 ) {
     val TAG = "IberdrolaHomeScreen"
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
 
-    val listaSuministros = listOf(
-        HomeUiState("C/ PALMA - ARTA KM 49, 5", "4ºA - PINTO (MADRID)"),
-        HomeUiState("AV. DE LA ALBUFERA 12", "1ºC - MADRID"),
-        HomeUiState("PASEO DE LA CASTELLANA 250", "PLANTA 12 - MADRID")
-    )
+    val homeUiState = homeViewModel.uiState.collectAsState()
 
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .background(IberdrolaTheme.colors.background)
-        .testTag("home_screen")
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize()
+    val listaSuministros = homeUiState.value.directionList
+    val isLoading = homeUiState.value.isLoading
+
+    if (isLoading) {
+        Log.d(TAG, "IberdrolaHomeScreen: Loading...")
+        IberdrolaHomeLoadingScreen()
+    }else {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .background(IberdrolaTheme.colors.background)
+            .testTag("home_screen")
         ) {
-            IberdrolaHomeHeader()
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = stringResource(R.string.selecciona_un_punto_de_suministro),
-                style = IberdrolaTheme.typography.tituloMedio,
-                color = IberdrolaTheme.colors.onSurfaceVariant,
-                modifier = Modifier.padding(horizontal = 16.dp)
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            LazyColumn(
-                modifier = Modifier.weight(1f),
-                contentPadding = PaddingValues(bottom = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+            Column(
+                modifier = Modifier.fillMaxSize()
             ) {
-                items(listaSuministros) { suministro ->
-                    SuministroItem(suministro, onAddressClick)
-                }
-            }
-            IberdrolaHomeFoot()
-        }
+                IberdrolaHomeHeader()
 
-        Log.d(TAG, "IberdrolaHomeScreen: mostrarSheet: $mostrarSheet")
-        if (mostrarSheet) {
-            IberdrolaFeedbackDialog(
-                sheetState = sheetState,
-                onDismiss = {
-                    Log.d(TAG, "IberdrolaHomeScreen: dismiss alert")
-                    scope.launch {
-                        sheetState.hide()
-                    }.invokeOnCompletion {
-                        if (!sheetState.isVisible) {
-                            setCont(1)
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    text = stringResource(R.string.selecciona_un_punto_de_suministro),
+                    style = IberdrolaTheme.typography.tituloMedio,
+                    color = IberdrolaTheme.colors.onSurfaceVariant,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                LazyColumn(
+                    modifier = Modifier.weight(1f),
+                    contentPadding = PaddingValues(bottom = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(listaSuministros) { suministro ->
+                        SuministroItem(suministro, onAddressClick)
+                    }
+                }
+                IberdrolaHomeFoot()
+            }
+
+            Log.d(TAG, "IberdrolaHomeScreen: mostrarSheet: $mostrarSheet")
+            if (mostrarSheet) {
+                IberdrolaFeedbackDialog(
+                    sheetState = sheetState,
+                    onDismiss = {
+                        Log.d(TAG, "IberdrolaHomeScreen: dismiss alert")
+                        scope.launch {
+                            sheetState.hide()
+                        }.invokeOnCompletion {
+                            if (!sheetState.isVisible) {
+                                setCont(1)
+                            }
                         }
-                    }
-                },
-                onAskLater = {
-                    scope.launch { sheetState.hide() }.invokeOnCompletion {
-                        setCont(3)
-                    }
-                },
-                onRatingSelected = {
-                    scope.launch { sheetState.hide() }.invokeOnCompletion {
-                        setCont(10)
-                    }
-                },
-            )
+                    },
+                    onAskLater = {
+                        scope.launch { sheetState.hide() }.invokeOnCompletion {
+                            setCont(3)
+                        }
+                    },
+                    onRatingSelected = {
+                        scope.launch { sheetState.hide() }.invokeOnCompletion {
+                            setCont(10)
+                        }
+                    },
+                )
+            }
         }
     }
 }
@@ -178,7 +187,7 @@ fun IberdrolaHomeHeader() {
 }
 
 @Composable
-fun SuministroItem(suministro: HomeUiState, onClick: () -> Unit) {
+fun SuministroItem(direction: Direction, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -216,19 +225,19 @@ fun SuministroItem(suministro: HomeUiState, onClick: () -> Unit) {
 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = suministro.direccion,
+                        text = direction.street,
                         style = IberdrolaTheme.typography.cuerpoGrande,
                         color = IberdrolaTheme.colors.onSurface,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
-                    Text(
-                        text = suministro.ciudad,
-                        style = IberdrolaTheme.typography.cuerpoMedio,
-                        color = IberdrolaTheme.colors.onSurfaceVariant,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
+//                    Text(
+//                        text = suministro.ciudad,
+//                        style = IberdrolaTheme.typography.cuerpoMedio,
+//                        color = IberdrolaTheme.colors.onSurfaceVariant,
+//                        maxLines = 1,
+//                        overflow = TextOverflow.Ellipsis
+//                    )
                 }
 
                 Icon(
@@ -306,7 +315,8 @@ fun PreviewIberdrolaHomeScreen() {
         IberdrolaHomeScreen(
             onAddressClick = { },
             setCont = { },
-            mostrarSheet = false
+            mostrarSheet = false,
+            homeViewModel = viewModel()
         )
     }
 }
@@ -318,7 +328,8 @@ fun PreviewIberdrolaHomeScreenWithAlert() {
         IberdrolaHomeScreen(
             onAddressClick = { },
             setCont = { },
-            mostrarSheet = true
+            mostrarSheet = true,
+            homeViewModel = viewModel()
         )
     }
 }

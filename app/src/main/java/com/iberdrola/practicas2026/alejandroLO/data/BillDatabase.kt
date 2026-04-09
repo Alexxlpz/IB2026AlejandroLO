@@ -6,20 +6,28 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.room.withTransaction
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.iberdrola.practicas2026.alejandroLO.data.model.Bill
 import com.iberdrola.practicas2026.alejandroLO.data.model.BillStatus
 import com.iberdrola.practicas2026.alejandroLO.data.model.BillType
+import com.iberdrola.practicas2026.alejandroLO.data.model.Direction
 import com.iberdrola.practicas2026.alejandroLO.data.repository.bill.BillsDao
 import com.iberdrola.practicas2026.alejandroLO.data.repository.billStatus.BillStatusDao
 import com.iberdrola.practicas2026.alejandroLO.data.repository.billType.BillTypeDao
+import com.iberdrola.practicas2026.alejandroLO.data.repository.direction.DirectionDao
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillStatusEnum
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeEnum
 
 
 @Database(
-    entities = [Bill::class, BillType::class, BillStatus::class],
-    version = 5,
+    entities = [
+        Bill::class,
+        BillType::class,
+        BillStatus::class,
+        Direction::class
+    ],
+    version = 14,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -28,8 +36,20 @@ abstract class BillDatabase : RoomDatabase() {
     abstract fun billTypeDao(): BillTypeDao
     abstract fun billStatusDao(): BillStatusDao
 
+    abstract fun directionDao(): DirectionDao
+
     val TAG: String = "BillDatabase"
 
+    suspend fun clearDatabase() {
+        this.withTransaction { // todxo en una transicion para que si se borra algo que no sea a medias
+            Log.d(TAG, "clearDatabase: Iniciando limpieza de tablas...")
+            billDao().deleteAllSync()
+            Log.d(TAG, "clearDatabase: Bills eliminadas")
+
+            directionDao().deleteAllSync()
+            Log.d(TAG, "clearDatabase: Direcciones eliminadas")
+        }
+    }
 
     companion object {
         @Volatile
@@ -57,16 +77,21 @@ private class BillDatabaseCallback: RoomDatabase.Callback() {
 
     override fun onCreate(db: SupportSQLiteDatabase) {
         super.onCreate(db)
-        Log.d("BillDatabaseCallback", "vamos a insertar los datos ")
-        BillTypeEnum.entries.forEach { type ->
-            db.execSQL("INSERT INTO billType (id, type) VALUES (${type.ordinal}, '${type.title}')")
-        }
-        Log.d("BillDatabaseCallback", "BILLTYPE INSERTADOS")
+        populateMasterData(db)
+    }
 
-        BillStatusEnum.entries.forEach { status ->
-            db.execSQL("INSERT INTO billStatus (id, status) VALUES (${status.ordinal}, '${status.title}')")
+    override fun onOpen(db: SupportSQLiteDatabase) {
+        super.onOpen(db)
+        populateMasterData(db)
+    }
+
+    private fun populateMasterData(db: SupportSQLiteDatabase) {
+        BillTypeEnum.entries.forEach { type ->
+            db.execSQL("INSERT OR IGNORE INTO billType (id, type) VALUES (${type.ordinal}, '${type.title}')")
         }
-        Log.d("BillDatabaseCallback", "BILLSTATUS INSERTADOS")
+        BillStatusEnum.entries.forEach { status ->
+            db.execSQL("INSERT OR IGNORE INTO billStatus (id, status) VALUES (${status.ordinal}, '${status.title}')")
+        }
     }
 }
 

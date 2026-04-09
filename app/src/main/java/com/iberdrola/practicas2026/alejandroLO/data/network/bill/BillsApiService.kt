@@ -5,6 +5,6 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 
 interface BillsApiService {
-    @GET("bills") // La ruta que configuraste en Mockoon
+    @GET("bills")
     suspend fun getBills(): List<Bill>
 }

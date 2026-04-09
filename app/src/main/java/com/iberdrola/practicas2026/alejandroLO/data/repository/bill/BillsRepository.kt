@@ -10,6 +10,7 @@ interface BillsRepository {
     suspend fun update(bill: Bill) // MODIFICAR UNA FACTURA
     suspend fun delete(bill: Bill) // BORRAR LA FACTURA PASADA POR PARAMETRO
     suspend fun deleteAll() // Borra todox de la base de datos
+    fun deleteAllSync() // borra todxo de forma sincrona
     suspend fun refreshBillsOnline() // Mete los datos de la API en la base de datos
     suspend fun insertMockBillsFromAssets() // Mete los datos de un json que tenemos en local
     fun getBillById(id: Int): Flow<Bill> // OBTENER LA FACTURA CON EL ID DEL PARAMETRO ORDENADAS POR FECHA DE MANERA DESCENDIENTE

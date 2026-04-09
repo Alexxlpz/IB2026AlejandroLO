@@ -81,6 +81,7 @@ dependencies {
     implementation(libs.compose.shimmer)
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.uiautomator)
     androidTestImplementation(libs.androidx.navigation.testing)
 
     // DEPENDENCIAS PARA LOS TEST
