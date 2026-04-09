@@ -10,5 +10,6 @@ data class BillsUiState (
     val isOnline: Boolean = false,
     val options: List<BillTypeEnum> = emptyList(),
     val directionId: Int = 0,
-    val directionStreet: String = ""
+    val directionStreet: String = "",
+    val errorMessage: String? = null
 )
