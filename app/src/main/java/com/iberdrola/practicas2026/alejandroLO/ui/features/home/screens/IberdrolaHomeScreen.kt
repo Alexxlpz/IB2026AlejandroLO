@@ -231,13 +231,13 @@ fun SuministroItem(direction: Direction, onClick: () -> Unit) {
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
-//                    Text(
-//                        text = suministro.ciudad,
-//                        style = IberdrolaTheme.typography.cuerpoMedio,
-//                        color = IberdrolaTheme.colors.onSurfaceVariant,
-//                        maxLines = 1,
-//                        overflow = TextOverflow.Ellipsis
-//                    )
+                    Text(
+                        text = direction.city,
+                        style = IberdrolaTheme.typography.cuerpoMedio,
+                        color = IberdrolaTheme.colors.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
                 }
 
                 Icon(

@@ -1,14 +1,17 @@
 [
   {
     "id": 1,
-    "street": "4340 Calle de Tetuán, 42941, Spain"
+    "street": "4340 Calle de Tetuán, 42941, Spain",
+    "city": "Malaga"
   },
   {
     "id": 2,
-    "street": "9885 Calle Mota, 56648, Spain"
+    "street": "9885 Calle Mota, 56648, Spain",
+    "city": "Madrid"
   },
-    {
+  {
     "id": 3,
-    "street": "2137 Avenida de América, 10139, Spain"
+    "street": "2137 Avenida de América, 10139, Spain",
+    "city": "Almeria"
   }
 ]

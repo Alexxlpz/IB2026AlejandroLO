@@ -27,7 +27,7 @@ import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeE
         BillStatus::class,
         Direction::class
     ],
-    version = 14,
+    version = 15,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -63,7 +63,7 @@ abstract class BillDatabase : RoomDatabase() {
                     "bill_database"
                 )
                     .addCallback(BillDatabaseCallback())
-                    .fallbackToDestructiveMigration()
+                    .fallbackToDestructiveMigration(false)
                     .build()
                     .also { Instance = it }
             }
