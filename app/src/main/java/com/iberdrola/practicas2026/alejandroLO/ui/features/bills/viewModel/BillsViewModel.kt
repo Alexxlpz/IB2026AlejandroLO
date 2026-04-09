@@ -23,7 +23,11 @@ class BillsViewModel(
     val TAG: String = "BillsViewModel"
 
     init {
-        refreshBills()
+        load_options()
+    }
+
+    fun load_options(){
+        _uiState.update { it.copy(options = BillTypeEnum.entries.toTypedArray().toList()) }
     }
 
     fun refreshBills() {

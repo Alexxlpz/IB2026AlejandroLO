@@ -29,7 +29,6 @@ import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeE
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.screens.IberdrolaBillsScreen
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsViewModel
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsViewModelFactory
-import com.iberdrola.practicas2026.alejandroLO.ui.features.main.viewModel.MainViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -42,15 +41,12 @@ fun IberdrolaMainScreen(
     onBackButtonClick: () -> Unit,
     modifier: Modifier = Modifier,
     locale: Locale = Locale.forLanguageTag("es-ES"),
-    billsViewModel: BillsViewModel = viewModel(factory = BillsViewModelFactory.Factory),
-    mainViewModel: MainViewModel = viewModel()
+    billsViewModel: BillsViewModel = viewModel(factory = BillsViewModelFactory.Factory)
 ) {
 
     LaunchedEffect(Unit) {
-        billsViewModel.updateDataBase(mainViewModel.uiState.value.isOnline)
+        billsViewModel.refreshBills()
     }
-
-    val mainUiState = mainViewModel.uiState.collectAsState()
 
     val billsUiState = billsViewModel.uiState.collectAsState()
 
@@ -62,13 +58,12 @@ fun IberdrolaMainScreen(
     }
 
     val pagerState = rememberPagerState(
-        initialPage = if (mainUiState.value.selectedOption == BillTypeEnum.LUZ) 0 else 1,
+        initialPage = if (billsUiState.value.selectedOption == BillTypeEnum.LUZ) 0 else 1,
         pageCount = { 2 }
     )
 
     LaunchedEffect(pagerState.currentPage) {
         val option = if (pagerState.currentPage == 0) BillTypeEnum.LUZ else BillTypeEnum.GAS
-        mainViewModel.updateSelectedOption(option)
         billsViewModel.updateSelectedOption(option)
     }
 
@@ -93,19 +88,18 @@ fun IberdrolaMainScreen(
             .fillMaxSize()
             .testTag("main_screen")
         ) {
-            Log.d("MainScreen", "is sync enabled: ${mainUiState.value.isOnline}")
+            Log.d("MainScreen", "is sync enabled: ${billsUiState.value.isOnline}")
             IberdrolaTopBar(
-                selectedOption = mainUiState.value.selectedOption,
-                options = mainUiState.value.options,
+                selectedOption = billsUiState.value.selectedOption,
+                options = billsUiState.value.options,
                 onOptionSelected = { option ->
                     val page = if (option == BillTypeEnum.LUZ) 0 else 1
                     scope.launch { pagerState.animateScrollToPage(page) }
                 },
                 onBackButtonClick = onBackButtonClick,
-                isSyncEnabled = mainUiState.value.isOnline,
+                isSyncEnabled = billsUiState.value.isOnline,
                 onSyncToggle = {
                     billsViewModel.updateDataBase(it)
-                    mainViewModel.updateIsOnline(it)
                 }
             )
 

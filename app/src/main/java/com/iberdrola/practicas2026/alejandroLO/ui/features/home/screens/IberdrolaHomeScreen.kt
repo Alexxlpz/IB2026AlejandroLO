@@ -36,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.iberdrola.practicas2026.alejandroLO.R
@@ -95,33 +96,31 @@ fun IberdrolaHomeScreen(
             IberdrolaHomeFoot()
         }
 
+        Log.d(TAG, "IberdrolaHomeScreen: mostrarSheet: $mostrarSheet")
         if (mostrarSheet) {
-            Box(){
-
-                IberdrolaFeedbackDialog(
-                    sheetState = sheetState,
-                    onDismiss = {
-                        Log.d(TAG, "IberdrolaHomeScreen: dismiss alert")
-                        scope.launch {
-                            sheetState.hide()
-                        }.invokeOnCompletion {
-                            if (!sheetState.isVisible) {
-                                setCont(1)
-                            }
+            IberdrolaFeedbackDialog(
+                sheetState = sheetState,
+                onDismiss = {
+                    Log.d(TAG, "IberdrolaHomeScreen: dismiss alert")
+                    scope.launch {
+                        sheetState.hide()
+                    }.invokeOnCompletion {
+                        if (!sheetState.isVisible) {
+                            setCont(1)
                         }
-                    },
-                    onAskLater = {
-                        scope.launch { sheetState.hide() }.invokeOnCompletion {
-                            setCont(3)
-                        }
-                    },
-                    onRatingSelected = {
-                        scope.launch { sheetState.hide() }.invokeOnCompletion {
-                            setCont(10)
-                        }
-                    },
-                )
-            }
+                    }
+                },
+                onAskLater = {
+                    scope.launch { sheetState.hide() }.invokeOnCompletion {
+                        setCont(3)
+                    }
+                },
+                onRatingSelected = {
+                    scope.launch { sheetState.hide() }.invokeOnCompletion {
+                        setCont(10)
+                    }
+                },
+            )
         }
     }
 }
@@ -194,7 +193,8 @@ fun SuministroItem(suministro: HomeUiState, onClick: () -> Unit) {
             Row(
                 modifier = Modifier
                     .padding(16.dp)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .height(60.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Surface(
@@ -218,12 +218,16 @@ fun SuministroItem(suministro: HomeUiState, onClick: () -> Unit) {
                     Text(
                         text = suministro.direccion,
                         style = IberdrolaTheme.typography.cuerpoGrande,
-                        color = IberdrolaTheme.colors.onSurface
+                        color = IberdrolaTheme.colors.onSurface,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                     Text(
                         text = suministro.ciudad,
                         style = IberdrolaTheme.typography.cuerpoMedio,
-                        color = IberdrolaTheme.colors.onSurfaceVariant
+                        color = IberdrolaTheme.colors.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
 
