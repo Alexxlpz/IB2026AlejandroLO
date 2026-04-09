@@ -22,6 +22,9 @@
       <SelectionState runConfigName="bottomSheet_isVisible_whenMostrarSheetTrue()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
+      <SelectionState runConfigName="Tests in 'com.iberdrola.practicas2026.alejandroLO'">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
     </selectionStates>
   </component>
 </project>

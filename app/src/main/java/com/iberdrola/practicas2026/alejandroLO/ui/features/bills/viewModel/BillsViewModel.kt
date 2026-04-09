@@ -35,7 +35,11 @@ class BillsViewModel(
         val isOnline = _uiState.value.isOnline
         val directionId = _uiState.value.directionId
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
+            _uiState.update { it.copy(
+                isLoading = true,
+                errorMessage = null
+            )
+        }
 
             val observator = launch {// solo coger aquellas que coincidan con la calle
                 billsRepository.getAllBillsByDirectionId(directionId).collect { bills ->
@@ -53,6 +57,7 @@ class BillsViewModel(
                     delay(1000) // debido a que se carga demasiado rapido y ves aparecer las bills mientras se cargan
                 } catch (e: Exception) {
                     Log.e(TAG, "Error al conectar con Mockoon: ${e.message}")
+                    _uiState.update { it.copy(errorMessage = "Error al conectar con Mockoon: ${e.message}") }
                 }
             }else {
                 billsRepository.insertMockBillsFromAssets()

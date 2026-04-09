@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.outlined.Lightbulb
 import androidx.compose.material.icons.outlined.LocalFireDepartment
@@ -30,6 +31,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
+import androidx.compose.material3.pulltorefresh.PullToRefreshState
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,10 +55,6 @@ import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
-import androidx.compose.material3.pulltorefresh.PullToRefreshState
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 
 @Composable
 fun IberdrolaBillsScreen(
@@ -63,6 +64,7 @@ fun IberdrolaBillsScreen(
     onclick: (Bill) -> Unit,
     modifier: Modifier = Modifier,
     refresh: () -> Unit = {},
+    error: String? = null,
     locale: Locale = Locale.forLanguageTag("es-ES")
 ) {
     val scrollState = rememberScrollState()
@@ -99,10 +101,44 @@ fun IberdrolaBillsScreen(
                     .verticalScroll(scrollState)
                     .testTag("bills_screen")
             ) {
-                if (lastBill != null) {
-                    IberdrolaLastBill(lastBill = lastBill, numberFormat = numberFormat)
+                if(error == null) {
+                    if (lastBill != null) {
+                        IberdrolaLastBill(lastBill = lastBill, numberFormat = numberFormat)
+                    }
+                    IberdrolaBillList(bills = bills, onclick = onclick, numberFormat = numberFormat)
                 }
-                IberdrolaBillList(bills = bills, onclick = onclick, numberFormat = numberFormat)
+
+
+                error?.let { message ->
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .testTag("error_message_surface"),
+                        color = IberdrolaTheme.colors.errorContainer,
+                        shape = RoundedCornerShape(12.dp),
+                        border = BorderStroke(1.dp, IberdrolaTheme.colors.onErrorContainer.copy(alpha = 0.2f)),
+                        shadowElevation = 2.dp
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Error,
+                                contentDescription = null,
+                                tint = IberdrolaTheme.colors.onErrorContainer,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Text(
+                                text = message,
+                                style = IberdrolaTheme.typography.cuerpoMedio,
+                                color = IberdrolaTheme.colors.onErrorContainer
+                            )
+                        }
+                    }
+                }
             }
         }
     }

@@ -121,6 +121,7 @@ fun IberdrolaMainScreen(
                     onclick = { selectingBill(it) },
                     refresh = { billsViewModel.refreshBills() },
                     modifier = Modifier.fillMaxSize(),
+                    error = billsUiState.value.errorMessage,
                     locale = locale
                 )
             }

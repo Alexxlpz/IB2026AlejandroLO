@@ -61,7 +61,9 @@ class OfflineBillsRepository(
                 Log.d(TAG, "Reintento online exitoso")
             }
         } catch (e: Exception) {
+            billDao.deleteAll()
             Log.e(TAG, "Error en refreshBillsOnline: ${e.message}")
+            throw e
         }
     }
 
