@@ -8,5 +8,5 @@ data class BillsUiState (
     val selectedOption: BillTypeEnum = BillTypeEnum.LUZ,
     val isLoading: Boolean = false,
     val isOnline: Boolean = false,
-    val hasBills: Boolean = billsList.isNotEmpty()
+    val options: List<BillTypeEnum> = emptyList()
 )

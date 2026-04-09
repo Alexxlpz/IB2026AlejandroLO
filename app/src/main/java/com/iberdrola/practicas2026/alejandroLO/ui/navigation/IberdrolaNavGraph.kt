@@ -10,10 +10,13 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsViewModel
+import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsViewModelFactory
 import com.iberdrola.practicas2026.alejandroLO.ui.features.home.screens.IberdrolaHomeScreen
 import com.iberdrola.practicas2026.alejandroLO.ui.features.main.screens.IberdrolaMainScreen
 import java.util.Locale
@@ -43,6 +46,8 @@ fun IberdrolaNavGraph(
         Log.d(TAG, "decrementarCont: cont = $cont")
     }
 
+   val billsViewModel: BillsViewModel = viewModel(factory = BillsViewModelFactory.Factory)
+
 
     NavHost(
         navController = navController,
@@ -70,7 +75,8 @@ fun IberdrolaNavGraph(
                         // la pila de navController
                     }
                 },
-                modifier = Modifier.padding(innerPadding)
+                modifier = Modifier.padding(innerPadding),
+                billsViewModel = billsViewModel
             )
         }
     }
