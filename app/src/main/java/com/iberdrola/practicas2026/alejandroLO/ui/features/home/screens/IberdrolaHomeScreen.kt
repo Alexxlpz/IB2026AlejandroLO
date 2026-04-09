@@ -53,7 +53,7 @@ import com.iberdrola.practicas2026.alejandroLO.ui.features.home.screensimport.Ib
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IberdrolaHomeScreen(
-    onAddressClick: () -> Unit,
+    onAddressClick: (Int, String) -> Unit,
     setCont: (Int) -> Unit,
     mostrarSheet: Boolean = false,
     homeViewModel: HomeViewModel
@@ -64,7 +64,7 @@ fun IberdrolaHomeScreen(
 
     val homeUiState = homeViewModel.uiState.collectAsState()
 
-    val listaSuministros = homeUiState.value.directionList
+    val directionList = homeUiState.value.directionList
     val isLoading = homeUiState.value.isLoading
 
     if (isLoading) {
@@ -97,8 +97,8 @@ fun IberdrolaHomeScreen(
                     contentPadding = PaddingValues(bottom = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(listaSuministros) { suministro ->
-                        SuministroItem(suministro, onAddressClick)
+                    items(directionList) { direccion ->
+                        SuministroItem(direccion, { onAddressClick(direccion.id, direccion.street) })
                     }
                 }
                 IberdrolaHomeFoot()
@@ -313,7 +313,7 @@ fun IberdrolaHomeFoot(){
 fun PreviewIberdrolaHomeScreen() {
     IB2026AlejandroLOTheme {
         IberdrolaHomeScreen(
-            onAddressClick = { },
+            onAddressClick = { _, _ -> },
             setCont = { },
             mostrarSheet = false,
             homeViewModel = viewModel()
@@ -326,7 +326,7 @@ fun PreviewIberdrolaHomeScreen() {
 fun PreviewIberdrolaHomeScreenWithAlert() {
     IB2026AlejandroLOTheme {
         IberdrolaHomeScreen(
-            onAddressClick = { },
+            onAddressClick = {_, _ -> },
             setCont = { },
             mostrarSheet = true,
             homeViewModel = viewModel()

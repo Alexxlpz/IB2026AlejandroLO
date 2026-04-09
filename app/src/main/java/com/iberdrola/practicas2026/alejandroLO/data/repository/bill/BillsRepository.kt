@@ -1,9 +1,7 @@
 package com.iberdrola.practicas2026.alejandroLO.data.repository.bill
 
 import com.iberdrola.practicas2026.alejandroLO.data.model.Bill
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.withContext
 
 interface BillsRepository {
     suspend fun insert(bill: Bill) // AÑADIR UNA FACTURA
@@ -16,4 +14,6 @@ interface BillsRepository {
     fun getBillById(id: Int): Flow<Bill> // OBTENER LA FACTURA CON EL ID DEL PARAMETRO ORDENADAS POR FECHA DE MANERA DESCENDIENTE
     fun getBillsByType(typeId: Int): Flow<List<Bill>> // OBTENER LA FACTURA CON EL TIPO DEL PARAMETRO ORDENADAS POR FECHA DE MANERA DESCENDIENTE
     fun getAllBills(): Flow<List<Bill>> // OBTENER TODAS LAS FACTURAS ORDENADAS POR FECHA DE MANERA DESCENDIENTE
+
+    fun getAllBillsByDirectionId(directionId: Int): Flow<List<Bill>> // OBTENER TODAS LAS FACTURAS ORDENADAS POR FECHA DE MANERA DESCENDIENTE
 }

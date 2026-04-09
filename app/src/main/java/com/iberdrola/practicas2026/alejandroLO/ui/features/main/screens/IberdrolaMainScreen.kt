@@ -91,6 +91,7 @@ fun IberdrolaMainScreen(
             Log.d("MainScreen", "is sync enabled: ${billsUiState.value.isOnline}")
             IberdrolaTopBar(
                 selectedOption = billsUiState.value.selectedOption,
+                streetName = billsUiState.value.directionStreet,
                 options = billsUiState.value.options,
                 onOptionSelected = { option ->
                     val page = if (option == BillTypeEnum.LUZ) 0 else 1

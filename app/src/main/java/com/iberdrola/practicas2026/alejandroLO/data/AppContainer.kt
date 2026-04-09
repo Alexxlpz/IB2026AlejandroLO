@@ -30,6 +30,7 @@ class AppDataContainer(private val context: Context) : AppContainer {
         .registerTypeAdapter(Date::class.java, JsonDeserializer { json, _, _ ->
             Date(json.asJsonPrimitive.asLong)
         })
+        .setLenient() // para que Gson sea mas tolerable con el json
         .create()
     private val retrofit: Retrofit = Retrofit.Builder()
         .addConverterFactory(GsonConverterFactory.create(gson)) // se lo pasamos para que lo use

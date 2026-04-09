@@ -3,12 +3,10 @@ package com.iberdrola.practicas2026.alejandroLO.data.repository.bill
 import android.content.Context
 import android.database.sqlite.SQLiteConstraintException
 import android.util.Log
-import androidx.compose.foundation.gestures.forEach
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.iberdrola.practicas2026.alejandroLO.data.BillDatabase
 import com.iberdrola.practicas2026.alejandroLO.data.model.Bill
-import com.iberdrola.practicas2026.alejandroLO.data.model.Direction
 import com.iberdrola.practicas2026.alejandroLO.data.network.bill.BillsApiService
 import com.iberdrola.practicas2026.alejandroLO.data.repository.direction.DirectionRepository
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillStatusEnum
@@ -28,6 +26,7 @@ class OfflineBillsRepository(
     val TAG: String = "OfflineBillsRepository"
 
     override fun getAllBills(): Flow<List<Bill>> = billDao.getAllBills()
+    override fun getAllBillsByDirectionId(directionId: Int): Flow<List<Bill>> = billDao.getAllBillsByDirectionId(directionId)
     override fun getBillsByType(typeId: Int): Flow<List<Bill>> = billDao.getBillsByType(typeId)
     override fun getBillById(id: Int): Flow<Bill> = billDao.getBill(id)
     override suspend fun insert(bill: Bill) = billDao.insert(bill)
@@ -46,7 +45,7 @@ class OfflineBillsRepository(
                 billDao.deleteAll()
                 Log.d(TAG, "Insertando facturas desde API...")
                 remoteBills.forEach { billDao.insert(it) }
-            } catch (e: SQLiteConstraintException) {
+            } catch (_: SQLiteConstraintException) {
                 Log.w(TAG, "Fallo de ForeignKey online. Refrescando direcciones desde API...")
                 directionsRepository.refreshDirectionsOnline()
 
@@ -75,7 +74,7 @@ class OfflineBillsRepository(
             billDao.deleteAll()
             Log.d(TAG, "Insertando facturas mock...")
             bills.forEach { billDao.insert(it) }
-        } catch (e: SQLiteConstraintException) {
+        } catch (_: SQLiteConstraintException) {
             Log.w(TAG, "Fallo de ForeignKey en mock. Cargando direcciones locales...")
             directionsRepository.insertMockDirectionsFromAssets()
 

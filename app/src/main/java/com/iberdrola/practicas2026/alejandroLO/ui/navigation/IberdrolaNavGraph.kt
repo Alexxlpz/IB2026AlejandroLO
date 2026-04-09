@@ -58,7 +58,11 @@ fun IberdrolaNavGraph(
     ) {
         composable(IberdrolaScreens.HOME.title) {
             IberdrolaHomeScreen(
-                onAddressClick = {
+                onAddressClick = { id, street ->
+                    billsViewModel.updateDirection (
+                        directionId = id,
+                        directionStreet = street
+                    )
                     navController.navigate(IberdrolaScreens.MAIN.title)
                 },
                 setCont = setCont,
