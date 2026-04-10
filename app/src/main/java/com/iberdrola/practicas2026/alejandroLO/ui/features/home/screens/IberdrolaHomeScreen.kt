@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
@@ -73,6 +74,7 @@ fun IberdrolaHomeScreen(
     val directionList = homeUiState.value.directionList
     val isLoading = homeUiState.value.isLoading
     val isOnline = homeUiState.value.isOnline
+    val error = homeUiState.value.errorMessage
 
     val localIsOnline = remember(isOnline) { mutableStateOf(isOnline) }
     val showConfirmDialog = remember { mutableStateOf(false) }
@@ -117,17 +119,22 @@ fun IberdrolaHomeScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                LazyColumn(
-                    modifier = Modifier.weight(1f),
-                    contentPadding = PaddingValues(bottom = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(directionList) { direccion ->
-                        SuministroItem(
-                            direccion,
-                            { onAddressClick(direccion.id, direccion.street) })
+                if(error == null) {
+                    LazyColumn(
+                        modifier = Modifier.weight(1f),
+                        contentPadding = PaddingValues(bottom = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(directionList) { direccion ->
+                            SuministroItem(
+                                direccion,
+                                { onAddressClick(direccion.id, direccion.street) })
+                        }
                     }
                 }
+
+                ErrorMessageShowing(error)
+
                 IberdrolaHomeFoot(
                     isOnline = localIsOnline.value,
                     onToggleMode = { newValue ->
@@ -420,6 +427,40 @@ fun IberdrolaConfirmDialog(
         containerColor = IberdrolaTheme.colors.surface,
         shape = RoundedCornerShape(28.dp)
     )
+}
+
+@Composable
+fun ErrorMessageShowing(error: String?){
+    error?.let { message ->
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+                .testTag("error_message_surface"),
+            color = IberdrolaTheme.colors.errorContainer,
+            shape = RoundedCornerShape(12.dp),
+            border = BorderStroke(1.dp, IberdrolaTheme.colors.onErrorContainer.copy(alpha = 0.2f)),
+            shadowElevation = 2.dp
+        ) {
+            Row(
+                modifier = Modifier.padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Error,
+                    contentDescription = null,
+                    tint = IberdrolaTheme.colors.onErrorContainer,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(
+                    text = message,
+                    style = IberdrolaTheme.typography.cuerpoMedio,
+                    color = IberdrolaTheme.colors.onErrorContainer
+                )
+            }
+        }
+    }
 }
 
 @Composable
