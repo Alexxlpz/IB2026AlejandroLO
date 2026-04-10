@@ -16,8 +16,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -39,18 +37,16 @@ fun IberdrolaTopBar(selectedOption: BillTypeEnum,
                     options: List<BillTypeEnum>,
                     onOptionSelected: (BillTypeEnum) -> Unit,
                     onBackButtonClick: () -> Unit,
-                    isSyncEnabled: Boolean,
-                    onSyncToggle: (Boolean) -> Unit,
                     modifier: Modifier = Modifier){
     Column(modifier = modifier
         .fillMaxWidth()
         .testTag("top_bar")) {
 
         IberdrolaBar(
-            onBackButtonClick = onBackButtonClick,
-            isSyncEnabled = isSyncEnabled,
-            onSyncToggle = onSyncToggle
+            onBackButtonClick = onBackButtonClick
+
         )
+
         IberdrolaTitleAndDescription(
             description = streetName,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
@@ -68,11 +64,8 @@ fun IberdrolaTopBar(selectedOption: BillTypeEnum,
 }
 
 @Composable
-fun IberdrolaBar(
-    onBackButtonClick: () -> Unit,
-    isSyncEnabled: Boolean,
-    onSyncToggle: (Boolean) -> Unit
-) {
+fun IberdrolaBar(onBackButtonClick: () -> Unit) {
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -101,25 +94,6 @@ fun IberdrolaBar(
                 style = IberdrolaTheme.typography.tituloPeque,
                 color = IberdrolaTheme.colors.primary,
                 textDecoration = TextDecoration.Underline
-            )
-        }
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Text(
-                text = if (isSyncEnabled) stringResource(R.string.online) else stringResource(R.string.offline),
-                style = IberdrolaTheme.typography.etiquetaPeque,
-                color = if (isSyncEnabled) IberdrolaTheme.colors.primary else IberdrolaTheme.colors.onSurfaceVariant
-            )
-            Switch(
-                checked = isSyncEnabled,
-                onCheckedChange = onSyncToggle,
-                colors = SwitchDefaults.colors(
-                    checkedThumbColor = Color.White,
-                    checkedTrackColor = IberdrolaTheme.colors.primary
-                )
             )
         }
     }
@@ -214,8 +188,6 @@ fun PreviewIberdrolaTopBar() {
             options = BillTypeEnum.entries,
             onOptionSelected = { },
             onBackButtonClick = { },
-            isSyncEnabled = false,
-            onSyncToggle = { },
             modifier = Modifier
         )
     }

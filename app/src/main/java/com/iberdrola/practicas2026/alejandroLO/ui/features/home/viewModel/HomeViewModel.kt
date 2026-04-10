@@ -63,5 +63,6 @@ class HomeViewModel(
                 isOnline = isOnline
             )
         }
+        refreshDirections()
     }
 }

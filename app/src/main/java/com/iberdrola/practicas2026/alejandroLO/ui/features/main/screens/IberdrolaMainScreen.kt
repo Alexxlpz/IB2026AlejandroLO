@@ -73,15 +73,6 @@ fun IberdrolaMainScreen(
     val scope: CoroutineScope = rememberCoroutineScope()
 
 
-//    val bill = Bill(
-//        type = BillType.LUZ.title,
-//        price = 100.0,
-//        status = BillStatus.PENDIENTE.title,
-//        date = Date(),
-//        dueDate = Date()
-//    )
-//    val bills = listOf(bill, bill, bill, bill, bill, bill, bill, bill, bill, bill)
-
     Box() {
         Column(modifier = modifier
             .fillMaxSize()
@@ -96,11 +87,7 @@ fun IberdrolaMainScreen(
                     val page = if (option == BillTypeEnum.LUZ) 0 else 1
                     scope.launch { pagerState.animateScrollToPage(page) }
                 },
-                onBackButtonClick = onBackButtonClick,
-                isSyncEnabled = billsUiState.value.isOnline,
-                onSyncToggle = {
-                    billsViewModel.updateDataBase(it)
-                }
+                onBackButtonClick = onBackButtonClick
             )
 
             HorizontalPager(
