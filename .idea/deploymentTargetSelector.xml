@@ -16,13 +16,10 @@
       <SelectionState runConfigName="IberdrolaMainScreenTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="IberdrolaBillsScreenTest">
+      <SelectionState runConfigName="IberdrolaNavGraphTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="bottomSheet_isVisible_whenMostrarSheetTrue()">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
-      <SelectionState runConfigName="Tests in 'com.iberdrola.practicas2026.alejandroLO'">
+      <SelectionState runConfigName="All Tests">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
