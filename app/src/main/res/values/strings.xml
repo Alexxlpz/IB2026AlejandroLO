@@ -1,3 +1,29 @@
 <resources>
+    <!--APP-->
     <string name="app_name">IB2026AlejandroLO</string>
+    <string name="back_button">Back</string>
+    <string name="cancel">Cancel</string>
+    <string name="next">Next</string>
+    <string name="subtotal">Subtotal: %s</string>
+    <string name="tax">Tax: %s</string>
+    <string name="total">Total: %s</string>
+    <string name="submit">Submit</string>
+    <string name="atras"><u>Atrás</u></string>
+    <string name="ultima_factura">Última factura</string>
+    <string name="online">Online</string>
+    <string name="offline">Offline</string>
+    <string name="mis_facturas">Mis facturas</string>
+    <string name="factura">Factura %1$s</string>
+    <string name="historico_de_facturas">Histórico de facturas</string>
+    <string name="no_hay_facturas">No hay facturas</string>
+    <string name="gestiona_tus_contratos_y_facturas">Gestiona tus contratos y facturas</string>
+    <string name="selecciona_un_punto_de_suministro">Selecciona un punto de suministro</string>
+    <string name="informacion">i</string>
+    <string name="iberdrola_clientes">Iberdrola Clientes</string>
+    <string name="atencion_al_cliente_24h">"Atención al cliente 24h: "</string>
+    <string name="hola">"Hola, "</string>
+    <string name="confirmar_cambio">Confirmar cambio de modo</string>
+    <string name="confirmar_cambio_modo_mensaje">La aplicación se recargará para obtener los nuevos datos. ¿Deseas continuar?</string>
+    <string name="aceptar">Aceptar</string>
+    <string name="cancelar">Cancelar</string>
 </resources>

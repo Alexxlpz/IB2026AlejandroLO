@@ -1,58 +1,78 @@
 package com.iberdrola.practicas2026.alejandroLO.ui.theme
 
-import android.app.Activity
-import android.os.Build
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+
+// Objeto para acceder al tema de forma "local"
+object IberdrolaTheme {
+    val colors: IberdrolaColors
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalIberdrolaColors.current
+
+    val typography: IberdrolaTypography
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalIberdrolaTypography.current
+}
+
+// Estructura de Colores Propios
+data class IberdrolaColors(
+    val primary: Color = IberdrolaGreen,
+    val primaryLight: Color = IberdrolaGreenLight,
+    val primaryDark: Color = IberdrolaGreenDark,
+    val background: Color = Color.White,
+    val surface: Color = Color.White,
+    val surfaceVariant: Color = SurfaceGray,
+    val onSurface: Color = TextPrimary,
+    val onSurfaceVariant: Color = TextSecondary,
+    val border: Color = BorderGray,
+    val successContainer: Color = IberdrolaGreenLight,
+    val onSuccessContainer: Color = IberdrolaGreenDark,
+    val errorContainer: Color = IberdrolaRedStatus,
+    val onErrorContainer: Color = IberdrolaRedText,
+    val iconLuzGas: Color = Color(0xFF004D3F),
+    val importeHistorico: Color = Color(0xFF868686)
 )
 
-private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+// Estructura de Tipografía Propia
+data class IberdrolaTypography(
+    val tituloGrande: TextStyle = Typography.titleLarge,
+    val tituloMedio: TextStyle = Typography.titleMedium,
+    val tituloPeque: TextStyle = Typography.titleSmall,
+    val importe: TextStyle = Typography.headlineMedium,
+    val cuerpoGrande: TextStyle = Typography.bodyLarge,
+    val cuerpoMedio: TextStyle = Typography.bodyMedium,
+    val cuerpoPeque: TextStyle = Typography.bodySmall,
+    val etiquetaGrande: TextStyle = Typography.labelLarge,
+    val etiquetaPeque: TextStyle = Typography.labelSmall,
+    val importeHistorico: TextStyle = PriceHistoryStyle
 )
+
+val LocalIberdrolaColors = staticCompositionLocalOf { IberdrolaColors() }
+val LocalIberdrolaTypography = staticCompositionLocalOf { IberdrolaTypography() }
 
 @Composable
 fun IB2026AlejandroLOTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
+    val colors = IberdrolaColors()
+    val typography = IberdrolaTypography()
 
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+    CompositionLocalProvider(
+        LocalIberdrolaColors provides colors,
+        LocalIberdrolaTypography provides typography
+    ) {
+        MaterialTheme(
+            colorScheme = lightColorScheme(primary = IberdrolaGreen),
+            content = content
+        )
     }
-
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
-        content = content
-    )
 }
