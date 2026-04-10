@@ -42,6 +42,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -119,21 +120,41 @@ fun IberdrolaHomeScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                if(error == null) {
-                    LazyColumn(
-                        modifier = Modifier.weight(1f),
-                        contentPadding = PaddingValues(bottom = 16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        items(directionList) { direccion ->
-                            SuministroItem(
-                                direccion,
-                                { onAddressClick(direccion.id, direccion.street) })
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                ) {
+                    if(error == null) {
+                        if (directionList.isEmpty()) {
+                            Text(
+                                text = "No se encontraron suministros",
+                                modifier = Modifier.align(Alignment.Center),
+                                style = IberdrolaTheme.typography.cuerpoMedio,
+                                color = Color.Gray
+                            )
+                        } else {
+                            LazyColumn(
+                                modifier = Modifier.fillMaxSize(),
+                                contentPadding = PaddingValues(bottom = 16.dp),
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                items(directionList) { direccion ->
+                                    SuministroItem(
+                                        direccion,
+                                        { onAddressClick(direccion.id, direccion.street) }
+                                    )
+                                }
+                            }
+                        }
+                    } else {
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            ErrorMessageShowing(error)
                         }
                     }
                 }
 
-                ErrorMessageShowing(error)
+
 
                 IberdrolaHomeFoot(
                     isOnline = localIsOnline.value,
