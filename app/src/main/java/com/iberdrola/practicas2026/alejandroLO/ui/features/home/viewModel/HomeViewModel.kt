@@ -39,7 +39,11 @@ class HomeViewModel(
     fun refreshDirections() {
         val isOnline = _uiState.value.isOnline
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
+            _uiState.update { it.copy(
+                isLoading = true,
+                errorMessage = null
+            )
+        }
 
             val observator = launch {
                 directionRepository.getAllDirections().collect { bills ->
@@ -57,6 +61,7 @@ class HomeViewModel(
                     delay(1000) // debido a que se carga demasiado rapido y ves aparecer las direcciones mientras se cargan
                 } catch (e: Exception) {
                     Log.e(TAG, "Error al conectar con Mockoon: ${e.message}")
+                    _uiState.update { it.copy(errorMessage = e.message) }
                 }
             }else {
                 directionRepository.insertMockDirectionsFromAssets()

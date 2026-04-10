@@ -2,13 +2,12 @@ package com.iberdrola.practicas2026.alejandroLO.data.repository.direction
 
 import android.content.Context
 import android.util.Log
-import com.iberdrola.practicas2026.alejandroLO.data.model.Direction
-import com.iberdrola.practicas2026.alejandroLO.data.network.direction.DirectionApiService
-import kotlinx.coroutines.flow.Flow
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import com.iberdrola.practicas2026.alejandroLO.data.BillDatabase
-import com.iberdrola.practicas2026.alejandroLO.data.model.Bill
+import com.iberdrola.practicas2026.alejandroLO.data.model.Direction
+import com.iberdrola.practicas2026.alejandroLO.data.network.direction.DirectionApiService
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
 
@@ -35,9 +34,9 @@ class OfflineDirectionRepository(
     override fun getAllDirections(): Flow<List<Direction>> = directionDao.getAllDirections()
 
     override suspend fun refreshDirectionsOnline() {
+        val database = BillDatabase.getDatabase(context)
         try {
             val remoteDir = apiService.getDirections()
-            val database = BillDatabase.getDatabase(context)
             withContext(kotlinx.coroutines.Dispatchers.IO) {
                 database.clearDatabase()
                 Log.d(
@@ -52,6 +51,8 @@ class OfflineDirectionRepository(
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error al conectar con Mockoon: ${e.message}, COMPRUEBA SI LE HAS DADO AL PLAY")
+            database.clearDatabase()
+            throw e
         }
     }
 
@@ -60,8 +61,6 @@ class OfflineDirectionRepository(
         val gson = GsonBuilder().create()
         val listType = object : TypeToken<List<Direction>>() {}.type
         val directions: List<Direction> = gson.fromJson(jsonString, listType)
-        val database = BillDatabase.getDatabase(context)
-
 
         // Limpiamos e insertamos
         withContext(kotlinx.coroutines.Dispatchers.IO) {
