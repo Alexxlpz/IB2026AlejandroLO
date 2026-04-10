@@ -8,6 +8,8 @@ import com.iberdrola.practicas2026.alejandroLO.data.network.bill.BillsApiService
 import com.iberdrola.practicas2026.alejandroLO.data.network.direction.DirectionApiService
 import com.iberdrola.practicas2026.alejandroLO.data.repository.bill.BillsRepository
 import com.iberdrola.practicas2026.alejandroLO.data.repository.bill.OfflineBillsRepository
+import com.iberdrola.practicas2026.alejandroLO.data.repository.conectivity.ConnectivityRepository
+import com.iberdrola.practicas2026.alejandroLO.data.repository.conectivity.OfflineConnectivityRepository
 import com.iberdrola.practicas2026.alejandroLO.data.repository.direction.DirectionRepository
 import com.iberdrola.practicas2026.alejandroLO.data.repository.direction.OfflineDirectionRepository
 import retrofit2.Retrofit
@@ -18,6 +20,7 @@ import java.util.Date
 interface AppContainer {
     val billsRepository: BillsRepository
     val directionsRepository: DirectionRepository
+    val connectivityRepository: ConnectivityRepository
 }
 
 class AppDataContainer(private val context: Context) : AppContainer {
@@ -62,5 +65,11 @@ class AppDataContainer(private val context: Context) : AppContainer {
             apiService = directionRetrofitService,
             context = context
         )
+    }
+
+    // patron de diseño "Shared Repository State"
+    // patron usado para centralizar la variable isOnline
+    override val connectivityRepository: ConnectivityRepository by lazy {
+        OfflineConnectivityRepository()
     }
 }
