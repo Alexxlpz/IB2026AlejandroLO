@@ -1,7 +1,9 @@
 package com.iberdrola.practicas2026.alejandroLO
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
@@ -26,6 +28,7 @@ class IberdrolaNavGraphTest {
         }
     }
 
+    @OptIn(ExperimentalTestApi::class)
     @Test
     fun givenHomeScreen_whenAddressClicked_thenNavigateToMainScreen() {
         val navController = setupNavController()
@@ -37,6 +40,9 @@ class IberdrolaNavGraphTest {
             )
         }
 
+        // Esperamos a que el componente de carga desaparezca y se muestre la home
+        composeTestRule.waitUntilAtLeastOneExists(hasTestTag("home_screen"), 5000)
+
         composeTestRule
             .onAllNodesWithTag("home_address_item")[0]
             .performClick()
@@ -44,6 +50,7 @@ class IberdrolaNavGraphTest {
         assert(navController.currentDestination?.route == IberdrolaScreens.MAIN.title)
     }
 
+    @OptIn(ExperimentalTestApi::class)
     @Test
     fun givenMainScreen_whenBackPressed_thenNavigateBackToHome() {
         val navController = setupNavController()
@@ -55,6 +62,9 @@ class IberdrolaNavGraphTest {
             )
         }
 
+        // Esperamos a que el componente de carga desaparezca y se muestre la home
+        composeTestRule.waitUntilAtLeastOneExists(hasTestTag("home_screen"), 5000)
+
         composeTestRule
             .onAllNodesWithTag("home_address_item")[0]
             .performClick()
@@ -63,6 +73,7 @@ class IberdrolaNavGraphTest {
         assert(navController.currentDestination?.route == IberdrolaScreens.HOME.title)
     }
 
+    @OptIn(ExperimentalTestApi::class)
     @Test
     fun givenHomeScreen_whenLoaded_thenIsDisplayed() {
         val navController = setupNavController()
@@ -74,9 +85,13 @@ class IberdrolaNavGraphTest {
             )
         }
 
+        // Esperamos a que el componente de carga desaparezca y se muestre la home
+        composeTestRule.waitUntilAtLeastOneExists(hasTestTag("home_screen"), 5000)
+        
         composeTestRule.onNodeWithTag("home_screen").assertIsDisplayed()
     }
 
+    @OptIn(ExperimentalTestApi::class)
     @Test
     fun givenMainScreen_whenNavigated_thenIsDisplayed() {
         val navController = setupNavController()
@@ -87,6 +102,9 @@ class IberdrolaNavGraphTest {
                 innerPadding = PaddingValues()
             )
         }
+
+        // Esperamos a que el componente de carga desaparezca y se muestre la home
+        composeTestRule.waitUntilAtLeastOneExists(hasTestTag("home_screen"), 5000)
 
         composeTestRule
             .onAllNodesWithTag("home_address_item")[0]
