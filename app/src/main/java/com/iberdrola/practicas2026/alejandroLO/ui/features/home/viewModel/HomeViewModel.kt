@@ -3,6 +3,7 @@ package com.iberdrola.practicas2026.alejandroLO.ui.features.home.viewModel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.iberdrola.practicas2026.alejandroLO.data.repository.conectivity.ConnectivityRepository
 import com.iberdrola.practicas2026.alejandroLO.data.repository.direction.DirectionRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,7 +14,8 @@ import kotlinx.coroutines.launch
 import java.lang.Math.random
 
 class HomeViewModel(
-    private val directionRepository: DirectionRepository
+    private val directionRepository: DirectionRepository,
+    private val connectivityRepository: ConnectivityRepository
 ) : ViewModel() {
 
     val TAG = "HomeViewModel"
@@ -22,7 +24,16 @@ class HomeViewModel(
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
     init {
+        load_conectivity()
         refreshDirections()
+    }
+
+    fun load_conectivity() {
+        viewModelScope.launch {
+            connectivityRepository.isOnline.collect { status ->
+                _uiState.update { it.copy(isOnline = status) }
+            }
+        }
     }
 
     fun refreshDirections() {
@@ -58,10 +69,8 @@ class HomeViewModel(
     }
 
     fun updateDirectionsOnline(isOnline: Boolean){
-        _uiState.update { currentState ->
-            currentState.copy(
-                isOnline = isOnline
-            )
-        }
+        connectivityRepository.setOnlineMode(isOnline) // el collect se encarga de cambiar el valor del uiState
+
+        refreshDirections()
     }
 }

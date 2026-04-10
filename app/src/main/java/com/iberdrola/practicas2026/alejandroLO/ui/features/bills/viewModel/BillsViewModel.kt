@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.iberdrola.practicas2026.alejandroLO.data.repository.bill.BillsRepository
+import com.iberdrola.practicas2026.alejandroLO.data.repository.conectivity.ConnectivityRepository
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeEnum
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,7 +15,8 @@ import kotlinx.coroutines.launch
 import java.lang.Math.random
 
 class BillsViewModel(
-    private val billsRepository: BillsRepository
+    private val billsRepository: BillsRepository,
+    private val connectivityRepository: ConnectivityRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BillsUiState())
@@ -23,10 +25,18 @@ class BillsViewModel(
     val TAG: String = "BillsViewModel"
 
     init {
+        load_conectivity()
         load_options()
         refreshBills()
     }
 
+    fun load_conectivity() {
+        viewModelScope.launch {
+            connectivityRepository.isOnline.collect { status ->
+                _uiState.update { it.copy(isOnline = status) }
+            }
+        }
+    }
     fun load_options(){
         _uiState.update { it.copy(options = BillTypeEnum.entries.toTypedArray().toList()) }
     }
@@ -79,7 +89,7 @@ class BillsViewModel(
     }
 
     fun updateDataBase(isOnline: Boolean) {
-        _uiState.update { it.copy(isOnline = isOnline) }
+        connectivityRepository.setOnlineMode(isOnline)
         refreshBills()
     }
 

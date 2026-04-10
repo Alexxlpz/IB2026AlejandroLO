@@ -13,7 +13,12 @@ object BillsViewModelFactory {
         initializer {
             val application = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as IberdrolaApplication)
             val repository = application.container.billsRepository
-            BillsViewModel(billsRepository = repository)
+            val connectivityRepository = application.container.connectivityRepository
+
+            BillsViewModel(
+                billsRepository = repository,
+                connectivityRepository = connectivityRepository
+            )
         }
     }
 }

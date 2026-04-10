@@ -22,4 +22,8 @@
     <string name="iberdrola_clientes">Iberdrola Clientes</string>
     <string name="atencion_al_cliente_24h">"Atención al cliente 24h: "</string>
     <string name="hola">"Hola, "</string>
+    <string name="confirmar_cambio">Confirmar cambio de modo</string>
+    <string name="confirmar_cambio_modo_mensaje">La aplicación se recargará para obtener los nuevos datos. ¿Deseas continuar?</string>
+    <string name="aceptar">Aceptar</string>
+    <string name="cancelar">Cancelar</string>
 </resources>
