@@ -15,6 +15,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.screens.IberdrolaFilterScreen
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsViewModel
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsViewModelFactory
 import com.iberdrola.practicas2026.alejandroLO.ui.features.home.screens.IberdrolaHomeScreen
@@ -84,7 +85,15 @@ fun IberdrolaNavGraph(
                     }
                 },
                 modifier = Modifier.padding(innerPadding),
-                billsViewModel = billsViewModel
+                billsViewModel = billsViewModel,
+                onFilterClick = {
+                    navController.navigate(IberdrolaScreens.FILTER.title)
+                }
+            )
+        }
+        composable(IberdrolaScreens.FILTER.title) {
+            IberdrolaFilterScreen(
+
             )
         }
     }

@@ -1,4 +1,4 @@
-package com.iberdrola.practicas2026.alejandroLO.ui.features.bills.screens
+package com.iberdrola.practicas2026.alejandroLO.ui.features.filter.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -13,27 +13,56 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.iberdrola.practicas2026.alejandroLO.ui.common.components.IberdrolaBar
+import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillStatusEnum
+import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.viewModel.FilterViewModel
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IB2026AlejandroLOTheme
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
+import java.text.SimpleDateFormat
+import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FilterScreen(
+fun IberdrolaFilterScreen(
     onBack: () -> Unit = {},
     onApply: () -> Unit = {},
-    onClear: () -> Unit = {}
+    onClear: () -> Unit = {},
+    filterViewModel: FilterViewModel = viewModel()
 ) {
+    val filterUiState by filterViewModel.uiState.collectAsState()
+
+    val selectedDateFrom = filterUiState.selectedDateFrom
+    val selectedDateTo = filterUiState.selectedDateTo
+    val priceRange = filterUiState.priceRange
+    val selectedStates = filterUiState.selectedStates
+
+    var showDatePickerFrom by remember { mutableStateOf(false) }
+    var showDatePickerTo by remember { mutableStateOf(false) }
+
+    if (showDatePickerFrom) {
+        IberdrolaDatePickerDialog(
+            onDateSelected = { filterViewModel.updateDateFrom(it) },
+            onDismiss = { showDatePickerFrom = false }
+        )
+    }
+
+    if (showDatePickerTo) {
+        IberdrolaDatePickerDialog(
+            onDateSelected = { filterViewModel.updateDateTo(it) },
+            onDismiss = { showDatePickerTo = false }
+        )
+    }
+
     Scaffold(
         topBar = {
             IberdrolaBar(
@@ -68,7 +97,10 @@ fun FilterScreen(
                         textDecoration = TextDecoration.Underline,
                         fontWeight = FontWeight.Bold
                     ),
-                    modifier = Modifier.clickable { onClear() }
+                    modifier = Modifier.clickable { 
+                        filterViewModel.clearFilters()
+                        onClear()
+                    }
                 )
             }
         }
@@ -91,33 +123,44 @@ fun FilterScreen(
             // Sección: Por fecha
             SectionTitle("Por fecha")
             Row(modifier = Modifier.fillMaxWidth()) {
-                DatePickerField(value = "Desde", modifier = Modifier.weight(1f))
+                DatePickerField(
+                    label = "Desde",
+                    value = selectedDateFrom,
+                    modifier = Modifier.weight(1f),
+                    onClick = { showDatePickerFrom = true }
+                )
                 Spacer(Modifier.width(24.dp))
-                DatePickerField(value = "Hasta", modifier = Modifier.weight(1f))
+                DatePickerField(
+                    label = "Hasta",
+                    value = selectedDateTo,
+                    modifier = Modifier.weight(1f),
+                    onClick = { showDatePickerTo = true }
+                )
             }
 
             Spacer(Modifier.height(40.dp))
 
             // Sección: Por un importe
             SectionTitle("Por un importe")
-            PriceRangeSelector()
+            PriceRangeSelector(
+                range = priceRange,
+                onRangeChange = { filterViewModel.updatePriceRange(it) }
+            )
 
             Spacer(Modifier.height(40.dp))
 
             // Sección: Por estado
             SectionTitle("Por estado")
-            val states = listOf("Pagadas", "Pendientes de Pago", "En trámite de cobro", "Anuladas", "Cuota Fija")
-            var selectedStates by remember { mutableStateOf(setOf("Pagadas")) }
 
-            states.forEach { state ->
+            BillStatusEnum.entries.forEach { state ->
                 FilterCheckboxItem(
-                    label = state,
+                    label = state.title,
                     isSelected = selectedStates.contains(state),
                     onClick = {
-                        selectedStates = if (selectedStates.contains(state)) {
-                            selectedStates - state
+                        if (selectedStates.contains(state)) {
+                            filterViewModel.removeState(state)
                         } else {
-                            selectedStates + state
+                            filterViewModel.addState(state)
                         }
                     }
                 )
@@ -140,16 +183,22 @@ fun SectionTitle(text: String) {
 }
 
 @Composable
-fun DatePickerField(value: String, modifier: Modifier = Modifier) {
-    Column(modifier = modifier) {
+fun DatePickerField(label: String, value: Date?, modifier: Modifier = Modifier, onClick: () -> Unit = {}) {
+    Column(modifier = modifier.clickable { onClick() }) {
+        Text(
+            text = "* $label",
+            style = IberdrolaTheme.typography.etiquetaPeque,
+            color = Color.Gray,
+            modifier = Modifier.padding(bottom = 4.dp)
+        )
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .drawBehind {
                     drawLine(
                         color = Color.LightGray,
-                        start = androidx.compose.ui.geometry.Offset(0f, size.height),
-                        end = androidx.compose.ui.geometry.Offset(size.width, size.height),
+                        start = Offset(0f, size.height),
+                        end = Offset(size.width, size.height),
                         strokeWidth = 1.dp.toPx()
                     )
                 }
@@ -157,7 +206,21 @@ fun DatePickerField(value: String, modifier: Modifier = Modifier) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(text = value, style = IberdrolaTheme.typography.cuerpoMedio, color = Color.LightGray)
+            val dateFormat = SimpleDateFormat("dd MMM. yyyy", Locale.forLanguageTag("es-ES"))
+
+            if(value == null){
+                Text(
+                    text = label,
+                    style = IberdrolaTheme.typography.cuerpoMedio,
+                    color = Color.LightGray
+                )
+            }else {
+                Text(
+                    text = dateFormat.format(value),
+                    style = IberdrolaTheme.typography.cuerpoMedio,
+                    color = Color.Black
+                )
+            }
             Icon(
                 imageVector = Icons.Default.CalendarMonth,
                 contentDescription = null,
@@ -170,8 +233,40 @@ fun DatePickerField(value: String, modifier: Modifier = Modifier) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PriceRangeSelector() {
-    var rangeValues by remember { mutableStateOf(15f..151f) }
+fun IberdrolaDatePickerDialog(
+    onDateSelected: (Date) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val datePickerState = rememberDatePickerState()
+    DatePickerDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = {
+                datePickerState.selectedDateMillis?.let {
+                    val date = Date(it)
+                    onDateSelected(date)
+                }
+                onDismiss()
+            }) {
+                Text("OK", color = IberdrolaTheme.colors.primary)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("CANCELAR", color = IberdrolaTheme.colors.onSurfaceVariant)
+            }
+        }
+    ) {
+        DatePicker(state = datePickerState)
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PriceRangeSelector(
+    range: ClosedFloatingPointRange<Float>,
+    onRangeChange: (ClosedFloatingPointRange<Float>) -> Unit
+) {
     val minLimit = 15f
     val maxLimit = 151f
 
@@ -179,14 +274,13 @@ fun PriceRangeSelector() {
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Etiqueta del rango (Pill)
         Surface(
             color = Color(0xFFE5EEE9),
             shape = RoundedCornerShape(4.dp),
             modifier = Modifier.padding(bottom = 12.dp)
         ) {
             Text(
-                text = "${rangeValues.start.toInt()} € - ${rangeValues.endInclusive.toInt()} €",
+                text = "${range.start.toInt()} € - ${range.endInclusive.toInt()} €",
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
                 style = IberdrolaTheme.typography.etiquetaPeque.copy(fontWeight = FontWeight.ExtraBold),
                 color = Color.DarkGray
@@ -194,8 +288,8 @@ fun PriceRangeSelector() {
         }
 
         RangeSlider(
-            value = rangeValues,
-            onValueChange = { rangeValues = it },
+            value = range,
+            onValueChange = { onRangeChange(it) },
             valueRange = minLimit..maxLimit,
             modifier = Modifier.fillMaxWidth(),
             startThumb = {
@@ -216,7 +310,7 @@ fun PriceRangeSelector() {
                 SliderDefaults.Track(
                     rangeSliderState = rangeSliderState,
                     modifier = Modifier.height(6.dp),
-                    thumbTrackGapSize = 0.dp, // Elimina la separación bola-barra
+                    thumbTrackGapSize = 0.dp,
                     colors = SliderDefaults.colors(
                         activeTrackColor = IberdrolaTheme.colors.primary,
                         inactiveTrackColor = Color.LightGray.copy(alpha = 0.3f)
@@ -226,7 +320,9 @@ fun PriceRangeSelector() {
         )
 
         Row(
-            modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 4.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text("${minLimit.toInt()} €", style = IberdrolaTheme.typography.etiquetaPeque, color = Color.Gray)
@@ -276,6 +372,11 @@ fun FilterCheckboxItem(label: String, isSelected: Boolean, onClick: () -> Unit) 
 @Composable
 fun FilterScreenPreview() {
     IB2026AlejandroLOTheme {
-        FilterScreen()
+        IberdrolaFilterScreen(
+            onBack = { },
+            onApply = { },
+            onClear = { },
+            filterViewModel = viewModel()
+        )
     }
 }
