@@ -1,0 +1,1 @@
+Una vez dada la charla de git, intentaré llevar la seguiente dinamica: se usará la master como la ultima version del proyecto, release como versiones de publicacion y tendrán el nombre de la entrega correspondiente y develop sera la rama en la que se desarrollará el proyecto con el uso de ramas features
