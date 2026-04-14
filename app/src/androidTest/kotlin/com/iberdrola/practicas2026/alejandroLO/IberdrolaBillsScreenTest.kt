@@ -36,7 +36,8 @@ class IberdrolaBillsScreenTest {
                 bills = emptyList(),
                 lastBill = null,
                 isLoading = true,
-                onclick = {}
+                onclick = {},
+                onFilterClick = { }
             )
         }
 
@@ -55,7 +56,8 @@ class IberdrolaBillsScreenTest {
                 bills = emptyList(),
                 lastBill = null,
                 isLoading = false,
-                onclick = {}
+                onclick = {},
+                onFilterClick = { }
             )
         }
 
@@ -76,7 +78,8 @@ class IberdrolaBillsScreenTest {
                 bills = listOf(bill),
                 lastBill = bill,
                 isLoading = false,
-                onclick = {}
+                onclick = {},
+                onFilterClick = { }
             )
         }
 
@@ -96,7 +99,8 @@ class IberdrolaBillsScreenTest {
                 bills = listOf(bill, bill),
                 lastBill = null,
                 isLoading = false,
-                onclick = {}
+                onclick = {},
+                onFilterClick = { }
             )
         }
 
@@ -117,7 +121,8 @@ class IberdrolaBillsScreenTest {
                 bills = listOf(bill),
                 lastBill = null,
                 isLoading = false,
-                onclick = { clicked = true }
+                onclick = { clicked = true },
+                onFilterClick = { }
             )
         }
 
@@ -139,7 +144,8 @@ class IberdrolaBillsScreenTest {
                 bills = listOf(bill),
                 lastBill = bill,
                 isLoading = false,
-                onclick = {}
+                onclick = {},
+                onFilterClick = { }
             )
         }
 
@@ -159,7 +165,8 @@ class IberdrolaBillsScreenTest {
                 bills = listOf(bill),
                 lastBill = bill,
                 isLoading = false,
-                onclick = {}
+                onclick = {},
+                onFilterClick = { }
             )
         }
 

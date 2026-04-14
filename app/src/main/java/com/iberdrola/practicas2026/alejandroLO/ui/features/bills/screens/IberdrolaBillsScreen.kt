@@ -65,7 +65,8 @@ fun IberdrolaBillsScreen(
     modifier: Modifier = Modifier,
     refresh: () -> Unit = {},
     error: String? = null,
-    locale: Locale = Locale.forLanguageTag("es-ES")
+    locale: Locale = Locale.forLanguageTag("es-ES"),
+    onFilterClick: () -> Unit
 ) {
     val scrollState = rememberScrollState()
     val numberFormat = NumberFormat.getCurrencyInstance(locale)
@@ -105,7 +106,12 @@ fun IberdrolaBillsScreen(
                     if (lastBill != null) {
                         IberdrolaLastBill(lastBill = lastBill, numberFormat = numberFormat)
                     }
-                    IberdrolaBillList(bills = bills, onclick = onclick, numberFormat = numberFormat)
+                    IberdrolaBillList(
+                        bills = bills,
+                        onclick = onclick,
+                        numberFormat = numberFormat,
+                        onFilterClick = onFilterClick
+                    )
                 }
 
 
@@ -241,7 +247,8 @@ fun IberdrolaLastBill(
 fun IberdrolaBillList(
     bills: List<Bill>,
     onclick: (Bill) -> Unit,
-    numberFormat: NumberFormat
+    numberFormat: NumberFormat,
+    onFilterClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -260,7 +267,7 @@ fun IberdrolaBillList(
             )
 
             OutlinedButton(
-                onClick = { /* TODO: Filtrar */ },
+                onClick = onFilterClick,
                 border = BorderStroke(2.dp, IberdrolaTheme.colors.primary),
                 shape = RoundedCornerShape(20.dp),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = IberdrolaTheme.colors.primary),
@@ -388,6 +395,13 @@ fun PreviewIberdrolaBillsScreen() {
     )
     val bills = listOf(bill, bill, bill)
     IB2026AlejandroLOTheme {
-        IberdrolaBillsScreen(bills = bills, isLoading = false, onclick = {}, lastBill = bill)
+        IberdrolaBillsScreen(
+            bills = bills,
+            isLoading = false,
+            onclick = {},
+            lastBill = bill,
+            locale = Locale.forLanguageTag("es-ES"),
+            onFilterClick = {}
+        )
     }
 }

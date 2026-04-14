@@ -40,7 +40,8 @@ fun IberdrolaMainScreen(
     onBackButtonClick: () -> Unit,
     modifier: Modifier = Modifier,
     locale: Locale = Locale.forLanguageTag("es-ES"),
-    billsViewModel: BillsViewModel = viewModel(factory = BillsViewModelFactory.Factory)
+    billsViewModel: BillsViewModel = viewModel(factory = BillsViewModelFactory.Factory),
+    onFilterClick: () -> Unit
 ) {
 
     LaunchedEffect(Unit) {
@@ -109,7 +110,8 @@ fun IberdrolaMainScreen(
                     refresh = { billsViewModel.refreshBills() },
                     modifier = Modifier.fillMaxSize(),
                     error = billsUiState.value.errorMessage,
-                    locale = locale
+                    locale = locale,
+                    onFilterClick = onFilterClick
                 )
             }
         }
@@ -134,6 +136,7 @@ fun PreviewIberdrolaMainScreen() {
     IberdrolaMainScreen(
         modifier = Modifier,
         onBackButtonClick = { },
-        locale = Locale.forLanguageTag("es-ES")
+        locale = Locale.forLanguageTag("es-ES"),
+        onFilterClick = {}
     )
 }
