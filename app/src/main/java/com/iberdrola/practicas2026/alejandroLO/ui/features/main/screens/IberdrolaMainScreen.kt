@@ -96,6 +96,7 @@ fun IberdrolaMainScreen(
                 modifier = Modifier.weight(1f)
             ) { page ->
 
+
                 val filteredBills = billsUiState.value.billsList.filter {
                     it.typeId == page // 0 = Luz, 1 = Gas
                 }

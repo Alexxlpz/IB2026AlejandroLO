@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.iberdrola.practicas2026.alejandroLO.data.repository.bill.BillsRepository
 import com.iberdrola.practicas2026.alejandroLO.data.repository.conectivity.ConnectivityRepository
+import com.iberdrola.practicas2026.alejandroLO.data.repository.filter.FilterRepository
+import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillStatusEnum
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeEnum
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,14 +15,19 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.lang.Math.random
+import kotlin.math.ceil
+import kotlin.math.floor
 
 class BillsViewModel(
     private val billsRepository: BillsRepository,
-    private val connectivityRepository: ConnectivityRepository
+    private val connectivityRepository: ConnectivityRepository,
+    private val filterRepository: FilterRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BillsUiState())
     val uiState: StateFlow<BillsUiState> = _uiState.asStateFlow()
+
+    val filterCriteria = filterRepository.filterCriteria
 
     val TAG: String = "BillsViewModel"
 
@@ -58,6 +65,17 @@ class BillsViewModel(
                             billsList = bills
                         )
                     }
+                    if (bills.isNotEmpty()) {
+                        // para redondear hacia arriba
+                        val maxPrice = floor(bills.maxOf { it.price }).toFloat()
+                        // para redondear hacia abajo
+                        val minPrice = ceil(bills.minOf { it.price }).toFloat()
+
+                        filterRepository.setMaxPrice(maxPrice)
+                        filterRepository.setMinPrice(minPrice)
+
+                        filterCriteriaApply()
+                    }
                 }
             }
 
@@ -77,6 +95,7 @@ class BillsViewModel(
 
             observator.cancel()
         }
+        filterCriteriaApply() // antes de terminar filtramos las facturas
     }
 
     fun updateSelectedOption(option: BillTypeEnum) {
@@ -99,6 +118,32 @@ class BillsViewModel(
                 directionId = directionId,
                 directionStreet = directionStreet
             )
+        }
+    }
+
+    fun filterCriteriaApply(){
+        viewModelScope.launch {
+
+            Log.d(TAG, "BILLS -> filterCriteria price: ${filterCriteria.value.priceRange}")
+            Log.d(TAG, "BILLS -> filterCriteria dateFrom: ${filterCriteria.value.selectedDateFrom}")
+            Log.d(TAG, "BILLS -> filterCriteria dateTo: ${filterCriteria.value.selectedDateTo}")
+            Log.d(TAG, "BILLS -> filterCriteria states: ${filterCriteria.value.selectedStates}")
+
+
+            val filteredBills = _uiState.value.billsList.filter { bill ->
+                bill.price in filterCriteria.value.priceRange &&
+                filterCriteria.value.selectedStates.contains(BillStatusEnum.entries[bill.statusId]) &&
+                filterCriteria.value.selectedDateFrom?.before(bill.date) ?: true
+                filterCriteria.value.selectedDateTo?.after(bill.date) ?: true
+            }
+
+            Log.d(TAG, "BILLS -> filterCriteriaApply: ${filteredBills.size}")
+
+            _uiState.update {
+                it.copy(
+                    billsList = filteredBills
+                )
+            }
         }
     }
 }

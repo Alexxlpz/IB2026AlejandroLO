@@ -7,5 +7,7 @@ data class FilterUiState (
     val selectedDateFrom: Date? = null,
     val selectedDateTo: Date? = null,
     val priceRange: ClosedFloatingPointRange<Float> = 15f..151f,
-    val selectedStates: List<BillStatusEnum> = emptyList()
+    val selectedStates: List<BillStatusEnum> = BillStatusEnum.entries.toList(),
+    val maxPrice: Float = 151f,
+    val minPrice: Float = 15f
 )

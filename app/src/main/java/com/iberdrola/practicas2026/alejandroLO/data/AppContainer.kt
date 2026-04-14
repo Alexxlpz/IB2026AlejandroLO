@@ -12,6 +12,8 @@ import com.iberdrola.practicas2026.alejandroLO.data.repository.conectivity.Conne
 import com.iberdrola.practicas2026.alejandroLO.data.repository.conectivity.OfflineConnectivityRepository
 import com.iberdrola.practicas2026.alejandroLO.data.repository.direction.DirectionRepository
 import com.iberdrola.practicas2026.alejandroLO.data.repository.direction.OfflineDirectionRepository
+import com.iberdrola.practicas2026.alejandroLO.data.repository.filter.FilterRepository
+import com.iberdrola.practicas2026.alejandroLO.data.repository.filter.OfflineFilterRepository
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.Date
@@ -21,6 +23,8 @@ interface AppContainer {
     val billsRepository: BillsRepository
     val directionsRepository: DirectionRepository
     val connectivityRepository: ConnectivityRepository
+
+    val filterRepository: FilterRepository
 }
 
 class AppDataContainer(private val context: Context) : AppContainer {
@@ -71,5 +75,9 @@ class AppDataContainer(private val context: Context) : AppContainer {
     // patron usado para centralizar la variable isOnline
     override val connectivityRepository: ConnectivityRepository by lazy {
         OfflineConnectivityRepository()
+    }
+
+    override val filterRepository: FilterRepository by lazy {
+        OfflineFilterRepository()
     }
 }
