@@ -156,6 +156,9 @@ fun IberdrolaLastBill(
     firstBillDate: Date,
     numberFormat: NumberFormat
 ) {
+    val billColor = BillStatusEnum.entries[lastBill.statusId].color
+    val billStatus = BillStatusEnum.entries[lastBill.statusId].status
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -228,16 +231,15 @@ fun IberdrolaLastBill(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            val isPaid = lastBill.statusId == BillStatusEnum.PAGADA.ordinal
             Surface(
-                color = if (isPaid) IberdrolaTheme.colors.successContainer else IberdrolaTheme.colors.errorContainer,
+                color = billStatus,
                 shape = RoundedCornerShape(8.dp)
             ) {
                 Text(
                     text = BillStatusEnum.entries[lastBill.statusId].title,
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                     style = IberdrolaTheme.typography.etiquetaGrande,
-                    color = if (isPaid) IberdrolaTheme.colors.onSuccessContainer else IberdrolaTheme.colors.onErrorContainer
+                    color = billColor
                 )
             }
         }
@@ -326,8 +328,9 @@ fun IberdrolaBillItem(
     onclick: (Bill) -> Unit,
     numberFormat: NumberFormat
 ) {
-    val billStatus = BillStatusEnum.entries[bill.statusId].title
-    val isPaid = bill.statusId == BillStatusEnum.PAGADA.ordinal
+    val billStatusTitle = BillStatusEnum.entries[bill.statusId].title
+    val billColor = BillStatusEnum.entries[bill.statusId].color
+    val billStatus = BillStatusEnum.entries[bill.statusId].status
     val dateFormat = SimpleDateFormat("d 'de' MMMM", Locale.forLanguageTag("es-ES"))
     val type = BillTypeEnum.entries.find { it.ordinal == bill.typeId }?.title ?: ""
 
@@ -354,15 +357,15 @@ fun IberdrolaBillItem(
             Spacer(modifier = Modifier.height(8.dp))
 
             Surface(
-                color = if (isPaid) IberdrolaTheme.colors.successContainer else IberdrolaTheme.colors.errorContainer,
+                color = billStatus,
                 shape = RoundedCornerShape(8.dp),
-                modifier = Modifier.testTag("bill_status_$billStatus")
+                modifier = Modifier.testTag("bill_status_$billStatusTitle")
             ) {
                 Text(
-                    text = billStatus,
+                    text = billStatusTitle,
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
                     style = IberdrolaTheme.typography.etiquetaPeque,
-                    color = if (isPaid) IberdrolaTheme.colors.onSuccessContainer else IberdrolaTheme.colors.onErrorContainer
+                    color = billColor
                 )
             }
         }
