@@ -20,7 +20,8 @@ class IberdrolaMainScreenTest {
     fun givenMainScreen_whenLoaded_thenIsDisplayed() {
         composeTestRule.setContent {
             IberdrolaMainScreen(
-                onBackButtonClick = {}
+                onBackButtonClick = {},
+                onFilterClick = { }
             )
         }
 
@@ -36,7 +37,8 @@ class IberdrolaMainScreenTest {
 
         composeTestRule.setContent {
             IberdrolaMainScreen(
-                onBackButtonClick = { backClicked = true }
+                onBackButtonClick = { backClicked = true },
+                onFilterClick = { }
             )
         }
 
@@ -72,7 +74,8 @@ class IberdrolaMainScreenTest {
     fun givenMainScreen_whenOptionSelected_thenPagerChanges() {
         composeTestRule.setContent {
             IberdrolaMainScreen(
-                onBackButtonClick = {}
+                onBackButtonClick = {},
+                onFilterClick = { }
             )
         }
 

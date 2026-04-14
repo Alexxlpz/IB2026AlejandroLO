@@ -119,7 +119,7 @@ fun IberdrolaTitleAndDescription(
 }
 
 @Composable
-    fun ServiceSelector(
+fun ServiceSelector(
     selectedOption: String,
     options: List<String>,
     onOptionSelected: (String) -> Unit
@@ -181,7 +181,7 @@ fun ServiceOption(
 @Composable
 @Preview(showBackground = true)
 fun PreviewIberdrolaTopBar() {
-    IB2026AlejandroLOTheme { // <--- Usa el nombre de la función Composable definida en Theme.kt
+    IB2026AlejandroLOTheme {
         IberdrolaTopBar(
             selectedOption = BillTypeEnum.LUZ,
             streetName = "Calle Falsa 123",

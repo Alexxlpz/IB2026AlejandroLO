@@ -49,32 +49,45 @@ fun IberdrolaFilterScreen(
     var showDatePickerFrom by remember { mutableStateOf(false) }
     var showDatePickerTo by remember { mutableStateOf(false) }
 
+    val setDatePickerFrom: (Boolean) -> Unit = {
+        showDatePickerFrom = it
+    }
+
+    val setDatePickerTo: (Boolean) -> Unit = {
+        showDatePickerTo = it
+    }
+
     if (showDatePickerFrom) {
         IberdrolaDatePickerDialog(
             onDateSelected = { filterViewModel.updateDateFrom(it) },
-            onDismiss = { showDatePickerFrom = false }
+            onDismiss = { setDatePickerFrom(false) }
         )
     }
 
     if (showDatePickerTo) {
         IberdrolaDatePickerDialog(
             onDateSelected = { filterViewModel.updateDateTo(it) },
-            onDismiss = { showDatePickerTo = false }
+            onDismiss = { setDatePickerTo(false) }
         )
     }
 
     Scaffold(
         topBar = {
-            IberdrolaBar(
-                onBackButtonClick = onBack
-            )
+            Box(
+                modifier = Modifier
+                    .padding(WindowInsets.statusBars.asPaddingValues())
+            ){
+                IberdrolaBar(
+                    onBackButtonClick = onBack
+                )
+            }
         },
         bottomBar = {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color.White)
-                    .padding(24.dp),
+                    .windowInsetsPadding(WindowInsets.navigationBars)                    .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Button(
@@ -127,14 +140,14 @@ fun IberdrolaFilterScreen(
                     label = "Desde",
                     value = selectedDateFrom,
                     modifier = Modifier.weight(1f),
-                    onClick = { showDatePickerFrom = true }
+                    onClick = { setDatePickerFrom(true) }
                 )
                 Spacer(Modifier.width(24.dp))
                 DatePickerField(
                     label = "Hasta",
                     value = selectedDateTo,
                     modifier = Modifier.weight(1f),
-                    onClick = { showDatePickerTo = true }
+                    onClick = { setDatePickerTo(true) }
                 )
             }
 
