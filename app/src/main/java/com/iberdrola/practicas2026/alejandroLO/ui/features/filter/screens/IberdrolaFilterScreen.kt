@@ -266,7 +266,7 @@ fun IberdrolaDatePickerDialog(
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("CANCELAR", color = IberdrolaTheme.colors.onSurfaceVariant)
+                Text("CANCELAR", color = IberdrolaTheme.colors.primary)
             }
         }
     ) {

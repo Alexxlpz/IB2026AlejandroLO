@@ -22,8 +22,7 @@ class IberdrolaBillsScreenTest {
             typeId = BillTypeEnum.LUZ.ordinal,
             price = 50.0,
             statusId = BillStatusEnum.PAGADA.ordinal,
-            date = Date(),
-            dueDate = Date()
+            date = Date()
         )
     }
 
