@@ -104,7 +104,7 @@ fun IberdrolaBillsScreen(
             ) {
                 if(error == null) {
                     if (lastBill != null) {
-                        IberdrolaLastBill(lastBill = lastBill, numberFormat = numberFormat)
+                        IberdrolaLastBill(lastBill = lastBill, firstBillDate = bills.lastOrNull()?.date!!, numberFormat = numberFormat)
                     }
                     IberdrolaBillList(
                         bills = bills,
@@ -153,6 +153,7 @@ fun IberdrolaBillsScreen(
 @Composable
 fun IberdrolaLastBill(
     lastBill: Bill,
+    firstBillDate: Date,
     numberFormat: NumberFormat
 ) {
     Card(
@@ -212,7 +213,7 @@ fun IberdrolaLastBill(
 
             val dateFormat = SimpleDateFormat("dd MMM. yyyy", Locale.forLanguageTag("es-ES"))
             Text(
-                text = "${dateFormat.format(lastBill.date)} - ${dateFormat.format(lastBill.dueDate)}",
+                text = "${dateFormat.format(firstBillDate)} - ${dateFormat.format(lastBill.date)}",
                 style = IberdrolaTheme.typography.cuerpoPeque,
                 color = IberdrolaTheme.colors.onSurfaceVariant
             )
@@ -390,8 +391,7 @@ fun PreviewIberdrolaBillsScreen() {
         typeId = BillTypeEnum.LUZ.ordinal,
         price = 20.0,
         statusId = BillStatusEnum.PENDIENTE.ordinal,
-        date = Date(),
-        dueDate = Date()
+        date = Date()
     )
     val bills = listOf(bill, bill, bill)
     IB2026AlejandroLOTheme {

@@ -46,7 +46,5 @@ data class Bill(
     @ColumnInfo(name = "directionId")
     val directionId: Int = 0,
     @NonNull
-    val date: Date = Date(),
-    @NonNull
-    val dueDate: Date = Date()
+    val date: Date = Date()
 )
