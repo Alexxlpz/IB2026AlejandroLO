@@ -67,9 +67,9 @@ class BillsViewModel(
                     }
                     if (bills.isNotEmpty()) {
                         // para redondear hacia arriba
-                        val maxPrice = floor(bills.maxOf { it.price }).toFloat()
+                        val maxPrice = ceil(bills.maxOf { it.price }).toFloat()
                         // para redondear hacia abajo
-                        val minPrice = ceil(bills.minOf { it.price }).toFloat()
+                        val minPrice = floor(bills.minOf { it.price }).toFloat()
 
                         filterRepository.setMaxPrice(maxPrice)
                         filterRepository.setMinPrice(minPrice)
@@ -133,7 +133,7 @@ class BillsViewModel(
             val filteredBills = _uiState.value.billsList.filter { bill ->
                 bill.price in filterCriteria.value.priceRange &&
                 filterCriteria.value.selectedStates.contains(BillStatusEnum.entries[bill.statusId]) &&
-                filterCriteria.value.selectedDateFrom?.before(bill.date) ?: true
+                filterCriteria.value.selectedDateFrom?.before(bill.date) ?: true &&
                 filterCriteria.value.selectedDateTo?.after(bill.date) ?: true
             }
 

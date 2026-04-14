@@ -82,7 +82,11 @@ class FilterViewModel(
     fun clearFilters() {
         val maxPrice = filterRepository.maxPrice.value
         val minPrice = filterRepository.minPrice.value
-        _uiState.value = FilterUiState(priceRange = minPrice..maxPrice)
+        _uiState.value = FilterUiState(
+            priceRange = minPrice..maxPrice,
+            maxPrice = maxPrice,
+            minPrice = minPrice
+        )
     }
 
     fun addState(state: BillStatusEnum) {

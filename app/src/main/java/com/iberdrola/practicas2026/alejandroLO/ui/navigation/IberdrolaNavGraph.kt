@@ -81,7 +81,7 @@ fun IberdrolaNavGraph(
                     Log.d(TAG, "Back button clicked")
                     if (navController.currentBackStackEntry?.destination?.route == IberdrolaScreens.MAIN.title) {
                         decrementarCont()
-                        navController.popBackStack()
+                        navController.navigate(IberdrolaScreens.HOME.title)
                         // no puedo ponerback porque si te da tiempo a pulsar varias
                         // veces antes de que cambie de pantalla llegamos a la base de
                         // la pila de navController
