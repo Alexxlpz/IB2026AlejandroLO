@@ -113,4 +113,11 @@ class FilterViewModel(
     fun sumbmitButtom(){
         filterRepository.setFilterCriteria(_uiState.value)
     }
+
+    fun onClearDate(dateField: Int) {
+        when (dateField) {
+            0 -> _uiState.update { it.copy(selectedDateFrom = null) }
+            1 -> _uiState.update { it.copy(selectedDateTo = null) }
+        }
+    }
 }

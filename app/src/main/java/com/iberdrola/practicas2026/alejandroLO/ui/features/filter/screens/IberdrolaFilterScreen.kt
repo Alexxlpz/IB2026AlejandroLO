@@ -69,7 +69,6 @@ import java.util.Locale
 @Composable
 fun IberdrolaFilterScreen(
     onBack: () -> Unit = {},
-    onClear: () -> Unit = {},
     filterViewModel: FilterViewModel = viewModel()
 ) {
     val filterUiState by filterViewModel.uiState.collectAsState()
@@ -81,6 +80,10 @@ fun IberdrolaFilterScreen(
 
     var showDatePickerFrom by remember { mutableStateOf(false) }
     var showDatePickerTo by remember { mutableStateOf(false) }
+
+    val onClearDate: (Int) -> Unit = {
+        filterViewModel.onClearDate(it)
+    }
 
     val setDatePickerFrom: (Boolean) -> Unit = {
         showDatePickerFrom = it
@@ -149,7 +152,6 @@ fun IberdrolaFilterScreen(
                     ),
                     modifier = Modifier.clickable { 
                         filterViewModel.clearFilters()
-                        onClear()
                     }
                 )
             }
@@ -177,14 +179,16 @@ fun IberdrolaFilterScreen(
                     label = "Desde",
                     value = selectedDateFrom,
                     modifier = Modifier.weight(1f),
-                    onClick = { setDatePickerFrom(true) }
+                    onClick = { setDatePickerFrom(true) },
+                    onClearDate = { onClearDate(0) }
                 )
                 Spacer(Modifier.width(24.dp))
                 DatePickerField(
                     label = "Hasta",
                     value = selectedDateTo,
                     modifier = Modifier.weight(1f),
-                    onClick = { setDatePickerTo(true) }
+                    onClick = { setDatePickerTo(true) },
+                    onClearDate = { onClearDate(1) }
                 )
             }
 
@@ -240,7 +244,7 @@ fun DatePickerField(
     value: Date?,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
-    //onClearDate: () -> Unit
+    onClearDate: () -> Unit
 ) {
     Column(modifier = modifier.clickable { onClick() }) {
         Text(
@@ -288,7 +292,9 @@ fun DatePickerField(
                     imageVector = Icons.Default.Cancel,
                     contentDescription = null,
                     tint = Color.Gray,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clickable { onClearDate() }
                 )
             }
         }
@@ -439,7 +445,6 @@ fun FilterScreenPreview() {
     IB2026AlejandroLOTheme {
         IberdrolaFilterScreen(
             onBack = { },
-            onClear = { },
             filterViewModel = viewModel()
         )
     }
