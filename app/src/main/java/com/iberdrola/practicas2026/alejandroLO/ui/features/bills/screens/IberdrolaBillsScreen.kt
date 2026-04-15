@@ -61,6 +61,8 @@ import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.math.ceil
+import kotlin.math.floor
 
 @Composable
 fun IberdrolaBillsScreen(
@@ -299,38 +301,13 @@ fun IberdrolaBillList(
         }
 
         Spacer(modifier = Modifier.height(7.dp))
-        val dateFormat = SimpleDateFormat("d 'de' MMMM", Locale.forLanguageTag("es-ES"))
-        val activeFilters = remember(filterUiState) {
-            mutableListOf<ActiveFilterItem>().apply {
-                if (filterUiState.selectedDateFrom != null) add(ActiveFilterItem(FilterType.DATE_FROM, "Desde: ${dateFormat.format(filterUiState.selectedDateFrom)}"))
-                if (filterUiState.selectedDateTo != null) add(ActiveFilterItem(FilterType.DATE_TO, "Hasta: ${dateFormat.format(filterUiState.selectedDateTo)}"))
-                if (filterUiState.priceRange != filterUiState.minPrice..filterUiState.maxPrice) add(ActiveFilterItem(FilterType.PRICE_RANGE, "Precio: ${filterUiState.priceRange.start}-${filterUiState.priceRange.endInclusive}"))
-                if (filterUiState.selectedStates != BillStatusEnum.entries) BillStatusEnum.entries.forEach {
-                    if(!filterUiState.selectedStates.contains(it)){
-                        add(ActiveFilterItem(FilterType.STATUS, it.title))
-                    }
-                }
-            }
-        }
 
-        if (activeFilters.isNotEmpty()) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)
-                    .horizontalScroll(rememberScrollState())
-                    .padding(horizontal = 16.dp)
-            ) {
-                activeFilters.forEach { activeFilterItem ->
-                    FilterChip(
-                        text = activeFilterItem.label,
-                        onRemove = { clearFilterField(activeFilterItem) }
-                    )
-                }
-            }
-        }
+        FilterChipList(
+            filterUiState = filterUiState,
+            clearFilterField = clearFilterField
+        )
 
-        Spacer(modifier = Modifier.height(7.dp))
+        Spacer(modifier = Modifier.height(5.dp))
 
         val yearFormat = SimpleDateFormat("yyyy", Locale.forLanguageTag("es-ES"))
         var auxyear = ""
@@ -427,6 +404,49 @@ fun IberdrolaBillItem(
                 tint = IberdrolaTheme.colors.onSurfaceVariant,
                 modifier = Modifier.size(40.dp)
             )
+        }
+    }
+}
+
+@Composable
+fun FilterChipList(
+    filterUiState: FilterUiState,
+    clearFilterField: (ActiveFilterItem) -> Unit
+){
+    val dateFormat = SimpleDateFormat("d 'de' MMMM", Locale.forLanguageTag("es-ES"))
+    val activeFilters = remember(filterUiState) {
+        mutableListOf<ActiveFilterItem>().apply {
+            if (filterUiState.selectedDateFrom != null) add(ActiveFilterItem(FilterType.DATE_FROM, "Desde: ${dateFormat.format(filterUiState.selectedDateFrom)}"))
+            if (filterUiState.selectedDateTo != null) add(ActiveFilterItem(FilterType.DATE_TO, "Hasta: ${dateFormat.format(filterUiState.selectedDateTo)}"))
+            if (filterUiState.priceRange != filterUiState.minPrice..filterUiState.maxPrice){
+                // para redondear hacia arriba
+                val maxPrice = ceil(filterUiState.priceRange.endInclusive)
+                // para redondear hacia abajo
+                val minPrice = floor(filterUiState.priceRange.start)
+                add(ActiveFilterItem(FilterType.PRICE_RANGE, "Precio: $minPrice-$maxPrice"))
+            }
+            if (filterUiState.selectedStates != BillStatusEnum.entries) BillStatusEnum.entries.forEach {
+                if(!filterUiState.selectedStates.contains(it)){
+                    add(ActiveFilterItem(FilterType.STATUS, it.title))
+                }
+            }
+        }
+    }
+
+    if (activeFilters.isNotEmpty()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
+                .horizontalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp)
+        ) {
+            activeFilters.forEach { activeFilterItem ->
+                FilterChip(
+                    text = activeFilterItem.label,
+                    onRemove = { clearFilterField(activeFilterItem) }
+                )
+            }
         }
     }
 }

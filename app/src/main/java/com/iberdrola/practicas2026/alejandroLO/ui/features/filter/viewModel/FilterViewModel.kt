@@ -50,44 +50,6 @@ class FilterViewModel(
         }
     }
 
-    fun updatePriceRange(range: ClosedFloatingPointRange<Float>) {
-        _uiState.update { 
-            it.copy(priceRange = range)
-        }
-    }
-
-    fun updateDateFrom(date: Date) {
-        if(_uiState.value.selectedDateTo != null
-            && _uiState.value.selectedDateTo!! < date){
-
-            _uiState.update {
-                it.copy(
-                    selectedDateFrom = it.selectedDateTo,
-                    selectedDateTo = date
-                )
-            }
-
-        }else {
-            _uiState.update { it.copy(selectedDateFrom = date) }
-        }
-    }
-
-    fun updateDateTo(date: Date) {
-        if(_uiState.value.selectedDateFrom != null
-            && _uiState.value.selectedDateFrom!! > date){
-
-            _uiState.update {
-                it.copy(
-                    selectedDateFrom = date,
-                    selectedDateTo = it.selectedDateFrom
-                )
-            }
-
-        }else {
-            _uiState.update { it.copy(selectedDateTo = date) }
-        }
-    }
-
     fun clearFilters() {
         val maxPrice = filterRepository.maxPrice.value
         val minPrice = filterRepository.minPrice.value
@@ -96,25 +58,23 @@ class FilterViewModel(
             maxPrice = maxPrice,
             minPrice = minPrice
         )
+        filterRepository.setFilterCriteria(_uiState.value)
     }
 
-    fun addState(state: BillStatusEnum) {
+    fun sumbmitButtom(
+        dateFrom: Date?,
+        dateTo: Date?,
+        priceRange: ClosedFloatingPointRange<Float>,
+        selectedStates: List<BillStatusEnum>
+    ){
         _uiState.update {
             it.copy(
-                selectedStates = it.selectedStates + state
+                selectedDateFrom = dateFrom,
+                selectedDateTo = dateTo,
+                priceRange = priceRange,
+                selectedStates = selectedStates
             )
         }
-    }
-
-    fun removeState(state: BillStatusEnum) {
-        _uiState.update {
-            it.copy(
-                selectedStates = it.selectedStates - state
-            )
-        }
-    }
-
-    fun sumbmitButtom(){
         filterRepository.setFilterCriteria(_uiState.value)
     }
 
@@ -155,6 +115,6 @@ class FilterViewModel(
             FilterType.PRICE_RANGE -> onClearPriceRange()
             FilterType.STATUS -> onClearState(BillStatusEnum.entries.find{ it.title == activeFilterItem.label }!!)
         }
-        sumbmitButtom()
+        filterRepository.setFilterCriteria(_uiState.value)
     }
 }

@@ -71,18 +71,55 @@ fun IberdrolaFilterScreen(
     onBack: () -> Unit = {},
     filterViewModel: FilterViewModel = viewModel()
 ) {
-    val filterUiState by filterViewModel.uiState.collectAsState()
 
-    val selectedDateFrom = filterUiState.selectedDateFrom
-    val selectedDateTo = filterUiState.selectedDateTo
-    val priceRange = filterUiState.priceRange
-    val selectedStates = filterUiState.selectedStates
+    val filterUiState = filterViewModel.uiState.collectAsState().value
+
+    var selectedDateFrom by remember(filterUiState.selectedDateFrom) {
+        mutableStateOf(filterUiState.selectedDateFrom)
+    }
+    var selectedDateTo by remember(filterUiState.selectedDateTo) {
+        mutableStateOf(filterUiState.selectedDateTo)
+    }
+    var priceRange by remember(filterUiState.priceRange) {
+        mutableStateOf(filterUiState.priceRange)
+    }
+    var selectedStates by remember(filterUiState.selectedStates) {
+        mutableStateOf(filterUiState.selectedStates)
+    }
 
     var showDatePickerFrom by remember { mutableStateOf(false) }
     var showDatePickerTo by remember { mutableStateOf(false) }
 
+    val updateDateFrom: (Date) -> Unit = {
+        if(selectedDateTo != null
+            && selectedDateTo!! < it){
+
+            selectedDateFrom = selectedDateTo
+            selectedDateTo = it
+
+        }else {
+            selectedDateFrom = it
+        }
+    }
+
+
+    val updateDateTo: (date: Date) -> Unit = {
+        if(selectedDateFrom != null
+            && selectedDateFrom!! > it){
+
+            selectedDateFrom = it
+            selectedDateTo = selectedDateFrom
+
+        }else {
+            selectedDateTo = it
+        }
+    }
+
     val onClearDate: (Int) -> Unit = {
-        filterViewModel.onClearDate(it)
+        when (it) {
+            0 -> selectedDateFrom = null
+            1 -> selectedDateTo = null
+        }
     }
 
     val setDatePickerFrom: (Boolean) -> Unit = {
@@ -95,14 +132,14 @@ fun IberdrolaFilterScreen(
 
     if (showDatePickerFrom) {
         IberdrolaDatePickerDialog(
-            onDateSelected = { filterViewModel.updateDateFrom(it) },
+            onDateSelected = { updateDateFrom(it) },
             onDismiss = { setDatePickerFrom(false) }
         )
     }
 
     if (showDatePickerTo) {
         IberdrolaDatePickerDialog(
-            onDateSelected = { filterViewModel.updateDateTo(it) },
+            onDateSelected = { updateDateTo(it) },
             onDismiss = { setDatePickerTo(false) }
         )
     }
@@ -129,7 +166,12 @@ fun IberdrolaFilterScreen(
             ) {
                 Button(
                     onClick = {
-                        filterViewModel.sumbmitButtom()
+                        filterViewModel.sumbmitButtom(
+                            dateFrom = selectedDateFrom,
+                            dateTo = selectedDateTo,
+                            priceRange = priceRange,
+                            selectedStates = selectedStates
+                        )
                         onBack()
                     },
                     modifier = Modifier
@@ -151,6 +193,10 @@ fun IberdrolaFilterScreen(
                         fontWeight = FontWeight.Bold
                     ),
                     modifier = Modifier.clickable { 
+                        selectedDateFrom = null
+                        selectedDateTo = null
+                        priceRange = filterUiState.minPrice..filterUiState.maxPrice
+                        selectedStates = BillStatusEnum.entries
                         filterViewModel.clearFilters()
                     }
                 )
@@ -200,7 +246,7 @@ fun IberdrolaFilterScreen(
                 range = priceRange,
                 maxPrice = filterUiState.maxPrice,
                 minPrice = filterUiState.minPrice,
-                onRangeChange = { filterViewModel.updatePriceRange(it) }
+                onRangeChange = { priceRange = it }
             )
 
             Spacer(Modifier.height(40.dp))
@@ -213,10 +259,10 @@ fun IberdrolaFilterScreen(
                     label = state.title,
                     isSelected = selectedStates.contains(state),
                     onClick = {
-                        if (selectedStates.contains(state)) {
-                            filterViewModel.removeState(state)
+                        selectedStates = if (selectedStates.contains(state)) {
+                            selectedStates - state
                         } else {
-                            filterViewModel.addState(state)
+                            selectedStates + state
                         }
                     }
                 )
