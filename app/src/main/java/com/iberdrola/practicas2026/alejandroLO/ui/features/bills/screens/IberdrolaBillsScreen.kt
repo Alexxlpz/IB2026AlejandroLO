@@ -3,6 +3,7 @@ package com.iberdrola.practicas2026.alejandroLO.ui.features.bills.screens
 import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -19,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.outlined.Lightbulb
@@ -36,6 +38,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshState
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -46,6 +49,9 @@ import com.iberdrola.practicas2026.alejandroLO.R
 import com.iberdrola.practicas2026.alejandroLO.data.model.Bill
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillStatusEnum
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeEnum
+import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.enums.FilterType
+import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.viewModel.ActiveFilterItem
+import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.viewModel.FilterUiState
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IB2026AlejandroLOTheme
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
 import com.valentinilk.shimmer.ShimmerBounds
@@ -66,7 +72,9 @@ fun IberdrolaBillsScreen(
     refresh: () -> Unit = {},
     error: String? = null,
     locale: Locale = Locale.forLanguageTag("es-ES"),
-    onFilterClick: () -> Unit
+    onFilterClick: () -> Unit,
+    filterUiState: FilterUiState,
+    clearFilterField: (ActiveFilterItem) -> Unit
 ) {
     val scrollState = rememberScrollState()
     val numberFormat = NumberFormat.getCurrencyInstance(locale)
@@ -110,7 +118,9 @@ fun IberdrolaBillsScreen(
                         bills = bills,
                         onclick = onclick,
                         numberFormat = numberFormat,
-                        onFilterClick = onFilterClick
+                        onFilterClick = onFilterClick,
+                        filterUiState = filterUiState,
+                        clearFilterField = clearFilterField
                     )
                 }
 
@@ -251,7 +261,9 @@ fun IberdrolaBillList(
     bills: List<Bill>,
     onclick: (Bill) -> Unit,
     numberFormat: NumberFormat,
-    onFilterClick: () -> Unit
+    onFilterClick: () -> Unit,
+    filterUiState: FilterUiState,
+    clearFilterField: (ActiveFilterItem) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -286,7 +298,39 @@ fun IberdrolaBillList(
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(7.dp))
+        val dateFormat = SimpleDateFormat("d 'de' MMMM", Locale.forLanguageTag("es-ES"))
+        val activeFilters = remember(filterUiState) {
+            mutableListOf<ActiveFilterItem>().apply {
+                if (filterUiState.selectedDateFrom != null) add(ActiveFilterItem(FilterType.DATE_FROM, "Desde: ${dateFormat.format(filterUiState.selectedDateFrom)}"))
+                if (filterUiState.selectedDateTo != null) add(ActiveFilterItem(FilterType.DATE_TO, "Hasta: ${dateFormat.format(filterUiState.selectedDateTo)}"))
+                if (filterUiState.priceRange != filterUiState.minPrice..filterUiState.maxPrice) add(ActiveFilterItem(FilterType.PRICE_RANGE, "Precio: ${filterUiState.priceRange.start}-${filterUiState.priceRange.endInclusive}"))
+                if (filterUiState.selectedStates != BillStatusEnum.entries) BillStatusEnum.entries.forEach {
+                    if(!filterUiState.selectedStates.contains(it)){
+                        add(ActiveFilterItem(FilterType.STATUS, it.title))
+                    }
+                }
+            }
+        }
+
+        if (activeFilters.isNotEmpty()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+                    .horizontalScroll(rememberScrollState())
+                    .padding(horizontal = 16.dp)
+            ) {
+                activeFilters.forEach { activeFilterItem ->
+                    FilterChip(
+                        text = activeFilterItem.label,
+                        onRemove = { clearFilterField(activeFilterItem) }
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(7.dp))
 
         val yearFormat = SimpleDateFormat("yyyy", Locale.forLanguageTag("es-ES"))
         var auxyear = ""
@@ -388,6 +432,39 @@ fun IberdrolaBillItem(
 }
 
 @Composable
+fun FilterChip(
+    text: String,
+    onRemove: () -> Unit
+) {
+    Surface(
+        modifier = Modifier.padding(end = 8.dp),
+        color = IberdrolaTheme.colors.successContainer, // Verde muy suave de Iberdrola
+        shape = RoundedCornerShape(16.dp),
+        border = BorderStroke(1.dp, IberdrolaTheme.colors.primary.copy(alpha = 0.2f))
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = text,
+                style = IberdrolaTheme.typography.etiquetaPeque,
+                color = IberdrolaTheme.colors.primary
+            )
+            Spacer(Modifier.width(8.dp))
+            Icon(
+                imageVector = Icons.Default.Cancel,
+                contentDescription = "Quitar filtro",
+                modifier = Modifier
+                    .size(16.dp)
+                    .clickable { onRemove() },
+                tint = IberdrolaTheme.colors.primary
+            )
+        }
+    }
+}
+
+@Composable
 @Preview(showBackground = true)
 fun PreviewIberdrolaBillsScreen() {
     val bill = Bill(
@@ -404,7 +481,9 @@ fun PreviewIberdrolaBillsScreen() {
             onclick = {},
             lastBill = bill,
             locale = Locale.forLanguageTag("es-ES"),
-            onFilterClick = {}
+            onFilterClick = {},
+            filterUiState = FilterUiState(),
+            clearFilterField = {}
         )
     }
 }

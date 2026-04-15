@@ -3,11 +3,13 @@ package com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.iberdrola.practicas2026.alejandroLO.data.model.Bill
 import com.iberdrola.practicas2026.alejandroLO.data.repository.bill.BillsRepository
 import com.iberdrola.practicas2026.alejandroLO.data.repository.conectivity.ConnectivityRepository
 import com.iberdrola.practicas2026.alejandroLO.data.repository.filter.FilterRepository
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillStatusEnum
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeEnum
+import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.viewModel.FilterUiState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,7 +38,17 @@ class BillsViewModel(
         load_conectivity()
         load_options()
         refreshBills()
+        listenToFilterCriteria()
     }
+
+    fun listenToFilterCriteria() {
+        viewModelScope.launch {
+            filterRepository.filterCriteria.collect {
+                refreshBills()
+            }
+        }
+    }
+
 
     fun load_conectivity() {
         viewModelScope.launch {
@@ -140,12 +152,7 @@ class BillsViewModel(
             Log.d(TAG, "BILLS -> filterCriteria states: ${filterCriteria.value.selectedStates}")
 
 
-            val filteredBills = _uiState.value.billsList.filter { bill ->
-                bill.price in filterCriteria.value.priceRange &&
-                filterCriteria.value.selectedStates.contains(BillStatusEnum.entries[bill.statusId]) &&
-                filterCriteria.value.selectedDateFrom?.before(bill.date) ?: true &&
-                filterCriteria.value.selectedDateTo?.after(bill.date) ?: true
-            }
+            val filteredBills = filterBillsLocally(_uiState.value.billsList, filterCriteria.value)
 
             Log.d(TAG, "BILLS -> filterCriteriaApply: ${filteredBills.size}")
 
@@ -154,6 +161,18 @@ class BillsViewModel(
                     billsList = filteredBills
                 )
             }
+        }
+    }
+
+    private fun filterBillsLocally(bills: List<Bill>, criteria: FilterUiState): List<Bill> {
+        return bills.filter { bill ->
+            val priceIn = bill.price in criteria.priceRange
+            val statusMatch = criteria.selectedStates.isEmpty() ||
+                    criteria.selectedStates.contains(BillStatusEnum.entries[bill.statusId])
+            val dateFromMatch = criteria.selectedDateFrom?.let { !bill.date.before(it) } ?: true
+            val dateToMatch = criteria.selectedDateTo?.let { !bill.date.after(it) } ?: true
+
+            priceIn && statusMatch && dateFromMatch && dateToMatch
         }
     }
 }

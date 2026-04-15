@@ -91,7 +91,8 @@ fun IberdrolaNavGraph(
                 billsViewModel = billsViewModel,
                 onFilterClick = {
                     navController.navigate(IberdrolaScreens.FILTER.title)
-                }
+                },
+                filterViewModel = filterViewModel
             )
         }
         composable(IberdrolaScreens.FILTER.title) {

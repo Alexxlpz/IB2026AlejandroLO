@@ -28,6 +28,7 @@ import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeE
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.screens.IberdrolaBillsScreen
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsViewModel
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsViewModelFactory
+import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.viewModel.FilterViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -41,7 +42,8 @@ fun IberdrolaMainScreen(
     modifier: Modifier = Modifier,
     locale: Locale = Locale.forLanguageTag("es-ES"),
     billsViewModel: BillsViewModel = viewModel(factory = BillsViewModelFactory.Factory),
-    onFilterClick: () -> Unit
+    onFilterClick: () -> Unit,
+    filterViewModel: FilterViewModel
 ) {
 
     LaunchedEffect(Unit) {
@@ -49,6 +51,8 @@ fun IberdrolaMainScreen(
     }
 
     val billsUiState = billsViewModel.uiState.collectAsState()
+    val filterUiState = filterViewModel.uiState.collectAsState()
+
 
     var showAlert by remember { mutableStateOf(false) }
     val selectingBill: (Bill) -> Unit = remember {
@@ -112,7 +116,9 @@ fun IberdrolaMainScreen(
                     modifier = Modifier.fillMaxSize(),
                     error = billsUiState.value.errorMessage,
                     locale = locale,
-                    onFilterClick = onFilterClick
+                    onFilterClick = onFilterClick,
+                    filterUiState = filterUiState.value,
+                    clearFilterField = { filterViewModel.clearFilterField(it) }
                 )
             }
         }
@@ -131,6 +137,7 @@ fun IberdrolaMainScreen(
     }
 }
 
+
 @Composable
 @Preview
 fun PreviewIberdrolaMainScreen() {
@@ -138,6 +145,7 @@ fun PreviewIberdrolaMainScreen() {
         modifier = Modifier,
         onBackButtonClick = { },
         locale = Locale.forLanguageTag("es-ES"),
-        onFilterClick = {}
+        onFilterClick = {},
+        filterViewModel = viewModel()
     )
 }

@@ -1,9 +1,11 @@
 package com.iberdrola.practicas2026.alejandroLO.ui.features.filter.viewModel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.iberdrola.practicas2026.alejandroLO.data.repository.filter.FilterRepository
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillStatusEnum
+import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.enums.FilterType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,6 +21,8 @@ class FilterViewModel(
 
     private val _uiState = MutableStateFlow(FilterUiState())
     val uiState: StateFlow<FilterUiState> = _uiState.asStateFlow()
+
+    val TAG = "FilterViewModel"
 
     init {
         loadPriceRange()
@@ -119,5 +123,38 @@ class FilterViewModel(
             0 -> _uiState.update { it.copy(selectedDateFrom = null) }
             1 -> _uiState.update { it.copy(selectedDateTo = null) }
         }
+        if(dateField == 0){
+            Log.d(TAG, "onClearDate(0): ${_uiState.value.selectedDateFrom}")
+        }else {
+            Log.d(TAG, "onClearDate(1): ${_uiState.value.selectedDateTo}")
+        }
+    }
+
+    fun onClearState(state: BillStatusEnum) {
+        _uiState.update {
+            it.copy(
+                selectedStates = it.selectedStates + state
+            )
+        }
+        Log.d(TAG, "onClearState: ${_uiState.value.selectedStates}")
+    }
+
+    fun onClearPriceRange() {
+        _uiState.update {
+            it.copy(
+                priceRange = it.minPrice..it.maxPrice
+            )
+        }
+        Log.d(TAG, "onClearPriceRange: ${_uiState.value.priceRange}")
+    }
+
+    fun clearFilterField(activeFilterItem: ActiveFilterItem){
+        when(activeFilterItem.type){
+            FilterType.DATE_FROM -> onClearDate(0)
+            FilterType.DATE_TO -> onClearDate(1)
+            FilterType.PRICE_RANGE -> onClearPriceRange()
+            FilterType.STATUS -> onClearState(BillStatusEnum.entries.find{ it.title == activeFilterItem.label }!!)
+        }
+        sumbmitButtom()
     }
 }
