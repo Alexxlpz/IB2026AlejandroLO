@@ -27,7 +27,7 @@ import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeE
         BillStatus::class,
         Direction::class
     ],
-    version = 16,
+    version = 17,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

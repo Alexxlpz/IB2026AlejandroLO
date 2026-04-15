@@ -8,6 +8,7 @@ import com.iberdrola.practicas2026.alejandroLO.data.repository.conectivity.Conne
 import com.iberdrola.practicas2026.alejandroLO.data.repository.filter.FilterRepository
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillStatusEnum
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeEnum
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -66,15 +67,24 @@ class BillsViewModel(
                         )
                     }
                     if (bills.isNotEmpty()) {
-                        // para redondear hacia arriba
-                        val maxPrice = ceil(bills.maxOf { it.price }).toFloat()
-                        // para redondear hacia abajo
-                        val minPrice = floor(bills.minOf { it.price }).toFloat()
+                        launch(Dispatchers.IO) {
+                            try {
+                                val rawMax = billsRepository.getMaxPrice()
+                                val rawMin = billsRepository.getMinPrice()
 
-                        filterRepository.setMaxPrice(maxPrice)
-                        filterRepository.setMinPrice(minPrice)
+                                // para redondear hacia arriba
+                                val maxPrice = ceil(bills.maxOf { rawMax })
+                                // para redondear hacia abajo
+                                val minPrice = floor(bills.minOf { rawMin })
 
-                        filterCriteriaApply()
+                                filterRepository.setMaxPrice(maxPrice)
+                                filterRepository.setMinPrice(minPrice)
+
+                                filterCriteriaApply()
+                            } catch (e: Exception) {
+                                Log.e(TAG, "Error calculando rangos de filtro: ${e.message}")
+                            }
+                        }
                     }
                 }
             }

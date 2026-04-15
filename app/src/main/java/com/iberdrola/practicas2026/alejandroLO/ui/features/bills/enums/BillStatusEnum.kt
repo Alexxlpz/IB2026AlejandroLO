@@ -15,17 +15,17 @@ enum class BillStatusEnum(val title: String, val color: Color, val status: Color
     ),
     EN_TRAMITE(
         title = "En trámite de cobro",
-        color = Color(0xFF7A5901),
-        status = Color(0xFFFFF4D1)
+        color = Color(0xFFBF711E),
+        status = Color(0xFFFFE198)
     ),
     ANULADA(
         title = "Anulada",
-        color = Color(0xFF424242),
-        status = Color(0xFFEEEEEE)
+        color = Color(0xFF7B1FA2),
+        status = Color(0xFFF9D8FF)
     ),
     CUOTA_FIJA(
         title = "Cuota Fija",
         color = Color(0xFF01579B),
-        status = Color(0xFFE1F5FE)
+        status = Color(0xFFC1E6F7)
     )
 }

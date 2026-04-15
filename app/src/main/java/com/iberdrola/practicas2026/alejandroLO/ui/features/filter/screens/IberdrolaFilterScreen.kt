@@ -25,6 +25,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -234,7 +235,13 @@ fun SectionTitle(text: String) {
 }
 
 @Composable
-fun DatePickerField(label: String, value: Date?, modifier: Modifier = Modifier, onClick: () -> Unit = {}) {
+fun DatePickerField(
+    label: String,
+    value: Date?,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
+    //onClearDate: () -> Unit
+) {
     Column(modifier = modifier.clickable { onClick() }) {
         Text(
             text = "* $label",
@@ -265,19 +272,25 @@ fun DatePickerField(label: String, value: Date?, modifier: Modifier = Modifier, 
                     style = IberdrolaTheme.typography.cuerpoMedio,
                     color = Color.LightGray
                 )
+                Icon(
+                    imageVector = Icons.Default.CalendarMonth,
+                    contentDescription = null,
+                    tint = Color.Gray,
+                    modifier = Modifier.size(24.dp)
+                )
             }else {
                 Text(
                     text = dateFormat.format(value),
                     style = IberdrolaTheme.typography.cuerpoMedio,
                     color = Color.Black
                 )
+                Icon(
+                    imageVector = Icons.Default.Cancel,
+                    contentDescription = null,
+                    tint = Color.Gray,
+                    modifier = Modifier.size(24.dp)
+                )
             }
-            Icon(
-                imageVector = Icons.Default.CalendarMonth,
-                contentDescription = null,
-                tint = Color.Gray,
-                modifier = Modifier.size(24.dp)
-            )
         }
     }
 }

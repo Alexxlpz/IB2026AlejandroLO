@@ -7,7 +7,8 @@ import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillStatu
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.Date
@@ -28,7 +29,11 @@ class FilterViewModel(
             kotlinx.coroutines.flow.combine(
                 filterRepository.minPrice,
                 filterRepository.maxPrice
-            ) { minPrice, maxPrice ->
+            ) { minPrice, maxPrice -> Pair(minPrice, maxPrice) }
+                .filter { (minPrice, maxPrice) -> maxPrice > minPrice }
+                // toma el primer valor válido y cancela la suscripción automáticamente
+                .first()
+                .let { (minPrice, maxPrice) ->
 
                 _uiState.update { currentState ->
                     currentState.copy(
@@ -37,7 +42,7 @@ class FilterViewModel(
                         maxPrice = maxPrice
                     )
                 }
-            }.collect()
+            }
         }
     }
 

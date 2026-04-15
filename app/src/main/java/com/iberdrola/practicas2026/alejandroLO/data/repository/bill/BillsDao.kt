@@ -38,4 +38,10 @@ interface BillsDao {
 
     @Query("SELECT * from bills WHERE directionId = :directionId ORDER BY date DESC")
     fun getAllBillsByDirectionId(directionId: Int): Flow<List<Bill>>
+
+    @Query("SELECT MAX(price) FROM bills")
+    fun getMaxPrice(): Float
+
+    @Query("SELECT MIN(price) FROM bills")
+    fun getMinPrice(): Float
 }
