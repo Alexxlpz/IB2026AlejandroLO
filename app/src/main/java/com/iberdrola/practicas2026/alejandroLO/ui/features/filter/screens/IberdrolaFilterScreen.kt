@@ -198,7 +198,7 @@ fun IberdrolaFilterScreen(
                         selectedDateFrom = null
                         selectedDateTo = null
                         priceRange = filterUiState.minPrice..filterUiState.maxPrice
-                        selectedStates = BillStatusEnum.entries
+                        selectedStates = emptyList()
                         filterViewModel.clearFilters()
                     }
                 )
@@ -497,6 +497,7 @@ fun PriceRangeSelector(
                     rangeSliderState = rangeSliderState,
                     modifier = Modifier.height(6.dp),
                     thumbTrackGapSize = 0.dp,
+                    drawStopIndicator = null,
                     colors = SliderDefaults.colors(
                         activeTrackColor = IberdrolaTheme.colors.primary,
                         inactiveTrackColor = Color.LightGray.copy(alpha = 0.3f)

@@ -67,12 +67,17 @@ class FilterViewModel(
         priceRange: ClosedFloatingPointRange<Float>,
         selectedStates: List<BillStatusEnum>
     ){
+        var selectedStatesAux = selectedStates
+        if(selectedStates.isEmpty()){ // si esta vacio estamos filtrando por todos
+            selectedStatesAux = BillStatusEnum.entries
+        }
+
         _uiState.update {
             it.copy(
                 selectedDateFrom = dateFrom,
                 selectedDateTo = dateTo,
                 priceRange = priceRange,
-                selectedStates = selectedStates
+                selectedStates = selectedStatesAux
             )
         }
         filterRepository.setFilterCriteria(_uiState.value)
@@ -91,9 +96,16 @@ class FilterViewModel(
     }
 
     fun onClearState(state: BillStatusEnum) {
+        var futureState = _uiState.value.selectedStates - state
+
+        if(_uiState.value.selectedStates.size == 1
+            && _uiState.value.selectedStates.contains(state)){
+            futureState = BillStatusEnum.entries
+        }
+
         _uiState.update {
             it.copy(
-                selectedStates = it.selectedStates - state
+                selectedStates = futureState
             )
         }
         Log.d(TAG, "onClearState: ${_uiState.value.selectedStates}")

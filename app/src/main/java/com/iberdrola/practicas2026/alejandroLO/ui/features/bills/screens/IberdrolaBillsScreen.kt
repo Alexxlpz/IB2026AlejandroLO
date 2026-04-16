@@ -83,6 +83,16 @@ fun IberdrolaBillsScreen(
 
     val refreshingState: PullToRefreshState = rememberPullToRefreshState()
 
+    val filterIsApplied = remember(filterUiState) {
+                filterUiState.selectedDateFrom != null ||
+                filterUiState.selectedDateTo != null ||
+                filterUiState.priceRange != filterUiState.minPrice..filterUiState.maxPrice ||
+                filterUiState.selectedStates != BillStatusEnum.entries
+    }
+
+//    Log.d("FilterChipList", "FilterChipList: $filterIsApplied")
+//    Log.d("FilterChipList", "FilterChipList: $filterUiState")
+
     PullToRefreshBox( // para refrescar las facturas
         modifier = Modifier.fillMaxSize(),
         isRefreshing = isLoading,
@@ -122,7 +132,8 @@ fun IberdrolaBillsScreen(
                         numberFormat = numberFormat,
                         onFilterClick = onFilterClick,
                         filterUiState = filterUiState,
-                        clearFilterField = clearFilterField
+                        clearFilterField = clearFilterField,
+                        filterIsApplied = filterIsApplied
                     )
                 }
 
@@ -265,7 +276,8 @@ fun IberdrolaBillList(
     numberFormat: NumberFormat,
     onFilterClick: () -> Unit,
     filterUiState: FilterUiState,
-    clearFilterField: (ActiveFilterItem) -> Unit
+    clearFilterField: (ActiveFilterItem) -> Unit,
+    filterIsApplied: Boolean
 ) {
     Column(
         modifier = Modifier
@@ -287,7 +299,17 @@ fun IberdrolaBillList(
                 onClick = onFilterClick,
                 border = BorderStroke(2.dp, IberdrolaTheme.colors.primary),
                 shape = RoundedCornerShape(20.dp),
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = IberdrolaTheme.colors.primary),
+                colors = if(filterIsApplied){
+                    ButtonDefaults.outlinedButtonColors(
+                        containerColor = IberdrolaTheme.colors.primary,
+                        contentColor = IberdrolaTheme.colors.surfaceVariant
+                    )
+                } else {
+                    ButtonDefaults.outlinedButtonColors(
+                        containerColor = IberdrolaTheme.colors.surfaceVariant,
+                        contentColor = IberdrolaTheme.colors.primary
+                    )
+                },
                 contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
             ) {
                 Icon(
@@ -296,11 +318,15 @@ fun IberdrolaBillList(
                     modifier = Modifier.size(18.dp)
                 )
                 Spacer(Modifier.width(8.dp))
-                Text("Filtrar")
+                if(filterIsApplied){
+                    Text("Filtrar º")
+                }else {
+                    Text("Filtrar")
+                }
             }
         }
 
-        Spacer(modifier = Modifier.height(7.dp))
+        Spacer(modifier = Modifier.height(5.dp))
 
         FilterChipList(
             filterUiState = filterUiState,
@@ -413,7 +439,7 @@ fun FilterChipList(
     filterUiState: FilterUiState,
     clearFilterField: (ActiveFilterItem) -> Unit
 ){
-    val dateFormat = SimpleDateFormat("d 'de' MMMM", Locale.forLanguageTag("es-ES"))
+    val dateFormat = SimpleDateFormat("dd MMM. yyyy", Locale.forLanguageTag("es-ES"))
     val activeFilters = remember(filterUiState) {
         mutableListOf<ActiveFilterItem>().apply {
             if (filterUiState.selectedDateFrom != null) add(ActiveFilterItem(FilterType.DATE_FROM, "Desde: ${dateFormat.format(filterUiState.selectedDateFrom)}"))
@@ -459,26 +485,26 @@ fun FilterChip(
     onRemove: () -> Unit
 ) {
     Surface(
-        modifier = Modifier.padding(end = 8.dp),
+        modifier = Modifier.padding(end = 10.dp),
         color = IberdrolaTheme.colors.successContainer, // Verde muy suave de Iberdrola
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(20.dp),
         border = BorderStroke(1.dp, IberdrolaTheme.colors.primary.copy(alpha = 0.2f))
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = text,
-                style = IberdrolaTheme.typography.etiquetaPeque,
+                style = IberdrolaTheme.typography.cuerpoPeque,
                 color = IberdrolaTheme.colors.primary
             )
-            Spacer(Modifier.width(8.dp))
+            Spacer(Modifier.width(10.dp))
             Icon(
                 imageVector = Icons.Default.Cancel,
                 contentDescription = "Quitar filtro",
                 modifier = Modifier
-                    .size(16.dp)
+                    .size(18.dp)
                     .clickable { onRemove() },
                 tint = IberdrolaTheme.colors.primary
             )
