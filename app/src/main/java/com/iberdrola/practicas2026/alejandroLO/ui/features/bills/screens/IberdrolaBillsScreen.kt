@@ -425,9 +425,11 @@ fun FilterChipList(
                 val minPrice = floor(filterUiState.priceRange.start)
                 add(ActiveFilterItem(FilterType.PRICE_RANGE, "Precio: $minPrice-$maxPrice"))
             }
-            if (filterUiState.selectedStates != BillStatusEnum.entries) BillStatusEnum.entries.forEach {
-                if(!filterUiState.selectedStates.contains(it)){
-                    add(ActiveFilterItem(FilterType.STATUS, it.title))
+            if (filterUiState.selectedStates != BillStatusEnum.entries && filterUiState.selectedStates.isNotEmpty()){
+                BillStatusEnum.entries.forEach {
+                    if(filterUiState.selectedStates.contains(it)){
+                        add(ActiveFilterItem(FilterType.STATUS, it.title))
+                    }
                 }
             }
         }

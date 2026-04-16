@@ -93,7 +93,7 @@ class FilterViewModel(
     fun onClearState(state: BillStatusEnum) {
         _uiState.update {
             it.copy(
-                selectedStates = it.selectedStates + state
+                selectedStates = it.selectedStates - state
             )
         }
         Log.d(TAG, "onClearState: ${_uiState.value.selectedStates}")

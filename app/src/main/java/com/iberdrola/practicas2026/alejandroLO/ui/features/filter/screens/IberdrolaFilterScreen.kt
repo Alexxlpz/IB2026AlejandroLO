@@ -64,6 +64,7 @@ import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.collections.emptyList
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -73,6 +74,11 @@ fun IberdrolaFilterScreen(
 ) {
 
     val filterUiState = filterViewModel.uiState.collectAsState().value
+    val statesToShow = if(filterUiState.selectedStates.containsAll(BillStatusEnum.entries)){
+        emptyList()
+    }else {
+        filterUiState.selectedStates
+    }
 
     var selectedDateFrom by remember(filterUiState.selectedDateFrom) {
         mutableStateOf(filterUiState.selectedDateFrom)
@@ -83,8 +89,8 @@ fun IberdrolaFilterScreen(
     var priceRange by remember(filterUiState.priceRange) {
         mutableStateOf(filterUiState.priceRange)
     }
-    var selectedStates by remember(filterUiState.selectedStates) {
-        mutableStateOf(filterUiState.selectedStates)
+    var selectedStates by remember(statesToShow) {
+        mutableStateOf(statesToShow)
     }
 
     var showDatePickerFrom by remember { mutableStateOf(false) }
