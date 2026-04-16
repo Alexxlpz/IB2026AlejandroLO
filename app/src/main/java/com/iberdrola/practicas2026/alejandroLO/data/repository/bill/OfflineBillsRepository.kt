@@ -27,6 +27,8 @@ class OfflineBillsRepository(
 
     override fun getAllBills(): Flow<List<Bill>> = billDao.getAllBills()
     override fun getAllBillsByDirectionId(directionId: Int): Flow<List<Bill>> = billDao.getAllBillsByDirectionId(directionId)
+    override fun getMaxPrice(): Float = billDao.getMaxPrice()
+    override fun getMinPrice(): Float = billDao.getMinPrice()
     override fun getBillsByType(typeId: Int): Flow<List<Bill>> = billDao.getBillsByType(typeId)
     override fun getBillById(id: Int): Flow<Bill> = billDao.getBill(id)
     override suspend fun insert(bill: Bill) = billDao.insert(bill)

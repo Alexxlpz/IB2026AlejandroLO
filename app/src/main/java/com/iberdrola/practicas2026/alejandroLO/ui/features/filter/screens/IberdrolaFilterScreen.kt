@@ -1,23 +1,62 @@
 package com.iberdrola.practicas2026.alejandroLO.ui.features.filter.screens
 
+import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DisplayMode
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.RangeSlider
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SelectableDates
+import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,25 +68,55 @@ import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.viewModel.Filt
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IB2026AlejandroLOTheme
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar.getInstance
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IberdrolaFilterScreen(
     onBack: () -> Unit = {},
-    onApply: () -> Unit = {},
-    onClear: () -> Unit = {},
     filterViewModel: FilterViewModel = viewModel()
 ) {
-    val filterUiState by filterViewModel.uiState.collectAsState()
 
-    val selectedDateFrom = filterUiState.selectedDateFrom
-    val selectedDateTo = filterUiState.selectedDateTo
-    val priceRange = filterUiState.priceRange
-    val selectedStates = filterUiState.selectedStates
+    val filterUiState = filterViewModel.uiState.collectAsState().value
+    val statesToShow = if(filterUiState.selectedStates.containsAll(BillStatusEnum.entries)){
+        emptyList()
+    }else {
+        filterUiState.selectedStates
+    }
+
+    var selectedDateFrom by remember(filterUiState.selectedDateFrom) {
+        mutableStateOf(filterUiState.selectedDateFrom)
+    }
+    var selectedDateTo by remember(filterUiState.selectedDateTo) {
+        mutableStateOf(filterUiState.selectedDateTo)
+    }
+    var priceRange by remember(filterUiState.priceRange) {
+        mutableStateOf(filterUiState.priceRange)
+    }
+    var selectedStates by remember(statesToShow) {
+        mutableStateOf(statesToShow)
+    }
 
     var showDatePickerFrom by remember { mutableStateOf(false) }
     var showDatePickerTo by remember { mutableStateOf(false) }
+
+    val updateDateFrom: (Date) -> Unit = {
+        selectedDateFrom = it
+    }
+
+
+    val updateDateTo: (date: Date) -> Unit = {
+        selectedDateTo = it
+    }
+
+    val onClearDate: (Int) -> Unit = {
+        when (it) {
+            0 -> selectedDateFrom = null
+            1 -> selectedDateTo = null
+        }
+    }
 
     val setDatePickerFrom: (Boolean) -> Unit = {
         showDatePickerFrom = it
@@ -59,15 +128,21 @@ fun IberdrolaFilterScreen(
 
     if (showDatePickerFrom) {
         IberdrolaDatePickerDialog(
-            onDateSelected = { filterViewModel.updateDateFrom(it) },
-            onDismiss = { setDatePickerFrom(false) }
+            onDateSelected = { updateDateFrom(it) },
+            onDismiss = { setDatePickerFrom(false) },
+            minDate = null,
+            maxDate = selectedDateTo,
+            actual = selectedDateFrom?: selectedDateTo?: Date()
         )
     }
 
     if (showDatePickerTo) {
         IberdrolaDatePickerDialog(
-            onDateSelected = { filterViewModel.updateDateTo(it) },
-            onDismiss = { setDatePickerTo(false) }
+            onDateSelected = { updateDateTo(it) },
+            onDismiss = { setDatePickerTo(false) },
+            minDate = selectedDateFrom,
+            maxDate = null,
+            actual = selectedDateTo?: selectedDateFrom?: Date()
         )
     }
 
@@ -87,11 +162,20 @@ fun IberdrolaFilterScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color.White)
-                    .windowInsetsPadding(WindowInsets.navigationBars)                    .padding(24.dp),
+                    .windowInsetsPadding(WindowInsets.navigationBars)
+                    .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Button(
-                    onClick = onApply,
+                    onClick = {
+                        filterViewModel.sumbmitButtom(
+                            dateFrom = selectedDateFrom,
+                            dateTo = selectedDateTo,
+                            priceRange = priceRange,
+                            selectedStates = selectedStates
+                        )
+                        onBack()
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
@@ -111,8 +195,11 @@ fun IberdrolaFilterScreen(
                         fontWeight = FontWeight.Bold
                     ),
                     modifier = Modifier.clickable { 
+                        selectedDateFrom = null
+                        selectedDateTo = null
+                        priceRange = filterUiState.minPrice..filterUiState.maxPrice
+                        selectedStates = emptyList()
                         filterViewModel.clearFilters()
-                        onClear()
                     }
                 )
             }
@@ -140,14 +227,16 @@ fun IberdrolaFilterScreen(
                     label = "Desde",
                     value = selectedDateFrom,
                     modifier = Modifier.weight(1f),
-                    onClick = { setDatePickerFrom(true) }
+                    onClick = { setDatePickerFrom(true) },
+                    onClearDate = { onClearDate(0) }
                 )
                 Spacer(Modifier.width(24.dp))
                 DatePickerField(
                     label = "Hasta",
                     value = selectedDateTo,
                     modifier = Modifier.weight(1f),
-                    onClick = { setDatePickerTo(true) }
+                    onClick = { setDatePickerTo(true) },
+                    onClearDate = { onClearDate(1) }
                 )
             }
 
@@ -157,7 +246,9 @@ fun IberdrolaFilterScreen(
             SectionTitle("Por un importe")
             PriceRangeSelector(
                 range = priceRange,
-                onRangeChange = { filterViewModel.updatePriceRange(it) }
+                maxPrice = filterUiState.maxPrice,
+                minPrice = filterUiState.minPrice,
+                onRangeChange = { priceRange = it }
             )
 
             Spacer(Modifier.height(40.dp))
@@ -170,10 +261,10 @@ fun IberdrolaFilterScreen(
                     label = state.title,
                     isSelected = selectedStates.contains(state),
                     onClick = {
-                        if (selectedStates.contains(state)) {
-                            filterViewModel.removeState(state)
+                        selectedStates = if (selectedStates.contains(state)) {
+                            selectedStates - state
                         } else {
-                            filterViewModel.addState(state)
+                            selectedStates + state
                         }
                     }
                 )
@@ -196,68 +287,149 @@ fun SectionTitle(text: String) {
 }
 
 @Composable
-fun DatePickerField(label: String, value: Date?, modifier: Modifier = Modifier, onClick: () -> Unit = {}) {
+fun DatePickerField(
+    label: String,
+    value: Date?,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
+    onClearDate: () -> Unit
+) {
     Column(modifier = modifier.clickable { onClick() }) {
-        Text(
-            text = "* $label",
-            style = IberdrolaTheme.typography.etiquetaPeque,
-            color = Color.Gray,
-            modifier = Modifier.padding(bottom = 4.dp)
-        )
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .drawBehind {
-                    drawLine(
-                        color = Color.LightGray,
-                        start = Offset(0f, size.height),
-                        end = Offset(size.width, size.height),
-                        strokeWidth = 1.dp.toPx()
+        val transition = updateTransition(targetState = value != null, label = "LabelTransition")
+
+        val labelOffsetY by transition.animateDp(label = "LabelOffset") { isSelected ->
+            if (isSelected) 0.dp else 26.dp
+        }
+
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                text = "* $label",
+                style = IberdrolaTheme.typography.etiquetaPeque,
+                color = if (value == null) Color.Gray else IberdrolaTheme.colors.primary,
+                modifier = Modifier
+                    .graphicsLayer {
+                        translationY = labelOffsetY.toPx()
+                        scaleX = 1.2f
+                        scaleY = 1.2f
+                        transformOrigin = TransformOrigin(0f, 0f)
+                    }
+            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 22.dp)
+                    .drawBehind {
+                        drawLine(
+                            color = Color.LightGray,
+                            start = Offset(0f, size.height),
+                            end = Offset(size.width, size.height),
+                            strokeWidth = 1.dp.toPx()
+                        )
+                    }
+                    .padding(bottom = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                val dateFormat = SimpleDateFormat("dd MMM. yyyy", Locale.forLanguageTag("es-ES"))
+
+                if (value == null) {
+                    Spacer(modifier = Modifier.weight(1f))
+                    Icon(
+                        imageVector = Icons.Default.CalendarMonth,
+                        contentDescription = null,
+                        tint = Color.Gray,
+                        modifier = Modifier.size(24.dp)
+                    )
+                } else {
+                    Text(
+                        text = dateFormat.format(value),
+                        style = IberdrolaTheme.typography.cuerpoMedio,
+                        color = Color.Black,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Icon(
+                        imageVector = Icons.Default.Cancel,
+                        contentDescription = "Borrar fecha",
+                        tint = Color.Gray,
+                        modifier = Modifier
+                            .size(24.dp)
+                            .clickable { onClearDate() }
                     )
                 }
-                .padding(bottom = 8.dp, top = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            val dateFormat = SimpleDateFormat("dd MMM. yyyy", Locale.forLanguageTag("es-ES"))
-
-            if(value == null){
-                Text(
-                    text = label,
-                    style = IberdrolaTheme.typography.cuerpoMedio,
-                    color = Color.LightGray
-                )
-            }else {
-                Text(
-                    text = dateFormat.format(value),
-                    style = IberdrolaTheme.typography.cuerpoMedio,
-                    color = Color.Black
-                )
             }
-            Icon(
-                imageVector = Icons.Default.CalendarMonth,
-                contentDescription = null,
-                tint = Color.Gray,
-                modifier = Modifier.size(24.dp)
-            )
         }
     }
 }
 
+@Suppress("DEPRECATION")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IberdrolaDatePickerDialog(
     onDateSelected: (Date) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    minDate: Date? = null,
+    maxDate: Date? = null,
+    actual: Date
 ) {
-    val datePickerState = rememberDatePickerState()
+    val selectableDates = remember(minDate, maxDate) {
+        object : SelectableDates {
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                // normalizaoms el minimo y el maximo SI NO ES NULO a utc para una mejor
+                // comparacion con la fecha seleccionable
+                val minTime = minDate?.let {
+                    val cal = getInstance(java.util.TimeZone.getTimeZone("UTC"))
+                    cal.time = it
+                    cal.set(java.util.Calendar.HOUR_OF_DAY, 0)
+                    cal.set(java.util.Calendar.MINUTE, 0)
+                    cal.set(java.util.Calendar.SECOND, 0)
+                    cal.set(java.util.Calendar.MILLISECOND, 0)
+                    cal.timeInMillis
+                }
+                val maxTime = maxDate?.let {
+                    val cal = getInstance(java.util.TimeZone.getTimeZone("UTC"))
+                    cal.time = it
+                    cal.set(java.util.Calendar.HOUR_OF_DAY, 0)
+                    cal.set(java.util.Calendar.MINUTE, 0)
+                    cal.set(java.util.Calendar.SECOND, 0)
+                    cal.set(java.util.Calendar.MILLISECOND, 0)
+                    cal.timeInMillis
+                }
+
+                val dateIsAfterMin = minTime?.let { utcTimeMillis >= it } ?: true
+                val dateIsBeforeMax = maxTime?.let { utcTimeMillis <= it } ?: true
+
+                return dateIsAfterMin && dateIsBeforeMax
+            }
+
+            override fun isSelectableYear(year: Int): Boolean {
+                val cal = getInstance()
+                val minYear = minDate?.let {
+                    cal.time = it
+                    cal.get(java.util.Calendar.YEAR)
+                } ?: 0
+                val maxYear = maxDate?.let {
+                    cal.time = it
+                    cal.get(java.util.Calendar.YEAR)
+                } ?: Int.MAX_VALUE
+
+                return year in minYear..maxYear
+            }
+        }
+    }
+
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = actual.time,
+        selectableDates = selectableDates,
+        initialDisplayMode = DisplayMode.Picker
+    )
+
     DatePickerDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
             TextButton(onClick = {
                 datePickerState.selectedDateMillis?.let {
-                    val date = Date(it)
-                    onDateSelected(date)
+                    onDateSelected(Date(it))
                 }
                 onDismiss()
             }) {
@@ -278,10 +450,10 @@ fun IberdrolaDatePickerDialog(
 @Composable
 fun PriceRangeSelector(
     range: ClosedFloatingPointRange<Float>,
+    maxPrice: Float,
+    minPrice: Float,
     onRangeChange: (ClosedFloatingPointRange<Float>) -> Unit
 ) {
-    val minLimit = 15f
-    val maxLimit = 151f
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -303,8 +475,9 @@ fun PriceRangeSelector(
         RangeSlider(
             value = range,
             onValueChange = { onRangeChange(it) },
-            valueRange = minLimit..maxLimit,
+            valueRange = minPrice..maxPrice,
             modifier = Modifier.fillMaxWidth(),
+
             startThumb = {
                 Surface(
                     modifier = Modifier.size(20.dp),
@@ -324,6 +497,7 @@ fun PriceRangeSelector(
                     rangeSliderState = rangeSliderState,
                     modifier = Modifier.height(6.dp),
                     thumbTrackGapSize = 0.dp,
+                    drawStopIndicator = null,
                     colors = SliderDefaults.colors(
                         activeTrackColor = IberdrolaTheme.colors.primary,
                         inactiveTrackColor = Color.LightGray.copy(alpha = 0.3f)
@@ -338,8 +512,8 @@ fun PriceRangeSelector(
                 .padding(top = 4.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("${minLimit.toInt()} €", style = IberdrolaTheme.typography.etiquetaPeque, color = Color.Gray)
-            Text("${maxLimit.toInt()} €", style = IberdrolaTheme.typography.etiquetaPeque, color = Color.Gray)
+            Text("$minPrice €", style = IberdrolaTheme.typography.etiquetaPeque, color = Color.Gray)
+            Text("$maxPrice €", style = IberdrolaTheme.typography.etiquetaPeque, color = Color.Gray)
         }
     }
 }
@@ -387,8 +561,6 @@ fun FilterScreenPreview() {
     IB2026AlejandroLOTheme {
         IberdrolaFilterScreen(
             onBack = { },
-            onApply = { },
-            onClear = { },
             filterViewModel = viewModel()
         )
     }

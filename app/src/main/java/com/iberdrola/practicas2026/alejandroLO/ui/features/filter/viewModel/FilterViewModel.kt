@@ -1,74 +1,132 @@
 package com.iberdrola.practicas2026.alejandroLO.ui.features.filter.viewModel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.iberdrola.practicas2026.alejandroLO.data.repository.filter.FilterRepository
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillStatusEnum
+import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.enums.FilterType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import java.util.Date
 
-class FilterViewModel() : ViewModel() {
+class FilterViewModel(
+    private val filterRepository: FilterRepository
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FilterUiState())
     val uiState: StateFlow<FilterUiState> = _uiState.asStateFlow()
 
+    val TAG = "FilterViewModel"
 
-    fun updatePriceRange(range: ClosedFloatingPointRange<Float>) {
-        _uiState.update { 
-            it.copy(priceRange = range)
-        }
+    init {
+        loadPriceRange()
     }
 
-    fun updateDateFrom(date: Date) {
-        if(_uiState.value.selectedDateTo != null
-            && _uiState.value.selectedDateTo!! < date){
+    fun loadPriceRange() {
+        viewModelScope.launch {
+            kotlinx.coroutines.flow.combine(
+                filterRepository.minPrice,
+                filterRepository.maxPrice
+            ) { minPrice, maxPrice -> Pair(minPrice, maxPrice) }
+                .filter { (minPrice, maxPrice) -> maxPrice > minPrice }
+                // toma el primer valor válido y cancela la suscripción automáticamente
+                .first()
+                .let { (minPrice, maxPrice) ->
 
-            _uiState.update {
-                it.copy(
-                    selectedDateFrom = it.selectedDateTo,
-                    selectedDateTo = date
-                )
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        priceRange = minPrice..maxPrice,
+                        minPrice = minPrice,
+                        maxPrice = maxPrice
+                    )
+                }
             }
-
-        }else {
-            _uiState.update { it.copy(selectedDateFrom = date) }
-        }
-    }
-
-    fun updateDateTo(date: Date) {
-        if(_uiState.value.selectedDateFrom != null
-            && _uiState.value.selectedDateFrom!! > date){
-
-            _uiState.update {
-                it.copy(
-                    selectedDateFrom = date,
-                    selectedDateTo = it.selectedDateFrom
-                )
-            }
-
-        }else {
-            _uiState.update { it.copy(selectedDateTo = date) }
         }
     }
 
     fun clearFilters() {
-        _uiState.value = FilterUiState()
+        val maxPrice = filterRepository.maxPrice.value
+        val minPrice = filterRepository.minPrice.value
+        _uiState.value = FilterUiState(
+            priceRange = minPrice..maxPrice,
+            maxPrice = maxPrice,
+            minPrice = minPrice
+        )
+        filterRepository.setFilterCriteria(_uiState.value)
     }
 
-    fun addState(state: BillStatusEnum) {
+    fun sumbmitButtom(
+        dateFrom: Date?,
+        dateTo: Date?,
+        priceRange: ClosedFloatingPointRange<Float>,
+        selectedStates: List<BillStatusEnum>
+    ){
+        var selectedStatesAux = selectedStates
+        if(selectedStates.isEmpty()){ // si esta vacio estamos filtrando por todos
+            selectedStatesAux = BillStatusEnum.entries
+        }
+
         _uiState.update {
             it.copy(
-                selectedStates = it.selectedStates + state
+                selectedDateFrom = dateFrom,
+                selectedDateTo = dateTo,
+                priceRange = priceRange,
+                selectedStates = selectedStatesAux
             )
+        }
+        filterRepository.setFilterCriteria(_uiState.value)
+    }
+
+    fun onClearDate(dateField: Int) {
+        when (dateField) {
+            0 -> _uiState.update { it.copy(selectedDateFrom = null) }
+            1 -> _uiState.update { it.copy(selectedDateTo = null) }
+        }
+        if(dateField == 0){
+            Log.d(TAG, "onClearDate(0): ${_uiState.value.selectedDateFrom}")
+        }else {
+            Log.d(TAG, "onClearDate(1): ${_uiState.value.selectedDateTo}")
         }
     }
 
-    fun removeState(state: BillStatusEnum) {
+    fun onClearState(state: BillStatusEnum) {
+        var futureState = _uiState.value.selectedStates - state
+
+        if(_uiState.value.selectedStates.size == 1
+            && _uiState.value.selectedStates.contains(state)){
+            futureState = BillStatusEnum.entries
+        }
+
         _uiState.update {
             it.copy(
-                selectedStates = it.selectedStates - state
+                selectedStates = futureState
             )
         }
+        Log.d(TAG, "onClearState: ${_uiState.value.selectedStates}")
+    }
+
+    fun onClearPriceRange() {
+        _uiState.update {
+            it.copy(
+                priceRange = it.minPrice..it.maxPrice
+            )
+        }
+        Log.d(TAG, "onClearPriceRange: ${_uiState.value.priceRange}")
+    }
+
+    fun clearFilterField(activeFilterItem: ActiveFilterItem){
+        when(activeFilterItem.type){
+            FilterType.DATE_FROM -> onClearDate(0)
+            FilterType.DATE_TO -> onClearDate(1)
+            FilterType.PRICE_RANGE -> onClearPriceRange()
+            FilterType.STATUS -> onClearState(BillStatusEnum.entries.find{ it.title == activeFilterItem.label }!!)
+        }
+        filterRepository.setFilterCriteria(_uiState.value)
     }
 }
