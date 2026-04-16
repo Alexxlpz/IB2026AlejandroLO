@@ -1,5 +1,7 @@
 package com.iberdrola.practicas2026.alejandroLO.ui.features.filter.screens
 
+import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -31,10 +33,12 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -51,6 +55,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
@@ -62,9 +68,9 @@ import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.viewModel.Filt
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IB2026AlejandroLOTheme
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
 import java.text.SimpleDateFormat
+import java.util.Calendar.getInstance
 import java.util.Date
 import java.util.Locale
-import kotlin.collections.emptyList
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -97,28 +103,12 @@ fun IberdrolaFilterScreen(
     var showDatePickerTo by remember { mutableStateOf(false) }
 
     val updateDateFrom: (Date) -> Unit = {
-        if(selectedDateTo != null
-            && selectedDateTo!! < it){
-
-            selectedDateFrom = selectedDateTo
-            selectedDateTo = it
-
-        }else {
-            selectedDateFrom = it
-        }
+        selectedDateFrom = it
     }
 
 
     val updateDateTo: (date: Date) -> Unit = {
-        if(selectedDateFrom != null
-            && selectedDateFrom!! > it){
-
-            selectedDateFrom = it
-            selectedDateTo = selectedDateFrom
-
-        }else {
-            selectedDateTo = it
-        }
+        selectedDateTo = it
     }
 
     val onClearDate: (Int) -> Unit = {
@@ -139,14 +129,20 @@ fun IberdrolaFilterScreen(
     if (showDatePickerFrom) {
         IberdrolaDatePickerDialog(
             onDateSelected = { updateDateFrom(it) },
-            onDismiss = { setDatePickerFrom(false) }
+            onDismiss = { setDatePickerFrom(false) },
+            minDate = null,
+            maxDate = selectedDateTo,
+            actual = selectedDateFrom?: selectedDateTo?: Date()
         )
     }
 
     if (showDatePickerTo) {
         IberdrolaDatePickerDialog(
             onDateSelected = { updateDateTo(it) },
-            onDismiss = { setDatePickerTo(false) }
+            onDismiss = { setDatePickerTo(false) },
+            minDate = selectedDateFrom,
+            maxDate = null,
+            actual = selectedDateTo?: selectedDateFrom?: Date()
         )
     }
 
@@ -299,74 +295,141 @@ fun DatePickerField(
     onClearDate: () -> Unit
 ) {
     Column(modifier = modifier.clickable { onClick() }) {
-        Text(
-            text = "* $label",
-            style = IberdrolaTheme.typography.etiquetaPeque,
-            color = Color.Gray,
-            modifier = Modifier.padding(bottom = 4.dp)
-        )
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .drawBehind {
-                    drawLine(
-                        color = Color.LightGray,
-                        start = Offset(0f, size.height),
-                        end = Offset(size.width, size.height),
-                        strokeWidth = 1.dp.toPx()
+        val transition = updateTransition(targetState = value != null, label = "LabelTransition")
+
+        val labelOffsetY by transition.animateDp(label = "LabelOffset") { isSelected ->
+            if (isSelected) 0.dp else 26.dp
+        }
+
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                text = "* $label",
+                style = IberdrolaTheme.typography.etiquetaPeque,
+                color = if (value == null) Color.Gray else IberdrolaTheme.colors.primary,
+                modifier = Modifier
+                    .graphicsLayer {
+                        translationY = labelOffsetY.toPx()
+                        scaleX = 1.2f
+                        scaleY = 1.2f
+                        transformOrigin = TransformOrigin(0f, 0f)
+                    }
+            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 22.dp)
+                    .drawBehind {
+                        drawLine(
+                            color = Color.LightGray,
+                            start = Offset(0f, size.height),
+                            end = Offset(size.width, size.height),
+                            strokeWidth = 1.dp.toPx()
+                        )
+                    }
+                    .padding(bottom = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                val dateFormat = SimpleDateFormat("dd MMM. yyyy", Locale.forLanguageTag("es-ES"))
+
+                if (value == null) {
+                    Spacer(modifier = Modifier.weight(1f))
+                    Icon(
+                        imageVector = Icons.Default.CalendarMonth,
+                        contentDescription = null,
+                        tint = Color.Gray,
+                        modifier = Modifier.size(24.dp)
+                    )
+                } else {
+                    Text(
+                        text = dateFormat.format(value),
+                        style = IberdrolaTheme.typography.cuerpoMedio,
+                        color = Color.Black,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Icon(
+                        imageVector = Icons.Default.Cancel,
+                        contentDescription = "Borrar fecha",
+                        tint = Color.Gray,
+                        modifier = Modifier
+                            .size(24.dp)
+                            .clickable { onClearDate() }
                     )
                 }
-                .padding(bottom = 8.dp, top = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            val dateFormat = SimpleDateFormat("dd MMM. yyyy", Locale.forLanguageTag("es-ES"))
-
-            if(value == null){
-                Text(
-                    text = label,
-                    style = IberdrolaTheme.typography.cuerpoMedio,
-                    color = Color.LightGray
-                )
-                Icon(
-                    imageVector = Icons.Default.CalendarMonth,
-                    contentDescription = null,
-                    tint = Color.Gray,
-                    modifier = Modifier.size(24.dp)
-                )
-            }else {
-                Text(
-                    text = dateFormat.format(value),
-                    style = IberdrolaTheme.typography.cuerpoMedio,
-                    color = Color.Black
-                )
-                Icon(
-                    imageVector = Icons.Default.Cancel,
-                    contentDescription = null,
-                    tint = Color.Gray,
-                    modifier = Modifier
-                        .size(24.dp)
-                        .clickable { onClearDate() }
-                )
             }
         }
     }
 }
 
+@Suppress("DEPRECATION")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IberdrolaDatePickerDialog(
     onDateSelected: (Date) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    minDate: Date? = null,
+    maxDate: Date? = null,
+    actual: Date
 ) {
-    val datePickerState = rememberDatePickerState()
+    val selectableDates = remember(minDate, maxDate) {
+        object : SelectableDates {
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                // normalizaoms el minimo y el maximo SI NO ES NULO a utc para una mejor
+                // comparacion con la fecha seleccionable
+                val minTime = minDate?.let {
+                    val cal = getInstance(java.util.TimeZone.getTimeZone("UTC"))
+                    cal.time = it
+                    cal.set(java.util.Calendar.HOUR_OF_DAY, 0)
+                    cal.set(java.util.Calendar.MINUTE, 0)
+                    cal.set(java.util.Calendar.SECOND, 0)
+                    cal.set(java.util.Calendar.MILLISECOND, 0)
+                    cal.timeInMillis
+                }
+                val maxTime = maxDate?.let {
+                    val cal = getInstance(java.util.TimeZone.getTimeZone("UTC"))
+                    cal.time = it
+                    cal.set(java.util.Calendar.HOUR_OF_DAY, 0)
+                    cal.set(java.util.Calendar.MINUTE, 0)
+                    cal.set(java.util.Calendar.SECOND, 0)
+                    cal.set(java.util.Calendar.MILLISECOND, 0)
+                    cal.timeInMillis
+                }
+
+                val dateIsAfterMin = minTime?.let { utcTimeMillis >= it } ?: true
+                val dateIsBeforeMax = maxTime?.let { utcTimeMillis <= it } ?: true
+
+                return dateIsAfterMin && dateIsBeforeMax
+            }
+
+            override fun isSelectableYear(year: Int): Boolean {
+                val cal = getInstance()
+                val minYear = minDate?.let {
+                    cal.time = it
+                    cal.get(java.util.Calendar.YEAR)
+                } ?: 0
+                val maxYear = maxDate?.let {
+                    cal.time = it
+                    cal.get(java.util.Calendar.YEAR)
+                } ?: Int.MAX_VALUE
+
+                return year in minYear..maxYear
+            }
+        }
+    }
+
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = actual.time,
+        selectableDates = selectableDates,
+        initialDisplayMode = DisplayMode.Picker
+    )
+
     DatePickerDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
             TextButton(onClick = {
                 datePickerState.selectedDateMillis?.let {
-                    val date = Date(it)
-                    onDateSelected(date)
+                    onDateSelected(Date(it))
                 }
                 onDismiss()
             }) {
