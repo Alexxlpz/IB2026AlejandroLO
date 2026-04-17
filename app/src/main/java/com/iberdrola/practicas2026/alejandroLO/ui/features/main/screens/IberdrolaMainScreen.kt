@@ -132,8 +132,8 @@ fun IberdrolaMainScreen(
                         Text("Cerrar")
                     }
                 },
-                title = { Text("Funcionalidad aún no implementada") },
-                text = { Text("Esta funcionalidad aún no está implementada, mantente alerta a futuras actualizaciones") }
+                title = { Text(" la factura aún no está disponible") },
+                modifier = Modifier.background(IberdrolaTheme.colors.surface)
             )
         }
     }

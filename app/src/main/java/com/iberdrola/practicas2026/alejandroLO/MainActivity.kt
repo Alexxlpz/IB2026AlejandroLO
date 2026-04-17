@@ -1,6 +1,5 @@
 package com.iberdrola.practicas2026.alejandroLO
 
-import com.iberdrola.practicas2026.alejandroLO.ui.theme.IB2026AlejandroLOTheme
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -19,6 +18,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.iberdrola.practicas2026.alejandroLO.ui.navigation.IberdrolaNavGraph
+import com.iberdrola.practicas2026.alejandroLO.ui.theme.IB2026AlejandroLOTheme
+import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
 import java.util.Locale
 
 class MainActivity : ComponentActivity() {
@@ -52,7 +53,8 @@ class MainActivity : ComponentActivity() {
                             TextButton(onClick = { showExitDialog = false }) {
                                 Text("Cancelar")
                             }
-                        }
+                        },
+                        containerColor = IberdrolaTheme.colors.surface
                     )
                 }
 

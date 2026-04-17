@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -28,6 +29,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
 import com.valentinilk.shimmer.ShimmerTheme
 import com.valentinilk.shimmer.defaultShimmerTheme
 
@@ -38,7 +40,7 @@ fun SkeletonScreen(modifier: Modifier = Modifier) {
         modifier = modifier.fillMaxSize()
     ) {
         LastBillSkeleton()
-        Spacer(modifier = Modifier.height(36.dp))
+        Spacer(modifier = Modifier.height(25.dp))
         TitleAndFilterSkeleton()
         Spacer(modifier = Modifier.height(24.dp))
         BillSkeletonYear()
@@ -77,16 +79,23 @@ fun LastBillSkeleton() {
                 Column {
                     SkeletonBox(width = 120.dp, height = 20.dp)
                     Spacer(Modifier.height(8.dp))
-                    SkeletonBox(width = 250.dp, height = 15.dp)
+                    SkeletonBox(width = 77.dp, height = 15.dp)
                 }
                 SkeletonBox(width = 30.dp, height = 30.dp, shape = RoundedCornerShape(8.dp))
             }
             Spacer(Modifier.height(24.dp))
-            SkeletonBox(width = 140.dp, height = 35.dp)
-            Spacer(Modifier.height(30.dp))
-            SkeletonBox(width = 60.dp, height = 15.dp)
-            Spacer(Modifier.height(8.dp))
-            SkeletonBox(width = 280.dp, height = 15.dp)
+            SkeletonBox(width = 70.dp, height = 35.dp)
+            Spacer(Modifier.height(7.dp))
+            SkeletonBox(width = 170.dp, height = 15.dp)
+            Spacer(Modifier.height(7.dp))
+            HorizontalDivider(
+                modifier = Modifier.fillMaxWidth(),
+                thickness = 1.dp,
+                color = IberdrolaTheme.colors.onSurfaceVariant.copy(alpha = 0.15f)
+            )
+            Spacer(Modifier.height(14.dp))
+            SkeletonBox(width = 60.dp, height = 20.dp)
+            Spacer(Modifier.height(3.dp))
         }
     }
 }
@@ -98,12 +107,22 @@ fun BillItemSkeleton() {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 15.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = CenterVertically
         ) {
-            SkeletonBox(width = 100.dp, height = 50.dp, shape = RoundedCornerShape(8.dp)) // Cuadradito izquierda
-            SkeletonBox(width = 160.dp, height = 50.dp, modifier = Modifier.weight(1f)) // Linea central
-            SkeletonBox(width = 85.dp, height = 50.dp, shape = RoundedCornerShape(4.dp)) // Flecha derecha
+            Column {
+                SkeletonBox(width = 100.dp, height = 17.dp, shape = RoundedCornerShape(8.dp)) // Cuadradito izquierda
+                Spacer(Modifier.height(5.dp))
+                SkeletonBox(width = 70.dp, height = 15.dp, shape = RoundedCornerShape(8.dp)) // Cuadradito izquierda
+                Spacer(Modifier.height(5.dp))
+                SkeletonBox(width = 57.dp, height = 23.dp, shape = RoundedCornerShape(8.dp)) // Cuadradito izquierda
+            }
+
+            Row(verticalAlignment = CenterVertically) {
+                SkeletonBox(width = 50.dp, height = 20.dp, shape = RoundedCornerShape(4.dp)) // Flecha derecha
+                Spacer(Modifier.width(15.dp))
+                SkeletonBox(width = 25.dp, height = 30.dp, shape = RoundedCornerShape(4.dp))
+            }
         }
         HorizontalDivider(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),

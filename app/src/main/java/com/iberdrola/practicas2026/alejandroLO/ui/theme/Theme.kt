@@ -44,6 +44,7 @@ data class IberdrolaColors(
 
 // Estructura de Tipografía Propia
 data class IberdrolaTypography(
+    val tituloPrincipal: TextStyle = Typography.headlineMedium,
     val tituloGrande: TextStyle = Typography.titleLarge,
     val tituloMedio: TextStyle = Typography.titleMedium,
     val tituloPeque: TextStyle = Typography.titleSmall,

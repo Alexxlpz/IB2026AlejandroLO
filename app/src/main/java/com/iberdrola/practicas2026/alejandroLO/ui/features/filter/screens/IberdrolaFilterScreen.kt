@@ -150,6 +150,7 @@ fun IberdrolaFilterScreen(
         topBar = {
             Box(
                 modifier = Modifier
+                    .background(IberdrolaTheme.colors.surface)
                     .padding(WindowInsets.statusBars.asPaddingValues())
             ){
                 IberdrolaBar(
@@ -161,7 +162,7 @@ fun IberdrolaFilterScreen(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color.White)
+                    .background(IberdrolaTheme.colors.surface)
                     .windowInsetsPadding(WindowInsets.navigationBars)
                     .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -208,6 +209,7 @@ fun IberdrolaFilterScreen(
         Column(
             modifier = Modifier
                 .padding(padding)
+                .background(IberdrolaTheme.colors.surface)
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp)

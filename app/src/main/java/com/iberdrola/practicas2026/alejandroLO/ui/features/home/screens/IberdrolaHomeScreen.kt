@@ -54,6 +54,7 @@ import com.iberdrola.practicas2026.alejandroLO.data.model.Direction
 import com.iberdrola.practicas2026.alejandroLO.ui.common.components.IberdrolaFeedbackDialog
 import com.iberdrola.practicas2026.alejandroLO.ui.features.home.screensimport.IberdrolaHomeLoadingScreen
 import com.iberdrola.practicas2026.alejandroLO.ui.features.home.viewModel.HomeViewModel
+import com.iberdrola.practicas2026.alejandroLO.ui.features.home.viewModel.HomeViewModelFactory
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IB2026AlejandroLOTheme
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
 import kotlinx.coroutines.launch
@@ -112,7 +113,7 @@ fun IberdrolaHomeScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = stringResource(R.string.selecciona_un_punto_de_suministro),
+                    text = stringResource(R.string.selecciona_una_direccion_de_facturacion),
                     style = IberdrolaTheme.typography.tituloMedio,
                     color = IberdrolaTheme.colors.onSurfaceVariant,
                     modifier = Modifier.padding(horizontal = 16.dp)
@@ -492,7 +493,7 @@ fun PreviewIberdrolaHomeScreen() {
             onAddressClick = { _, _ -> },
             setCont = { },
             mostrarSheet = false,
-            homeViewModel = viewModel()
+            homeViewModel = viewModel(factory = HomeViewModelFactory.Factory)
         )
     }
 }
@@ -505,7 +506,8 @@ fun PreviewIberdrolaHomeScreenWithAlert() {
             onAddressClick = { _, _ -> },
             setCont = { },
             mostrarSheet = true,
-            homeViewModel = viewModel()
+            homeViewModel = viewModel(factory = HomeViewModelFactory.Factory)
         )
     }
 }
+// mockoon_iberdrola.json

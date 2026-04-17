@@ -107,7 +107,7 @@ fun IberdrolaTitleAndDescription(
     Column(modifier = modifier) {
         Text(
             text = stringResource(R.string.mis_facturas),
-            style = IberdrolaTheme.typography.tituloGrande,
+            style = IberdrolaTheme.typography.tituloPrincipal,
             color = IberdrolaTheme.colors.onSurface
         )
         Text(
@@ -124,8 +124,7 @@ fun ServiceSelector(
     options: List<String>,
     onOptionSelected: (String) -> Unit
 ) {
-    Row(
-        modifier = Modifier
+    Row(modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 18.dp)
     ) {
@@ -159,7 +158,7 @@ fun ServiceOption(
         modifier = Modifier
             .clickable(onClick = onClick)
             .testTag("service_option_$text"),
-        horizontalAlignment = Alignment.Start
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = text,
@@ -169,7 +168,7 @@ fun ServiceOption(
         )
         Box(
             modifier = Modifier
-                .width(40.dp)
+                .width(50.dp)
                 .height(4.dp)
                 .background(
                     color = if (isSelected) IberdrolaTheme.colors.primary else Color.Transparent

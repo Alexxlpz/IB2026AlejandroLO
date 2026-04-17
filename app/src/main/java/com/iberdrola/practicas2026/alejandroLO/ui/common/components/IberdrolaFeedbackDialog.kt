@@ -37,6 +37,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.Typography
 
 /*
@@ -58,7 +59,7 @@ fun IberdrolaFeedbackDialog(
             onDismiss()
         },
         sheetState = sheetState,
-        containerColor = Color(0xFFE8F5E9),
+        containerColor = IberdrolaTheme.colors.surfaceVariant,
         shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
         scrimColor = Color.Black.copy(alpha = 0.4f),
         dragHandle = { BottomSheetDefaults.DragHandle() },
@@ -135,6 +136,69 @@ fun FeedbackIcon(
             .clickable { onClick(rating) }
     )
 }
+
+//@Composable
+//fun IberdrolaThanksFeedback() {
+//    // Estado para disparar la animación al entrar
+//    val visible = remember { mutableStateOf(false) }
+//
+//    // Animación de escala para el pulgar
+//    val scale by animateFloatAsState(
+//        targetValue = if (visible.value) 1.2f else 0f,
+//        animationSpec = spring(
+//            dampingRatio = Spring.DampingRatioMediumBouncy,
+//            stiffness = Spring.StiffnessLow
+//        ),
+//        label = "ThumbScale"
+//    )
+//
+//    // Disparamos la animación nada más componer
+//    LaunchedEffect(Unit) {
+//        visible.value = true
+//    }
+//
+//    Column(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .padding(start = 24.dp, end = 24.dp, bottom = 48.dp),
+//        horizontalAlignment = Alignment.CenterHorizontally
+//    ) {
+//        Spacer(modifier = Modifier.height(16.dp))
+//
+//        // Icono de pulgar arriba animado
+//        Icon(
+//            imageVector = Icons.Outlined.ThumbUp,
+//            contentDescription = null,
+//            tint = Color(0xFF43A047), // Verde éxito
+//            modifier = Modifier
+//                .size(80.dp)
+//                .graphicsLayer {
+//                    scaleX = scale
+//                    scaleY = scale
+//                }
+//        )
+//
+//        Spacer(modifier = Modifier.height(24.dp))
+//
+//        Text(
+//            text = "¡Muchas gracias!",
+//            style = IberdrolaTheme.typography.tituloGrande, // Usando tu sistema de diseño
+//            fontWeight = FontWeight.Bold,
+//            color = IberdrolaTheme.colors.primary
+//        )
+//
+//        Spacer(modifier = Modifier.height(12.dp))
+//
+//        Text(
+//            text = "Tu valoración nos ayuda a seguir mejorando para ofrecerte el mejor servicio.",
+//            style = IberdrolaTheme.typography.cuerpoMedio,
+//            textAlign = TextAlign.Center,
+//            color = Color.Gray
+//        )
+//
+//        Spacer(modifier = Modifier.height(8.dp))
+//    }
+//}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

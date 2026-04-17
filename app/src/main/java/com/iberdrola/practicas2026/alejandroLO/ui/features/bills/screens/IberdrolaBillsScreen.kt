@@ -43,6 +43,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.iberdrola.practicas2026.alejandroLO.R
@@ -124,7 +127,11 @@ fun IberdrolaBillsScreen(
             ) {
                 if(error == null) {
                     if (lastBill != null) {
-                        IberdrolaLastBill(lastBill = lastBill, firstBillDate = bills.lastOrNull()?.date!!, numberFormat = numberFormat)
+                        IberdrolaLastBill(
+                            lastBill = lastBill,
+                            firstBillDate = bills.lastOrNull()?.date!!,
+                            numberFormat = numberFormat
+                        )
                     }
                     IberdrolaBillList(
                         bills = bills,
@@ -230,11 +237,29 @@ fun IberdrolaLastBill(
             }
 
             Spacer(modifier = Modifier.height(16.dp))
+            val formattedPrice = numberFormat.format(lastBill.price)
+
+            val annotatedPrice = buildAnnotatedString {
+                val euroSymbol = "€"
+                val pricePart = formattedPrice.replace(euroSymbol, "").trim()
+
+                append(pricePart)
+
+                pushStyle(
+                    SpanStyle(
+                        fontSize = IberdrolaTheme.typography.importe.fontSize * 0.65f,
+                        fontWeight = FontWeight.ExtraBold
+                    )
+                )
+                append(" $euroSymbol")
+                pop()
+            }
 
             Text(
-                text = numberFormat.format(lastBill.price),
+                text = annotatedPrice,
                 style = IberdrolaTheme.typography.importe,
-                color = IberdrolaTheme.colors.onSurface
+                color = IberdrolaTheme.colors.onSurface,
+                modifier = Modifier.padding(vertical = 4.dp)
             )
 
             val dateFormat = SimpleDateFormat("dd MMM. yyyy", Locale.forLanguageTag("es-ES"))
