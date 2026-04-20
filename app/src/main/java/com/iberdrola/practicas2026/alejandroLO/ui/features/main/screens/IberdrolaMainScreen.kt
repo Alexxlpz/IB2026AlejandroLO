@@ -2,6 +2,7 @@ package com.iberdrola.practicas2026.alejandroLO.ui.features.main.screens
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,6 +30,7 @@ import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.screens.Iberdro
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsViewModel
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsViewModelFactory
 import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.viewModel.FilterViewModel
+import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -78,7 +80,7 @@ fun IberdrolaMainScreen(
     val scope: CoroutineScope = rememberCoroutineScope()
 
 
-    Box() {
+    Box(Modifier.background(color = IberdrolaTheme.colors.surface)) {
         Column(modifier = modifier
             .fillMaxSize()
             .testTag("main_screen")
@@ -130,8 +132,8 @@ fun IberdrolaMainScreen(
                         Text("Cerrar")
                     }
                 },
-                title = { Text("Funcionalidad aún no implementada") },
-                text = { Text("Esta funcionalidad aún no está implementada, mantente alerta a futuras actualizaciones") }
+                title = { Text(" la factura aún no está disponible") },
+                modifier = Modifier.background(IberdrolaTheme.colors.surface)
             )
         }
     }

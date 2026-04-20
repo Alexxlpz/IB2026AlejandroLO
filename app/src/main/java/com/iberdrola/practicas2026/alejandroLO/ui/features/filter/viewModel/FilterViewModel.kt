@@ -9,6 +9,7 @@ import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.enums.FilterTy
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
@@ -30,7 +31,7 @@ class FilterViewModel(
 
     fun loadPriceRange() {
         viewModelScope.launch {
-            kotlinx.coroutines.flow.combine(
+            combine(
                 filterRepository.minPrice,
                 filterRepository.maxPrice
             ) { minPrice, maxPrice -> Pair(minPrice, maxPrice) }
@@ -49,6 +50,7 @@ class FilterViewModel(
             }
         }
     }
+
 
     fun clearFilters() {
         val maxPrice = filterRepository.maxPrice.value
