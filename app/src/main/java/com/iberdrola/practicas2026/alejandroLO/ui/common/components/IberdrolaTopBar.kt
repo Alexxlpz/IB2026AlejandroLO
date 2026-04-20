@@ -1,7 +1,12 @@
 package com.iberdrola.practicas2026.alejandroLO.ui.common.components
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,14 +17,19 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -65,12 +75,19 @@ fun IberdrolaTopBar(selectedOption: BillTypeEnum,
 
 @Composable
 fun IberdrolaBar(onBackButtonClick: () -> Unit) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    val backgroundColor by animateColorAsState(
+        targetValue = if (isPressed) IberdrolaTheme.colors.primary.copy(alpha = 0.12f) else Color.Transparent,
+        label = "backButtonBackground"
+    )
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(56.dp)
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ){
@@ -78,8 +95,10 @@ fun IberdrolaBar(onBackButtonClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier
+                .clip(RoundedCornerShape(50))
+                .background(backgroundColor)
                 .clickable { onBackButtonClick() }
-                .padding(vertical = 8.dp)
+                .padding(start = 8.dp, top = 8.dp, bottom = 8.dp, end = 10.dp)
                 .testTag("main_back_button")
         ) {
             Icon(
@@ -125,8 +144,8 @@ fun ServiceSelector(
     onOptionSelected: (String) -> Unit
 ) {
     Row(modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 18.dp)
+        .fillMaxWidth()
+        .padding(horizontal = 10.dp)
     ) {
         for (option in options) {
             ServiceOption(
@@ -134,7 +153,7 @@ fun ServiceSelector(
                 isSelected = selectedOption == option,
                 onClick = { onOptionSelected(option) }
             )
-            Spacer(modifier = Modifier.width(24.dp))
+            Spacer(modifier = Modifier.width(10.dp))
         }
     }
     Box(
@@ -142,7 +161,7 @@ fun ServiceSelector(
         contentAlignment = Alignment.BottomStart
     ) {
         HorizontalDivider(
-            thickness = 2.5.dp,
+            thickness = 3.dp,
             color = IberdrolaTheme.colors.border.copy(alpha = 0.5f)
         )
     }
@@ -154,21 +173,39 @@ fun ServiceOption(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
+    val textColor by animateColorAsState(
+        targetValue = if (isSelected) IberdrolaTheme.colors.onSurface else IberdrolaTheme.colors.onSurfaceVariant,
+        animationSpec = tween(durationMillis = 300),
+        label = "textColorAnimation"
+    )
+
+    val barWidth by animateDpAsState(
+        targetValue = if (isSelected) 50.dp else 0.dp,
+        animationSpec = tween(durationMillis = 300),
+        label = "barWidthAnimation"
+    )
+
     Column(
         modifier = Modifier
-            .clickable(onClick = onClick)
+            .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)) // Ripple recortado
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = ripple(color = IberdrolaTheme.colors.onSurface),
+                onClick = onClick
+            )
+            .padding(top = 12.dp)
             .testTag("service_option_$text"),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = text,
-            style = IberdrolaTheme.typography.tituloMedio,
-            color = if (isSelected) IberdrolaTheme.colors.onSurface else IberdrolaTheme.colors.onSurfaceVariant,
-            modifier = Modifier.padding(bottom = 8.dp)
+            style = IberdrolaTheme.typography.tituloGrande,
+            color = textColor,
+            modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 8.dp)
         )
         Box(
             modifier = Modifier
-                .width(50.dp)
+                .width(barWidth)
                 .height(4.dp)
                 .background(
                     color = if (isSelected) IberdrolaTheme.colors.primary else Color.Transparent

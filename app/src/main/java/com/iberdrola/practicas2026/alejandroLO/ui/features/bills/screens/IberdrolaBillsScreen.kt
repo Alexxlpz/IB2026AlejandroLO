@@ -1,9 +1,13 @@
 package com.iberdrola.practicas2026.alejandroLO.ui.features.bills.screens
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -37,10 +41,14 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshState
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -385,7 +393,7 @@ fun IberdrolaBillList(
                 IberdrolaBillItem(bill = bill, onclick = onclick, numberFormat = numberFormat)
                 HorizontalDivider(
                     modifier = Modifier.padding(vertical = 8.dp),
-                    thickness = 1.dp,
+                    thickness = 2.dp,
                     color = IberdrolaTheme.colors.border.copy(alpha = 0.5f)
                 )
             }
@@ -406,11 +414,25 @@ fun IberdrolaBillItem(
     val dateFormat = SimpleDateFormat("d 'de' MMMM", Locale.forLanguageTag("es-ES"))
     val type = BillTypeEnum.entries.find { it.ordinal == bill.typeId }?.title ?: ""
 
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    val backgroundColor by animateColorAsState(
+        targetValue = if (isPressed) IberdrolaTheme.colors.onSurface.copy(alpha = 0.08f) else Color.Transparent,
+        label = "billItemFocus"
+    )
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .clip(RoundedCornerShape(10.dp))
+            .background(backgroundColor)
+            .clickable(
+                interactionSource = interactionSource,
+                indication = ripple(color = IberdrolaTheme.colors.onSurface),
+                onClick = { onclick(bill) }
+            )
             .padding(vertical = 8.dp)
-            .clickable { onclick(bill) }
             .testTag("bill_item"),
         verticalAlignment = Alignment.CenterVertically
     ) {

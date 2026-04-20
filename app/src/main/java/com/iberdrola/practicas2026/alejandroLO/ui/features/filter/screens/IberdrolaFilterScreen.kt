@@ -5,6 +5,7 @@ import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,6 +45,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -52,16 +54,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.iberdrola.practicas2026.alejandroLO.R
 import com.iberdrola.practicas2026.alejandroLO.ui.common.components.IberdrolaBar
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillStatusEnum
 import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.viewModel.FilterViewModel
@@ -146,6 +151,8 @@ fun IberdrolaFilterScreen(
         )
     }
 
+    val interactionSource = remember { MutableInteractionSource() }
+
     Scaffold(
         topBar = {
             Box(
@@ -183,25 +190,34 @@ fun IberdrolaFilterScreen(
                     colors = ButtonDefaults.buttonColors(containerColor = IberdrolaTheme.colors.primary),
                     shape = RoundedCornerShape(28.dp)
                 ) {
-                    Text("Aplicar filtros", style = IberdrolaTheme.typography.tituloMedio, color = Color.White)
+                    Text(stringResource(R.string.aplicar_filtros), style = IberdrolaTheme.typography.tituloMedio, color = Color.White)
                 }
 
                 Spacer(Modifier.height(16.dp))
 
                 Text(
-                    "Borrar filtros",
+                    stringResource(R.string.borrar_filtros),
                     color = IberdrolaTheme.colors.primary,
                     style = IberdrolaTheme.typography.cuerpoMedio.copy(
                         textDecoration = TextDecoration.Underline,
                         fontWeight = FontWeight.Bold
                     ),
-                    modifier = Modifier.clickable { 
-                        selectedDateFrom = null
-                        selectedDateTo = null
-                        priceRange = filterUiState.minPrice..filterUiState.maxPrice
-                        selectedStates = emptyList()
-                        filterViewModel.clearFilters()
-                    }
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .clickable(
+                            interactionSource = interactionSource,
+                            indication = ripple(
+                                color = IberdrolaTheme.colors.onSurface.copy(alpha = 0.12f)
+                            ),
+                            onClick = {
+                                selectedDateFrom = null
+                                selectedDateTo = null
+                                priceRange = filterUiState.minPrice..filterUiState.maxPrice
+                                selectedStates = emptyList()
+                                filterViewModel.clearFilters()
+                            }
+                        )
+                        .padding(horizontal = 12.dp, vertical = 4.dp)
                 )
             }
         }

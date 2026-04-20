@@ -44,7 +44,7 @@ fun SkeletonScreen(modifier: Modifier = Modifier) {
         TitleAndFilterSkeleton()
         Spacer(modifier = Modifier.height(24.dp))
         BillSkeletonYear()
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
         BillSkeletonList()
     }
 }

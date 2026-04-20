@@ -26,4 +26,7 @@
     <string name="confirmar_cambio_modo_mensaje">La aplicación se recargará para obtener los nuevos datos. ¿Deseas continuar?</string>
     <string name="aceptar">Aceptar</string>
     <string name="cancelar">Cancelar</string>
+    <string name="aplicar_filtros">Aplicar filtros</string>
+    <string name="borrar_filtros">Borrar filtros</string>
+    <string name="responder_mas_tarde">Responder más tarde</string>
 </resources>

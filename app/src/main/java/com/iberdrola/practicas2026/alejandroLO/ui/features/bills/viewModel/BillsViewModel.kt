@@ -104,7 +104,8 @@ class BillsViewModel(
             if (isOnline) {
                 try {
                     billsRepository.refreshBillsOnline()
-                    delay(1000) // debido a que se carga demasiado rapido y ves aparecer las bills mientras se cargan
+                    // ahora el delay lo simulamos desde mockoon
+                    //delay(1000) // debido a que se carga demasiado rapido y ves aparecer las bills mientras se cargan
                 } catch (e: Exception) {
                     Log.e(TAG, "Error al conectar con Mockoon: ${e.message}")
                     _uiState.update { it.copy(errorMessage = "Error al conectar con Mockoon: ${e.message}") }
