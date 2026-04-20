@@ -57,6 +57,7 @@ import com.iberdrola.practicas2026.alejandroLO.ui.features.home.viewModel.HomeVi
 import com.iberdrola.practicas2026.alejandroLO.ui.features.home.viewModel.HomeViewModelFactory
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IB2026AlejandroLOTheme
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -187,7 +188,10 @@ fun IberdrolaHomeScreen(
                         }
                     },
                     onRatingSelected = {
-                        scope.launch { sheetState.hide() }.invokeOnCompletion {
+                        scope.launch {
+                            delay(3000)
+                            sheetState.hide()
+                        }.invokeOnCompletion {
                             setCont(10)
                         }
                     },
