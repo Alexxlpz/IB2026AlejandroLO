@@ -29,4 +29,5 @@
     <string name="aplicar_filtros">Aplicar filtros</string>
     <string name="borrar_filtros">Borrar filtros</string>
     <string name="responder_mas_tarde">Responder más tarde</string>
+    <string name="rango_de_precios_no_disponible">Rango de precios no disponible</string>
 </resources>

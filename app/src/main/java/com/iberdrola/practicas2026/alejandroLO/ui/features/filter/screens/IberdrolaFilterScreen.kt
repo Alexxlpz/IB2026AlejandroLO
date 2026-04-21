@@ -76,6 +76,8 @@ import java.text.SimpleDateFormat
 import java.util.Calendar.getInstance
 import java.util.Date
 import java.util.Locale
+import kotlin.math.ceil
+import kotlin.math.floor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -266,7 +268,9 @@ fun IberdrolaFilterScreen(
                 range = priceRange,
                 maxPrice = filterUiState.maxPrice,
                 minPrice = filterUiState.minPrice,
-                onRangeChange = { priceRange = it }
+                // asi si solo tenemos una factura o muchas con el mismo precio se deshabilita
+                enabled = (filterUiState.minPrice + 1  < filterUiState.maxPrice),
+                onRangeChange = { if(it.endInclusive.toInt() > it.start.toInt()) priceRange = it } // evitamos que cojan el mismo valor
             )
 
             Spacer(Modifier.height(40.dp))
@@ -470,6 +474,7 @@ fun PriceRangeSelector(
     range: ClosedFloatingPointRange<Float>,
     maxPrice: Float,
     minPrice: Float,
+    enabled: Boolean = true,
     onRangeChange: (ClosedFloatingPointRange<Float>) -> Unit
 ) {
 
@@ -483,7 +488,7 @@ fun PriceRangeSelector(
             modifier = Modifier.padding(bottom = 12.dp)
         ) {
             Text(
-                text = "${range.start.toInt()} € - ${range.endInclusive.toInt()} €",
+                text = "${floor(range.start)} € - ${ceil(range.endInclusive)} €",
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
                 style = IberdrolaTheme.typography.etiquetaPeque.copy(fontWeight = FontWeight.ExtraBold),
                 color = Color.DarkGray
@@ -494,25 +499,41 @@ fun PriceRangeSelector(
             value = range,
             onValueChange = { onRangeChange(it) },
             valueRange = minPrice..maxPrice,
+            enabled = enabled,
             modifier = Modifier.fillMaxWidth(),
+            colors = SliderDefaults.colors(
+                activeTrackColor = IberdrolaTheme.colors.primary,
+                inactiveTrackColor = IberdrolaTheme.colors.surfaceVariant.copy(alpha = 0.3f),
+                disabledActiveTrackColor = IberdrolaTheme.colors.surfaceVariant,
+                disabledInactiveTrackColor = IberdrolaTheme.colors.surfaceVariant.copy(alpha = 0.1f),
+            ),
 
             startThumb = {
                 Surface(
                     modifier = Modifier.size(20.dp),
                     shape = CircleShape,
-                    color = IberdrolaTheme.colors.primary
-                ) {}
+                    color = if (enabled) {
+                        IberdrolaTheme.colors.primary
+                    } else {
+                        IberdrolaTheme.colors.onSurfaceVariant
+                    }
+                ){}
             },
             endThumb = {
                 Surface(
                     modifier = Modifier.size(20.dp),
                     shape = CircleShape,
-                    color = IberdrolaTheme.colors.primary
+                    color = if (enabled) {
+                        IberdrolaTheme.colors.primary
+                    } else {
+                        IberdrolaTheme.colors.onSurfaceVariant
+                    }
                 ) {}
             },
             track = { rangeSliderState ->
                 SliderDefaults.Track(
                     rangeSliderState = rangeSliderState,
+                    enabled = enabled,
                     modifier = Modifier.height(6.dp),
                     thumbTrackGapSize = 0.dp,
                     drawStopIndicator = null,
@@ -532,6 +553,15 @@ fun PriceRangeSelector(
         ) {
             Text("$minPrice €", style = IberdrolaTheme.typography.etiquetaPeque, color = Color.Gray)
             Text("$maxPrice €", style = IberdrolaTheme.typography.etiquetaPeque, color = Color.Gray)
+        }
+
+        if (!enabled) {
+            Text(
+                text = stringResource(R.string.rango_de_precios_no_disponible),
+                style = IberdrolaTheme.typography.etiquetaPeque,
+                color = Color.Gray,
+                modifier = Modifier.padding(top = 4.dp)
+            )
         }
     }
 }

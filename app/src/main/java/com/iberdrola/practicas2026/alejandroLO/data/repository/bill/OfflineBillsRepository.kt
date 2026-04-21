@@ -7,6 +7,8 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.iberdrola.practicas2026.alejandroLO.data.BillDatabase
 import com.iberdrola.practicas2026.alejandroLO.data.model.Bill
+import com.iberdrola.practicas2026.alejandroLO.data.model.BillStatus
+import com.iberdrola.practicas2026.alejandroLO.data.model.BillType
 import com.iberdrola.practicas2026.alejandroLO.data.network.bill.BillsApiService
 import com.iberdrola.practicas2026.alejandroLO.data.repository.direction.DirectionRepository
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillStatusEnum
@@ -42,20 +44,25 @@ class OfflineBillsRepository(
         try {
             val remoteBills = apiService.getBills()
             val database = BillDatabase.getDatabase(context)
+            var cont = 0
 
             try {
                 billDao.deleteAll()
                 Log.d(TAG, "Insertando facturas desde API...")
-                remoteBills.forEach { billDao.insert(it) }
+                remoteBills.forEach{
+                    billDao.insert(it)
+                    cont++
+                }
+                Log.d(TAG, "Factura insertada: $cont")
             } catch (_: SQLiteConstraintException) {
                 Log.w(TAG, "Fallo de ForeignKey online. Refrescando direcciones desde API...")
                 directionsRepository.refreshDirectionsOnline()
 
                 BillTypeEnum.entries.forEach { type ->
-                    database.billTypeDao().insert(com.iberdrola.practicas2026.alejandroLO.data.model.BillType(type.ordinal, type.title))
+                    database.billTypeDao().insert(BillType(type.ordinal, type.title))
                 }
                 BillStatusEnum.entries.forEach { status ->
-                    database.billStatusDao().insert(com.iberdrola.practicas2026.alejandroLO.data.model.BillStatus(status.ordinal, status.title))
+                    database.billStatusDao().insert(BillStatus(status.ordinal, status.title))
                 }
 
                 billDao.deleteAll()
@@ -83,10 +90,10 @@ class OfflineBillsRepository(
             directionsRepository.insertMockDirectionsFromAssets()
 
             BillTypeEnum.entries.forEach { type ->
-                database.billTypeDao().insert(com.iberdrola.practicas2026.alejandroLO.data.model.BillType(type.ordinal, type.title))
+                database.billTypeDao().insert(BillType(type.ordinal, type.title))
             }
             BillStatusEnum.entries.forEach { status ->
-                database.billStatusDao().insert(com.iberdrola.practicas2026.alejandroLO.data.model.BillStatus(status.ordinal, status.title))
+                database.billStatusDao().insert(BillStatus(status.ordinal, status.title))
             }
 
             billDao.deleteAll()

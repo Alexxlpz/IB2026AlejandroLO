@@ -85,6 +85,7 @@ fun IberdrolaBillsScreen(
     refresh: () -> Unit = {},
     error: String? = null,
     locale: Locale = Locale.forLanguageTag("es-ES"),
+    enabledFilterButton: Boolean,
     onFilterClick: () -> Unit,
     filterUiState: FilterUiState,
     clearFilterField: (ActiveFilterItem) -> Unit
@@ -145,6 +146,7 @@ fun IberdrolaBillsScreen(
                         bills = bills,
                         onclick = onclick,
                         numberFormat = numberFormat,
+                        enabledFilterButton = enabledFilterButton,
                         onFilterClick = onFilterClick,
                         filterUiState = filterUiState,
                         clearFilterField = clearFilterField,
@@ -307,6 +309,7 @@ fun IberdrolaBillList(
     bills: List<Bill>,
     onclick: (Bill) -> Unit,
     numberFormat: NumberFormat,
+    enabledFilterButton: Boolean,
     onFilterClick: () -> Unit,
     filterUiState: FilterUiState,
     clearFilterField: (ActiveFilterItem) -> Unit,
@@ -328,22 +331,22 @@ fun IberdrolaBillList(
                 color = IberdrolaTheme.colors.onSurface
             )
 
+            val accentColor = if (enabledFilterButton) IberdrolaTheme.colors.primary else IberdrolaTheme.colors.onSurfaceVariant
+            val surfaceColor = IberdrolaTheme.colors.surface
+
             OutlinedButton(
                 onClick = onFilterClick,
-                border = BorderStroke(2.dp, IberdrolaTheme.colors.primary),
+                enabled = enabledFilterButton,
+                border = BorderStroke(2.dp, accentColor),
                 shape = RoundedCornerShape(20.dp),
-                colors = if(filterIsApplied){
-                    ButtonDefaults.outlinedButtonColors(
-                        containerColor = IberdrolaTheme.colors.primary,
-                        contentColor = IberdrolaTheme.colors.surfaceVariant
-                    )
-                } else {
-                    ButtonDefaults.outlinedButtonColors(
-                        containerColor = IberdrolaTheme.colors.surfaceVariant,
-                        contentColor = IberdrolaTheme.colors.primary
-                    )
-                },
-                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+                colors = ButtonDefaults.outlinedButtonColors(
+                    containerColor = if (filterIsApplied) accentColor else surfaceColor,
+                    contentColor = if (filterIsApplied) surfaceColor else accentColor,
+                    disabledContainerColor = IberdrolaTheme.colors.onSurfaceVariant.copy(alpha = 0.12f),
+                    disabledContentColor = IberdrolaTheme.colors.onSurfaceVariant.copy(alpha = 0.6f)
+                ),
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                modifier = Modifier.testTag("filter_button")
             ) {
                 Icon(
                     imageVector = Icons.Default.Tune,
@@ -576,6 +579,7 @@ fun PreviewIberdrolaBillsScreen() {
             onclick = {},
             lastBill = bill,
             locale = Locale.forLanguageTag("es-ES"),
+            enabledFilterButton = true,
             onFilterClick = {},
             filterUiState = FilterUiState(),
             clearFilterField = {}

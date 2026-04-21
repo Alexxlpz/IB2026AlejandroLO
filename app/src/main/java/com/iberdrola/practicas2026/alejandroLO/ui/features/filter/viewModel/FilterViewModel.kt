@@ -39,12 +39,17 @@ class FilterViewModel(
                 // toma el primer valor válido y cancela la suscripción automáticamente
                 .first()
                 .let { (minPrice, maxPrice) ->
+                    val auxMax = if(maxPrice == minPrice){
+                        minPrice + 1
+                    }else {
+                        maxPrice
+                    }
 
                 _uiState.update { currentState ->
                     currentState.copy(
-                        priceRange = minPrice..maxPrice,
+                        priceRange = minPrice..auxMax,
                         minPrice = minPrice,
-                        maxPrice = maxPrice
+                        maxPrice = auxMax
                     )
                 }
             }

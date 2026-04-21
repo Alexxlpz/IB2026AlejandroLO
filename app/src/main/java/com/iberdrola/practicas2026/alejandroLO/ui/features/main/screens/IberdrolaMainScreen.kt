@@ -55,6 +55,9 @@ fun IberdrolaMainScreen(
     val billsUiState = billsViewModel.uiState.collectAsState()
     val filterUiState = filterViewModel.uiState.collectAsState()
 
+    val enabledFilterButton = filterUiState.value.minPrice != 0f &&
+                            filterUiState.value.maxPrice != 0f
+
 
     var showAlert by remember { mutableStateOf(false) }
     val selectingBill: (Bill) -> Unit = remember {
@@ -118,6 +121,7 @@ fun IberdrolaMainScreen(
                     modifier = Modifier.fillMaxSize(),
                     error = billsUiState.value.errorMessage,
                     locale = locale,
+                    enabledFilterButton = enabledFilterButton,
                     onFilterClick = onFilterClick,
                     filterUiState = filterUiState.value,
                     clearFilterField = { filterViewModel.clearFilterField(it) }
