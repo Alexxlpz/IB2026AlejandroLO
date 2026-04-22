@@ -266,7 +266,23 @@ fun IberdrolaFilterScreen(
                 range = priceRange,
                 maxPrice = filterUiState.maxPrice,
                 minPrice = filterUiState.minPrice,
-                onRangeChange = { priceRange = it }
+                onRangeChange = { newRange ->
+                    val minGap = 1f
+
+                    if (newRange.endInclusive - newRange.start >= minGap) {
+                        priceRange = newRange
+                    } else {
+                        if (newRange.start != priceRange.start) {
+
+                            priceRange = (newRange.endInclusive - minGap)..newRange.endInclusive
+
+                        } else if (newRange.endInclusive != priceRange.endInclusive) {
+
+                            priceRange = newRange.start..(newRange.start + minGap)
+
+                        }
+                    }
+                }
             )
 
             Spacer(Modifier.height(40.dp))
@@ -472,12 +488,7 @@ fun PriceRangeSelector(
     minPrice: Float,
     onRangeChange: (ClosedFloatingPointRange<Float>) -> Unit
 ) {
-    var enabled = true
-
-    if (maxPrice == minPrice + 1f){
-        enabled = false
-    }
-
+    val enabled = (maxPrice != minPrice + 1f)
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -510,7 +521,7 @@ fun PriceRangeSelector(
                     color = if (enabled){
                         IberdrolaTheme.colors.primary
                     }else {
-                        IberdrolaTheme.colors.thumbsUnabled
+                        IberdrolaTheme.colors.disableFontColor
                     }
                 ) {}
             },
@@ -521,7 +532,7 @@ fun PriceRangeSelector(
                     color = if (enabled){
                         IberdrolaTheme.colors.primary
                     }else {
-                        IberdrolaTheme.colors.thumbsUnabled
+                        IberdrolaTheme.colors.disableFontColor
                     }
                 ) {}
             },

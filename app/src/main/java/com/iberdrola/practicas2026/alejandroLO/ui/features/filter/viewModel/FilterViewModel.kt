@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.iberdrola.practicas2026.alejandroLO.data.repository.filter.FilterRepository
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillStatusEnum
 import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.enums.FilterType
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -52,6 +53,7 @@ class FilterViewModel(
                                     currentState.priceRange.endInclusive.coerceIn(minRepo, maxAux)
                         }
 
+                        delay(500) // para que no se vean los cambios al darle al boton submit
                         currentState.copy(
                             minPrice = minRepo,
                             maxPrice = maxAux,
@@ -100,6 +102,7 @@ class FilterViewModel(
                 selectedStates = selectedStatesAux
             )
         }
+
         filterRepository.setFilterCriteria(_uiState.value)
     }
 
