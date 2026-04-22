@@ -30,13 +30,13 @@ interface BillsDao {
     @Query("SELECT * from bills WHERE id = :id")
     fun getBill(id: Int): Flow<Bill>
 
-    @Query("SELECT * from bills WHERE typeId = :typeId ORDER BY date DESC")
+    @Query("SELECT * from bills WHERE typeId = :typeId ORDER BY emissionDate DESC")
     fun getBillsByType(typeId: Int): Flow<List<Bill>>
 
-    @Query("SELECT * from bills ORDER BY date DESC")
+    @Query("SELECT * from bills ORDER BY emissionDate DESC")
     fun getAllBills(): Flow<List<Bill>>
 
-    @Query("SELECT * from bills WHERE directionId = :directionId ORDER BY date DESC")
+    @Query("SELECT * from bills WHERE directionId = :directionId ORDER BY emissionDate DESC")
     fun getAllBillsByDirectionId(directionId: Int): Flow<List<Bill>>
 
     @Query("SELECT MAX(price) FROM bills")

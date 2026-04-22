@@ -86,22 +86,14 @@ fun IberdrolaBillsScreen(
     locale: Locale = Locale.forLanguageTag("es-ES"),
     onFilterClick: () -> Unit,
     filterUiState: FilterUiState,
-    clearFilterField: (ActiveFilterItem) -> Unit
+    clearFilterField: (ActiveFilterItem) -> Unit,
+    enableFilterButton: Boolean,
+    filterIsApplied: Boolean
 ) {
     val scrollState = rememberScrollState()
     val numberFormat = NumberFormat.getCurrencyInstance(locale)
 
     val refreshingState: PullToRefreshState = rememberPullToRefreshState()
-
-    val filterIsApplied = remember(filterUiState) {
-                filterUiState.selectedDateFrom != null ||
-                filterUiState.selectedDateTo != null ||
-                filterUiState.priceRange != filterUiState.minPrice..filterUiState.maxPrice ||
-                filterUiState.selectedStates != BillStatusEnum.entries
-    }
-
-    // esta deshabilitado si no hay filtros y no hay facturas
-    val enableFilterButton = filterIsApplied || bills.isNotEmpty()
 
 //    Log.d("FilterChipList", "FilterChipList: $filterIsApplied")
 //    Log.d("FilterChipList", "FilterChipList: $filterUiState")
@@ -138,8 +130,7 @@ fun IberdrolaBillsScreen(
                 if(error == null) {
                     if (lastBill != null) {
                         IberdrolaLastBill(
-                            lastBill = lastBill,
-                            firstBillDate = bills.lastOrNull()?.date!!,
+                            lastBill = lastBill ,
                             numberFormat = numberFormat
                         )
                     }
@@ -194,7 +185,6 @@ fun IberdrolaBillsScreen(
 @Composable
 fun IberdrolaLastBill(
     lastBill: Bill,
-    firstBillDate: Date,
     numberFormat: NumberFormat
 ) {
     val billColor = BillStatusEnum.entries[lastBill.statusId].color
@@ -275,7 +265,7 @@ fun IberdrolaLastBill(
 
             val dateFormat = SimpleDateFormat("dd MMM. yyyy", Locale.forLanguageTag("es-ES"))
             Text(
-                text = "${dateFormat.format(firstBillDate)} - ${dateFormat.format(lastBill.date)}",
+                text = "${dateFormat.format(lastBill.startDate)} - ${dateFormat.format(lastBill.endDate)}",
                 style = IberdrolaTheme.typography.cuerpoPeque,
                 color = IberdrolaTheme.colors.onSurfaceVariant
             )
@@ -390,7 +380,7 @@ fun IberdrolaBillList(
             )
         } else {
             bills.forEach { bill ->
-                val currentYear = yearFormat.format(bill.date)
+                val currentYear = yearFormat.format(bill.emissionDate)
                 if (currentYear != auxyear) {
                     auxyear = currentYear
                     Text(
@@ -449,7 +439,7 @@ fun IberdrolaBillItem(
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = dateFormat.format(bill.date),
+                text = dateFormat.format(bill.emissionDate),
                 style = IberdrolaTheme.typography.cuerpoGrande,
                 color = IberdrolaTheme.colors.onSurface
             )
@@ -577,7 +567,7 @@ fun PreviewIberdrolaBillsScreen() {
         typeId = BillTypeEnum.LUZ.ordinal,
         price = 20.0,
         statusId = BillStatusEnum.PENDIENTE.ordinal,
-        date = Date()
+        emissionDate = Date()
     )
     val bills = listOf(bill, bill, bill)
     IB2026AlejandroLOTheme {
@@ -589,7 +579,9 @@ fun PreviewIberdrolaBillsScreen() {
             locale = Locale.forLanguageTag("es-ES"),
             onFilterClick = {},
             filterUiState = FilterUiState(),
-            clearFilterField = {}
+            clearFilterField = {},
+            enableFilterButton = true,
+            filterIsApplied = false
         )
     }
 }

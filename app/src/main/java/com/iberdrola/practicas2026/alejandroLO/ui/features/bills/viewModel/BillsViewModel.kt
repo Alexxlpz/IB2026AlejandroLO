@@ -170,8 +170,8 @@ class BillsViewModel(
             val priceIn = bill.price in criteria.priceRange
             val statusMatch = criteria.selectedStates.isEmpty() ||
                     criteria.selectedStates.contains(BillStatusEnum.entries[bill.statusId])
-            val dateFromMatch = criteria.selectedDateFrom?.let { !bill.date.before(it) } ?: true
-            val dateToMatch = criteria.selectedDateTo?.let { !bill.date.after(it) } ?: true
+            val dateFromMatch = criteria.selectedDateFrom?.let { !bill.emissionDate.before(it) } ?: true
+            val dateToMatch = criteria.selectedDateTo?.let { !bill.emissionDate.after(it) } ?: true
 
             priceIn && statusMatch && dateFromMatch && dateToMatch
         }

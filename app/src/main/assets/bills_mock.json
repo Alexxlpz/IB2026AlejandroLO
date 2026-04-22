@@ -5,7 +5,9 @@
     "price": 45.3,
     "statusId": 0,
     "directionId": 1,
-    "date": 1704067200000
+    "emissionDate": 1704067200000,
+    "startDate": 1703462400000,
+    "endDate": 1704672000000
   },
   {
     "id": 2,
@@ -13,7 +15,9 @@
     "price": 60.1,
     "statusId": 1,
     "directionId": 2,
-    "date": 1706745600000
+    "emissionDate": 1706745600000,
+    "startDate": 1761955200000,
+    "endDate": 1770000000000
   },
   {
     "id": 3,
@@ -21,7 +25,9 @@
     "price": 32.99,
     "statusId": 2,
     "directionId": 3,
-    "date": 1709251200000
+    "emissionDate": 1709251200000,
+    "startDate": 1762041600000,
+    "endDate": 1770086400000
   },
   {
     "id": 4,
@@ -29,7 +35,9 @@
     "price": 75.5,
     "statusId": 3,
     "directionId": 1,
-    "date": 1711929600000
+    "emissionDate": 1711929600000,
+    "startDate": 1762128000000,
+    "endDate": 1770172800000
   },
   {
     "id": 5,
@@ -37,7 +45,9 @@
     "price": 28.75,
     "statusId": 4,
     "directionId": 2,
-    "date": 1714521600000
+    "emissionDate": 1714521600000,
+    "startDate": 1762214400000,
+    "endDate": 1770259200000
   },
   {
     "id": 6,
@@ -45,7 +55,9 @@
     "price": 90.2,
     "statusId": 0,
     "directionId": 3,
-    "date": 1717200000000
+    "emissionDate": 1717200000000,
+    "startDate": 1716508800000,
+    "endDate": 1717804800000
   },
   {
     "id": 7,
@@ -53,7 +65,9 @@
     "price": 55.6,
     "statusId": 1,
     "directionId": 1,
-    "date": 1719792000000
+    "emissionDate": 1719792000000,
+    "startDate": 1762300800000,
+    "endDate": 1770345600000
   },
   {
     "id": 8,
@@ -61,7 +75,9 @@
     "price": 48.1,
     "statusId": 2,
     "directionId": 2,
-    "date": 1722470400000
+    "emissionDate": 1722470400000,
+    "startDate": 1762387200000,
+    "endDate": 1770432000000
   },
   {
     "id": 9,
@@ -69,7 +85,9 @@
     "price": 39.99,
     "statusId": 3,
     "directionId": 3,
-    "date": 1725148800000
+    "emissionDate": 1725148800000,
+    "startDate": 1762473600000,
+    "endDate": 1770518400000
   },
   {
     "id": 10,
@@ -77,7 +95,9 @@
     "price": 82.45,
     "statusId": 4,
     "directionId": 1,
-    "date": 1727740800000
+    "emissionDate": 1727740800000,
+    "startDate": 1762560000000,
+    "endDate": 1770604800000
   },
   {
     "id": 11,
@@ -85,7 +105,9 @@
     "price": 29.99,
     "statusId": 0,
     "directionId": 2,
-    "date": 1730419200000
+    "emissionDate": 1730419200000,
+    "startDate": 1729814400000,
+    "endDate": 1731024000000
   },
   {
     "id": 12,
@@ -93,7 +115,9 @@
     "price": 66.7,
     "statusId": 1,
     "directionId": 3,
-    "date": 1733011200000
+    "emissionDate": 1733011200000,
+    "startDate": 1762646400000,
+    "endDate": 1770691200000
   },
   {
     "id": 13,
@@ -101,7 +125,9 @@
     "price": 41.2,
     "statusId": 2,
     "directionId": 1,
-    "date": 1735689600000
+    "emissionDate": 1735689600000,
+    "startDate": 1762732800000,
+    "endDate": 1770777600000
   },
   {
     "id": 14,
@@ -109,7 +135,9 @@
     "price": 77.35,
     "statusId": 3,
     "directionId": 2,
-    "date": 1738368000000
+    "emissionDate": 1738368000000,
+    "startDate": 1762819200000,
+    "endDate": 1770864000000
   },
   {
     "id": 15,
@@ -117,7 +145,9 @@
     "price": 35.8,
     "statusId": 4,
     "directionId": 3,
-    "date": 1740787200000
+    "emissionDate": 1740787200000,
+    "startDate": 1762905600000,
+    "endDate": 1770950400000
   },
   {
     "id": 16,
@@ -125,7 +155,9 @@
     "price": 88.9,
     "statusId": 0,
     "directionId": 1,
-    "date": 1743465600000
+    "emissionDate": 1743465600000,
+    "startDate": 1742774400000,
+    "endDate": 1743984000000
   },
   {
     "id": 17,
@@ -133,7 +165,9 @@
     "price": 52.1,
     "statusId": 1,
     "directionId": 2,
-    "date": 1746057600000
+    "emissionDate": 1746057600000,
+    "startDate": 1762992000000,
+    "endDate": 1771036800000
   },
   {
     "id": 18,
@@ -141,7 +175,9 @@
     "price": 61.4,
     "statusId": 2,
     "directionId": 3,
-    "date": 1748736000000
+    "emissionDate": 1748736000000,
+    "startDate": 1763078400000,
+    "endDate": 1771123200000
   },
   {
     "id": 19,
@@ -149,7 +185,9 @@
     "price": 47.75,
     "statusId": 3,
     "directionId": 1,
-    "date": 1751328000000
+    "emissionDate": 1751328000000,
+    "startDate": 1763164800000,
+    "endDate": 1771209600000
   },
   {
     "id": 20,
@@ -157,7 +195,9 @@
     "price": 73.25,
     "statusId": 4,
     "directionId": 2,
-    "date": 1754006400000
+    "emissionDate": 1754006400000,
+    "startDate": 1763251200000,
+    "endDate": 1771296000000
   },
   {
     "id": 21,
@@ -165,7 +205,9 @@
     "price": 58.9,
     "statusId": 0,
     "directionId": 3,
-    "date": 1756684800000
+    "emissionDate": 1756684800000,
+    "startDate": 1755993600000,
+    "endDate": 1757203200000
   },
   {
     "id": 22,
@@ -173,7 +215,9 @@
     "price": 69.3,
     "statusId": 1,
     "directionId": 1,
-    "date": 1759276800000
+    "emissionDate": 1759276800000,
+    "startDate": 1763337600000,
+    "endDate": 1771382400000
   },
   {
     "id": 23,
@@ -181,7 +225,9 @@
     "price": 44.1,
     "statusId": 2,
     "directionId": 2,
-    "date": 1761955200000
+    "emissionDate": 1761955200000,
+    "startDate": 1763424000000,
+    "endDate": 1771468800000
   },
   {
     "id": 24,
@@ -189,7 +235,9 @@
     "price": 91.5,
     "statusId": 3,
     "directionId": 3,
-    "date": 1764547200000
+    "emissionDate": 1764547200000,
+    "startDate": 1763510400000,
+    "endDate": 1771555200000
   },
   {
     "id": 25,
@@ -197,7 +245,9 @@
     "price": 26.4,
     "statusId": 4,
     "directionId": 1,
-    "date": 1767225600000
+    "emissionDate": 1767225600000,
+    "startDate": 1763596800000,
+    "endDate": 1771641600000
   },
   {
     "id": 26,
@@ -205,7 +255,9 @@
     "price": 78.2,
     "statusId": 0,
     "directionId": 2,
-    "date": 1769904000000
+    "emissionDate": 1769904000000,
+    "startDate": 1769212800000,
+    "endDate": 1770422400000
   },
   {
     "id": 27,
@@ -213,7 +265,9 @@
     "price": 33.3,
     "statusId": 1,
     "directionId": 3,
-    "date": 1772323200000
+    "emissionDate": 1772323200000,
+    "startDate": 1763683200000,
+    "endDate": 1771728000000
   },
   {
     "id": 28,
@@ -221,7 +275,9 @@
     "price": 85.6,
     "statusId": 2,
     "directionId": 1,
-    "date": 1775001600000
+    "emissionDate": 1775001600000,
+    "startDate": 1763769600000,
+    "endDate": 1771814400000
   },
   {
     "id": 29,
@@ -229,7 +285,9 @@
     "price": 49.9,
     "statusId": 3,
     "directionId": 2,
-    "date": 1777593600000
+    "emissionDate": 1777593600000,
+    "startDate": 1763856000000,
+    "endDate": 1771900800000
   },
   {
     "id": 30,
@@ -237,7 +295,9 @@
     "price": 62.7,
     "statusId": 4,
     "directionId": 3,
-    "date": 1780272000000
+    "emissionDate": 1780272000000,
+    "startDate": 1763942400000,
+    "endDate": 1771987200000
   },
   {
     "id": 31,
@@ -245,7 +305,9 @@
     "price": 37.5,
     "statusId": 0,
     "directionId": 1,
-    "date": 1782864000000
+    "emissionDate": 1782864000000,
+    "startDate": 1782172800000,
+    "endDate": 1783382400000
   },
   {
     "id": 32,
@@ -253,7 +315,9 @@
     "price": 80.1,
     "statusId": 1,
     "directionId": 2,
-    "date": 1785542400000
+    "emissionDate": 1785542400000,
+    "startDate": 1764028800000,
+    "endDate": 1772073600000
   },
   {
     "id": 33,
@@ -261,7 +325,9 @@
     "price": 53.8,
     "statusId": 2,
     "directionId": 3,
-    "date": 1788220800000
+    "emissionDate": 1788220800000,
+    "startDate": 1764115200000,
+    "endDate": 1772160000000
   },
   {
     "id": 34,
@@ -269,7 +335,9 @@
     "price": 71.9,
     "statusId": 3,
     "directionId": 1,
-    "date": 1790812800000
+    "emissionDate": 1790812800000,
+    "startDate": 1764201600000,
+    "endDate": 1772246400000
   },
   {
     "id": 35,
@@ -277,7 +345,9 @@
     "price": 42.6,
     "statusId": 4,
     "directionId": 2,
-    "date": 1793491200000
+    "emissionDate": 1793491200000,
+    "startDate": 1764288000000,
+    "endDate": 1772332800000
   },
   {
     "id": 36,
@@ -285,7 +355,9 @@
     "price": 95.0,
     "statusId": 0,
     "directionId": 3,
-    "date": 1796083200000
+    "emissionDate": 1796083200000,
+    "startDate": 1795392000000,
+    "endDate": 1796601600000
   },
   {
     "id": 37,
@@ -293,7 +365,9 @@
     "price": 31.2,
     "statusId": 1,
     "directionId": 1,
-    "date": 1798761600000
+    "emissionDate": 1798761600000,
+    "startDate": 1764374400000,
+    "endDate": 1772419200000
   },
   {
     "id": 38,
@@ -301,7 +375,9 @@
     "price": 67.4,
     "statusId": 2,
     "directionId": 2,
-    "date": 1801440000000
+    "emissionDate": 1801440000000,
+    "startDate": 1764460800000,
+    "endDate": 1772505600000
   },
   {
     "id": 39,
@@ -309,7 +385,9 @@
     "price": 54.9,
     "statusId": 3,
     "directionId": 3,
-    "date": 1804032000000
+    "emissionDate": 1804032000000,
+    "startDate": 1764547200000,
+    "endDate": 1772592000000
   },
   {
     "id": 40,
@@ -317,7 +395,9 @@
     "price": 88.3,
     "statusId": 4,
     "directionId": 1,
-    "date": 1806710400000
+    "emissionDate": 1806710400000,
+    "startDate": 1764633600000,
+    "endDate": 1772678400000
   },
   {
     "id": 41,
@@ -325,7 +405,9 @@
     "price": 36.7,
     "statusId": 0,
     "directionId": 2,
-    "date": 1809302400000
+    "emissionDate": 1809302400000,
+    "startDate": 1808611200000,
+    "endDate": 1809820800000
   },
   {
     "id": 42,
@@ -333,7 +415,9 @@
     "price": 79.5,
     "statusId": 1,
     "directionId": 3,
-    "date": 1811980800000
+    "emissionDate": 1811980800000,
+    "startDate": 1764720000000,
+    "endDate": 1772764800000
   },
   {
     "id": 43,
@@ -341,7 +425,9 @@
     "price": 40.0,
     "statusId": 2,
     "directionId": 1,
-    "date": 1814572800000
+    "emissionDate": 1814572800000,
+    "startDate": 1764806400000,
+    "endDate": 1772851200000
   },
   {
     "id": 44,
@@ -349,7 +435,9 @@
     "price": 92.2,
     "statusId": 3,
     "directionId": 2,
-    "date": 1817251200000
+    "emissionDate": 1817251200000,
+    "startDate": 1764892800000,
+    "endDate": 1772937600000
   },
   {
     "id": 45,
@@ -357,7 +445,9 @@
     "price": 27.9,
     "statusId": 4,
     "directionId": 3,
-    "date": 1819843200000
+    "emissionDate": 1819843200000,
+    "startDate": 1764979200000,
+    "endDate": 1773024000000
   },
   {
     "id": 46,
@@ -365,7 +455,9 @@
     "price": 83.7,
     "statusId": 0,
     "directionId": 1,
-    "date": 1822521600000
+    "emissionDate": 1822521600000,
+    "startDate": 1821830400000,
+    "endDate": 1823040000000
   },
   {
     "id": 47,
@@ -373,7 +465,9 @@
     "price": 46.5,
     "statusId": 1,
     "directionId": 2,
-    "date": 1825200000000
+    "emissionDate": 1825200000000,
+    "startDate": 1765065600000,
+    "endDate": 1773110400000
   },
   {
     "id": 48,
@@ -381,7 +475,9 @@
     "price": 74.6,
     "statusId": 2,
     "directionId": 3,
-    "date": 1827792000000
+    "emissionDate": 1827792000000,
+    "startDate": 1765152000000,
+    "endDate": 1773196800000
   },
   {
     "id": 49,
@@ -389,7 +485,9 @@
     "price": 59.3,
     "statusId": 3,
     "directionId": 1,
-    "date": 1830470400000
+    "emissionDate": 1830470400000,
+    "startDate": 1765238400000,
+    "endDate": 1773283200000
   },
   {
     "id": 50,
@@ -397,6 +495,8 @@
     "price": 68.8,
     "statusId": 4,
     "directionId": 2,
-    "date": 1833062400000
+    "emissionDate": 1833062400000,
+    "startDate": 1765324800000,
+    "endDate": 1773369600000
   }
 ]

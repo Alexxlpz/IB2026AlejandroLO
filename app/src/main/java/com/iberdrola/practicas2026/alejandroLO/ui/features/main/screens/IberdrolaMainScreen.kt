@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.iberdrola.practicas2026.alejandroLO.data.model.Bill
 import com.iberdrola.practicas2026.alejandroLO.ui.common.components.IberdrolaTopBar
+import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillStatusEnum
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeEnum
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.screens.IberdrolaBillsScreen
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsViewModel
@@ -55,6 +56,15 @@ fun IberdrolaMainScreen(
     val billsUiState = billsViewModel.uiState.collectAsState()
     val filterUiState = filterViewModel.uiState.collectAsState()
 
+    val filterIsApplied = remember(filterUiState) {
+        filterUiState.value.selectedDateFrom != null ||
+                filterUiState.value.selectedDateTo != null ||
+                filterUiState.value.priceRange != filterUiState.value.minPrice..filterUiState.value.maxPrice ||
+                filterUiState.value.selectedStates != BillStatusEnum.entries
+    }
+
+    // esta deshabilitado si no hay filtros y no hay facturas
+    val enableFilterButton = filterIsApplied || billsUiState.value.billsList.isNotEmpty()
 
     var showAlert by remember { mutableStateOf(false) }
     val selectingBill: (Bill) -> Unit = remember {
@@ -107,7 +117,7 @@ fun IberdrolaMainScreen(
                     it.typeId == page // 0 = Luz, 1 = Gas
                 }
 
-                val lastBill = filteredBills.maxByOrNull { it.date.time }
+                val lastBill = filteredBills.maxByOrNull { it.emissionDate.time }
 
                 IberdrolaBillsScreen(
                     bills = filteredBills,
@@ -120,7 +130,9 @@ fun IberdrolaMainScreen(
                     locale = locale,
                     onFilterClick = onFilterClick,
                     filterUiState = filterUiState.value,
-                    clearFilterField = { filterViewModel.clearFilterField(it) }
+                    clearFilterField = { filterViewModel.clearFilterField(it) },
+                    filterIsApplied = filterIsApplied,
+                    enableFilterButton = enableFilterButton
                 )
             }
         }
