@@ -72,7 +72,6 @@ import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import kotlin.math.ceil
 import kotlin.math.floor
 
 @Composable
@@ -100,6 +99,9 @@ fun IberdrolaBillsScreen(
                 filterUiState.priceRange != filterUiState.minPrice..filterUiState.maxPrice ||
                 filterUiState.selectedStates != BillStatusEnum.entries
     }
+
+    // esta deshabilitado si no hay filtros y no hay facturas
+    val enableFilterButton = filterIsApplied || bills.isNotEmpty()
 
 //    Log.d("FilterChipList", "FilterChipList: $filterIsApplied")
 //    Log.d("FilterChipList", "FilterChipList: $filterUiState")
@@ -148,7 +150,8 @@ fun IberdrolaBillsScreen(
                         onFilterClick = onFilterClick,
                         filterUiState = filterUiState,
                         clearFilterField = clearFilterField,
-                        filterIsApplied = filterIsApplied
+                        filterIsApplied = filterIsApplied,
+                        enableFilterButton = enableFilterButton
                     )
                 }
 
@@ -310,7 +313,8 @@ fun IberdrolaBillList(
     onFilterClick: () -> Unit,
     filterUiState: FilterUiState,
     clearFilterField: (ActiveFilterItem) -> Unit,
-    filterIsApplied: Boolean
+    filterIsApplied: Boolean,
+    enableFilterButton: Boolean
 ) {
     Column(
         modifier = Modifier
@@ -330,17 +334,24 @@ fun IberdrolaBillList(
 
             OutlinedButton(
                 onClick = onFilterClick,
-                border = BorderStroke(2.dp, IberdrolaTheme.colors.primary),
+                border = if(!enableFilterButton){
+                    BorderStroke(2.dp, IberdrolaTheme.colors.disableFontColor)
+                }else {
+                    BorderStroke(2.dp, IberdrolaTheme.colors.primary)
+                },
                 shape = RoundedCornerShape(20.dp),
+                enabled = enableFilterButton,
                 colors = if(filterIsApplied){
                     ButtonDefaults.outlinedButtonColors(
                         containerColor = IberdrolaTheme.colors.primary,
-                        contentColor = IberdrolaTheme.colors.surfaceVariant
+                        contentColor = IberdrolaTheme.colors.surfaceVariant,
                     )
                 } else {
                     ButtonDefaults.outlinedButtonColors(
                         containerColor = IberdrolaTheme.colors.surfaceVariant,
-                        contentColor = IberdrolaTheme.colors.primary
+                        contentColor = IberdrolaTheme.colors.primary,
+                        disabledContainerColor = IberdrolaTheme.colors.onSurfaceVariant.copy(alpha = 0.12f),
+                        disabledContentColor = IberdrolaTheme.colors.disableFontColor.copy(alpha = 0.5f)
                     )
                 },
                 contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
@@ -492,8 +503,8 @@ fun FilterChipList(
             if (filterUiState.selectedDateFrom != null) add(ActiveFilterItem(FilterType.DATE_FROM, "Desde: ${dateFormat.format(filterUiState.selectedDateFrom)}"))
             if (filterUiState.selectedDateTo != null) add(ActiveFilterItem(FilterType.DATE_TO, "Hasta: ${dateFormat.format(filterUiState.selectedDateTo)}"))
             if (filterUiState.priceRange != filterUiState.minPrice..filterUiState.maxPrice){
-                // para redondear hacia arriba
-                val maxPrice = ceil(filterUiState.priceRange.endInclusive)
+                // para redondear hacia abajo
+                val maxPrice = floor(filterUiState.priceRange.endInclusive)
                 // para redondear hacia abajo
                 val minPrice = floor(filterUiState.priceRange.start)
                 add(ActiveFilterItem(FilterType.PRICE_RANGE, "Precio: $minPrice-$maxPrice"))

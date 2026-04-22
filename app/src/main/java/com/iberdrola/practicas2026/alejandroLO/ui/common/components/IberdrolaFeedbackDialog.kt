@@ -217,7 +217,7 @@ fun IberdrolaThanksFeedback() {
             .padding(start = 24.dp, end = 24.dp, bottom = 48.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         Icon(
             imageVector = Icons.Outlined.ThumbUp,
@@ -249,7 +249,7 @@ fun IberdrolaThanksFeedback() {
             color = Color.Gray
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(24.dp))
     }
 }
 
@@ -263,4 +263,11 @@ fun OpinionRequestPreview(){
         onAskLater = { },
         onRatingSelected = { }
     )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+@Preview
+fun ThanksPreview(){
+    IberdrolaThanksFeedback()
 }

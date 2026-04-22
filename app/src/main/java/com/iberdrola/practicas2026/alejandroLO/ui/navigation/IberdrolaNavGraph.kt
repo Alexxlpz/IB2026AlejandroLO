@@ -71,7 +71,11 @@ fun IberdrolaNavGraph(
                 },
                 setCont = setCont,
                 mostrarSheet = mostrarSheet,
-                homeViewModel = homeViewModel
+                homeViewModel = homeViewModel,
+                clearFilters = {
+                    billsViewModel.clearFilters()
+                    filterViewModel.clearFilters()
+                }
             )
         }
         composable(IberdrolaScreens.MAIN.title) {

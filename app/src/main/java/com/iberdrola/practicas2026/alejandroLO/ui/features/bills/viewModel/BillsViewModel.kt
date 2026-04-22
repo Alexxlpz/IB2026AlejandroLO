@@ -105,7 +105,7 @@ class BillsViewModel(
                 try {
                     billsRepository.refreshBillsOnline()
                     // ahora el delay lo simulamos desde mockoon
-                    //delay(1000) // debido a que se carga demasiado rapido y ves aparecer las bills mientras se cargan
+                    delay(500) // debido a que se carga demasiado rapido y ves aparecer las bills mientras se cargan
                 } catch (e: Exception) {
                     Log.e(TAG, "Error al conectar con Mockoon: ${e.message}")
                     _uiState.update { it.copy(errorMessage = "Error al conectar con Mockoon: ${e.message}") }
@@ -175,5 +175,10 @@ class BillsViewModel(
 
             priceIn && statusMatch && dateFromMatch && dateToMatch
         }
+    }
+
+    fun clearFilters(){
+        filterRepository.clearFilter()
+        refreshBills()
     }
 }

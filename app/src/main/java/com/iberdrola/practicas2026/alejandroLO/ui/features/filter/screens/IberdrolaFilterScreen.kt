@@ -266,7 +266,23 @@ fun IberdrolaFilterScreen(
                 range = priceRange,
                 maxPrice = filterUiState.maxPrice,
                 minPrice = filterUiState.minPrice,
-                onRangeChange = { priceRange = it }
+                onRangeChange = { newRange ->
+                    val minGap = 1f
+
+                    if (newRange.endInclusive - newRange.start >= minGap) {
+                        priceRange = newRange
+                    } else {
+                        if (newRange.start != priceRange.start) {
+
+                            priceRange = (newRange.endInclusive - minGap)..newRange.endInclusive
+
+                        } else if (newRange.endInclusive != priceRange.endInclusive) {
+
+                            priceRange = newRange.start..(newRange.start + minGap)
+
+                        }
+                    }
+                }
             )
 
             Spacer(Modifier.height(40.dp))
@@ -472,6 +488,7 @@ fun PriceRangeSelector(
     minPrice: Float,
     onRangeChange: (ClosedFloatingPointRange<Float>) -> Unit
 ) {
+    val enabled = (maxPrice != minPrice + 1f)
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -495,19 +512,28 @@ fun PriceRangeSelector(
             onValueChange = { onRangeChange(it) },
             valueRange = minPrice..maxPrice,
             modifier = Modifier.fillMaxWidth(),
+            enabled = enabled,
 
             startThumb = {
                 Surface(
                     modifier = Modifier.size(20.dp),
                     shape = CircleShape,
-                    color = IberdrolaTheme.colors.primary
+                    color = if (enabled){
+                        IberdrolaTheme.colors.primary
+                    }else {
+                        IberdrolaTheme.colors.disableFontColor
+                    }
                 ) {}
             },
             endThumb = {
                 Surface(
                     modifier = Modifier.size(20.dp),
                     shape = CircleShape,
-                    color = IberdrolaTheme.colors.primary
+                    color = if (enabled){
+                        IberdrolaTheme.colors.primary
+                    }else {
+                        IberdrolaTheme.colors.disableFontColor
+                    }
                 ) {}
             },
             track = { rangeSliderState ->
@@ -516,6 +542,7 @@ fun PriceRangeSelector(
                     modifier = Modifier.height(6.dp),
                     thumbTrackGapSize = 0.dp,
                     drawStopIndicator = null,
+                    enabled = enabled,
                     colors = SliderDefaults.colors(
                         activeTrackColor = IberdrolaTheme.colors.primary,
                         inactiveTrackColor = Color.LightGray.copy(alpha = 0.3f)

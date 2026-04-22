@@ -9,10 +9,10 @@ class OfflineFilterRepository() : FilterRepository {
     private val _filterCriteria = MutableStateFlow(FilterUiState())
     override val filterCriteria = _filterCriteria.asStateFlow()
 
-    private val _maxPrice = MutableStateFlow(0f)
+    private val _maxPrice = MutableStateFlow(Float.MAX_VALUE)
     override val maxPrice = _maxPrice.asStateFlow()
 
-    private val _minPrice = MutableStateFlow(999f)
+    private val _minPrice = MutableStateFlow(Float.MIN_VALUE)
     override val minPrice = _minPrice.asStateFlow()
 
     override fun setFilterCriteria(filterCriteria: FilterUiState) {
@@ -25,5 +25,11 @@ class OfflineFilterRepository() : FilterRepository {
 
     override fun setMinPrice(minPrice: Float) {
         _minPrice.value = minPrice
+    }
+
+    override fun clearFilter(){
+        _filterCriteria.value = FilterUiState()
+        _maxPrice.value = Float.MAX_VALUE
+        _minPrice.value = Float.MIN_VALUE
     }
 }

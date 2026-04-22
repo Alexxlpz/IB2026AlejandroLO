@@ -39,7 +39,8 @@ data class IberdrolaColors(
     val errorContainer: Color = IberdrolaRedStatus,
     val onErrorContainer: Color = IberdrolaRedText,
     val iconLuzGas: Color = Color(0xFF004D3F),
-    val importeHistorico: Color = Color(0xFF868686)
+    val importeHistorico: Color = Color(0xFF868686),
+    val disableFontColor: Color = Color(0xFF514F4F)
 )
 
 // Estructura de Tipografía Propia

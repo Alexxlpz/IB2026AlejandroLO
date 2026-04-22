@@ -6,12 +6,12 @@ import androidx.lifecycle.viewModelScope
 import com.iberdrola.practicas2026.alejandroLO.data.repository.filter.FilterRepository
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillStatusEnum
 import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.enums.FilterType
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.Date
@@ -34,32 +34,52 @@ class FilterViewModel(
             combine(
                 filterRepository.minPrice,
                 filterRepository.maxPrice
-            ) { minPrice, maxPrice -> Pair(minPrice, maxPrice) }
-                .filter { (minPrice, maxPrice) -> maxPrice > minPrice }
-                // toma el primer valor válido y cancela la suscripción automáticamente
-                .first()
-                .let { (minPrice, maxPrice) ->
+            ) { min, max -> min to max }
+                .filter { (min, max) -> max >= min }
+                .collect { (minRepo, maxRepo) ->
+                    _uiState.update { currentState ->
+                        val wasAtLimits = currentState.priceRange.start == currentState.minPrice &&
+                                currentState.priceRange.endInclusive == currentState.maxPrice
 
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        priceRange = minPrice..maxPrice,
-                        minPrice = minPrice,
-                        maxPrice = maxPrice
-                    )
+                        val isFirstLoad = currentState.minPrice == Float.MIN_VALUE &&
+                                currentState.maxPrice == Float.MAX_VALUE
+
+                        val maxAux = if (minRepo == maxRepo) minRepo + 1 else maxRepo
+
+                        val newRange = if (wasAtLimits || isFirstLoad) {
+                            minRepo..maxAux
+                        } else {
+                            currentState.priceRange.start.coerceIn(minRepo, maxAux)..
+                                    currentState.priceRange.endInclusive.coerceIn(minRepo, maxAux)
+                        }
+
+                        delay(500) // para que no se vean los cambios al darle al boton submit
+                        currentState.copy(
+                            minPrice = minRepo,
+                            maxPrice = maxAux,
+                            priceRange = newRange
+                        )
+                    }
                 }
-            }
         }
     }
 
 
+
     fun clearFilters() {
-        val maxPrice = filterRepository.maxPrice.value
-        val minPrice = filterRepository.minPrice.value
-        _uiState.value = FilterUiState(
-            priceRange = minPrice..maxPrice,
-            maxPrice = maxPrice,
-            minPrice = minPrice
-        )
+        val maxPrice = _uiState.value.maxPrice
+        val minPrice = _uiState.value.minPrice
+
+        _uiState.update {
+            it.copy(
+                selectedDateFrom = null,
+                selectedDateTo = null,
+                priceRange = minPrice..maxPrice,
+                maxPrice = maxPrice,
+                minPrice = minPrice,
+                selectedStates = BillStatusEnum.entries
+            )
+        }
         filterRepository.setFilterCriteria(_uiState.value)
     }
 
@@ -82,6 +102,7 @@ class FilterViewModel(
                 selectedStates = selectedStatesAux
             )
         }
+
         filterRepository.setFilterCriteria(_uiState.value)
     }
 
