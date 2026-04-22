@@ -472,6 +472,12 @@ fun PriceRangeSelector(
     minPrice: Float,
     onRangeChange: (ClosedFloatingPointRange<Float>) -> Unit
 ) {
+    var enabled = true
+
+    if (maxPrice == minPrice + 1f){
+        enabled = false
+    }
+
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -495,19 +501,28 @@ fun PriceRangeSelector(
             onValueChange = { onRangeChange(it) },
             valueRange = minPrice..maxPrice,
             modifier = Modifier.fillMaxWidth(),
+            enabled = enabled,
 
             startThumb = {
                 Surface(
                     modifier = Modifier.size(20.dp),
                     shape = CircleShape,
-                    color = IberdrolaTheme.colors.primary
+                    color = if (enabled){
+                        IberdrolaTheme.colors.primary
+                    }else {
+                        IberdrolaTheme.colors.thumbsUnabled
+                    }
                 ) {}
             },
             endThumb = {
                 Surface(
                     modifier = Modifier.size(20.dp),
                     shape = CircleShape,
-                    color = IberdrolaTheme.colors.primary
+                    color = if (enabled){
+                        IberdrolaTheme.colors.primary
+                    }else {
+                        IberdrolaTheme.colors.thumbsUnabled
+                    }
                 ) {}
             },
             track = { rangeSliderState ->
@@ -516,6 +531,7 @@ fun PriceRangeSelector(
                     modifier = Modifier.height(6.dp),
                     thumbTrackGapSize = 0.dp,
                     drawStopIndicator = null,
+                    enabled = enabled,
                     colors = SliderDefaults.colors(
                         activeTrackColor = IberdrolaTheme.colors.primary,
                         inactiveTrackColor = Color.LightGray.copy(alpha = 0.3f)

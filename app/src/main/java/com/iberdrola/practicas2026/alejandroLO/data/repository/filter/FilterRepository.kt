@@ -11,5 +11,5 @@ interface FilterRepository {
     fun setFilterCriteria(filterCriteria: FilterUiState)
     fun setMaxPrice(maxPrice: Float)
     fun setMinPrice(minPrice: Float)
-
+    fun clearFilter()
 }

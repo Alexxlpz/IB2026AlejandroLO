@@ -66,7 +66,8 @@ fun IberdrolaHomeScreen(
     onAddressClick: (Int, String) -> Unit,
     setCont: (Int) -> Unit,
     mostrarSheet: Boolean = false,
-    homeViewModel: HomeViewModel
+    homeViewModel: HomeViewModel,
+    clearFilters: () -> Unit
 ) {
     val TAG = "IberdrolaHomeScreen"
     val sheetState = rememberModalBottomSheetState()
@@ -87,7 +88,7 @@ fun IberdrolaHomeScreen(
         IberdrolaConfirmDialog(
             onConfirm = {
                 showConfirmDialog.value = false
-                homeViewModel.updateDirectionsOnline(pendingOnlineValue.value)
+                homeViewModel.updateDirectionsOnline(pendingOnlineValue.value, clearFilters)
             },
             onDismiss = {
                 showConfirmDialog.value = false
@@ -497,7 +498,8 @@ fun PreviewIberdrolaHomeScreen() {
             onAddressClick = { _, _ -> },
             setCont = { },
             mostrarSheet = false,
-            homeViewModel = viewModel(factory = HomeViewModelFactory.Factory)
+            homeViewModel = viewModel(factory = HomeViewModelFactory.Factory),
+            clearFilters = {}
         )
     }
 }
@@ -510,7 +512,8 @@ fun PreviewIberdrolaHomeScreenWithAlert() {
             onAddressClick = { _, _ -> },
             setCont = { },
             mostrarSheet = true,
-            homeViewModel = viewModel(factory = HomeViewModelFactory.Factory)
+            homeViewModel = viewModel(factory = HomeViewModelFactory.Factory),
+            clearFilters = {}
         )
     }
 }
