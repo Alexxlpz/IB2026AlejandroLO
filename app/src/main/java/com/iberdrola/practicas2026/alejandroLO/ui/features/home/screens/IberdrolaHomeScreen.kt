@@ -67,7 +67,7 @@ fun IberdrolaHomeScreen(
     setCont: (Int) -> Unit,
     mostrarSheet: Boolean = false,
     homeViewModel: HomeViewModel,
-    clearFilters: () -> Unit
+    clearFilters: (Boolean) -> Unit
 ) {
     val TAG = "IberdrolaHomeScreen"
     val sheetState = rememberModalBottomSheetState()
@@ -447,7 +447,7 @@ fun IberdrolaConfirmDialog(
             ) {
                 Text(
                     text = stringResource(R.string.cancelar),
-                    color = IberdrolaTheme.colors.onSurfaceVariant
+                    color = IberdrolaTheme.colors.primary
                 )
             }
         },

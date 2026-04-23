@@ -217,7 +217,7 @@ fun IberdrolaThanksFeedback() {
             .padding(start = 24.dp, end = 24.dp, bottom = 48.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(21.7.dp))
 
         Icon(
             imageVector = Icons.Outlined.ThumbUp,

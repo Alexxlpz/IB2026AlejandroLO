@@ -476,7 +476,10 @@ fun IberdrolaDatePickerDialog(
             }
         }
     ) {
-        DatePicker(state = datePickerState)
+        DatePicker(
+            state = datePickerState,
+            modifier = Modifier.background(IberdrolaTheme.colors.onSurface)
+        )
     }
 }
 

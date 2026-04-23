@@ -15,6 +15,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.lang.Math.random
@@ -118,7 +119,6 @@ class BillsViewModel(
 
             observator.cancel()
         }
-        filterCriteriaApply() // antes de terminar filtramos las facturas
     }
 
     fun updateSelectedOption(option: BillTypeEnum) {
@@ -145,9 +145,10 @@ class BillsViewModel(
     }
 
     fun filterCriteriaApply(){
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
 
             Log.d(TAG, "BILLS -> filterCriteria price: ${filterCriteria.value.priceRange}")
+            Log.d(TAG, "BILLS -> filterCriteria max-min: ${filterCriteria.value.maxPrice}-${filterCriteria.value.minPrice}")
             Log.d(TAG, "BILLS -> filterCriteria dateFrom: ${filterCriteria.value.selectedDateFrom}")
             Log.d(TAG, "BILLS -> filterCriteria dateTo: ${filterCriteria.value.selectedDateTo}")
             Log.d(TAG, "BILLS -> filterCriteria states: ${filterCriteria.value.selectedStates}")
@@ -170,15 +171,19 @@ class BillsViewModel(
             val priceIn = bill.price in criteria.priceRange
             val statusMatch = criteria.selectedStates.isEmpty() ||
                     criteria.selectedStates.contains(BillStatusEnum.entries[bill.statusId])
-            val dateFromMatch = criteria.selectedDateFrom?.let { !bill.date.before(it) } ?: true
-            val dateToMatch = criteria.selectedDateTo?.let { !bill.date.after(it) } ?: true
+            val dateFromMatch = criteria.selectedDateFrom?.let { !bill.emissionDate.before(it) } ?: true
+            val dateToMatch = criteria.selectedDateTo?.let { !bill.emissionDate.after(it) } ?: true
 
             priceIn && statusMatch && dateFromMatch && dateToMatch
         }
     }
 
-    fun clearFilters(){
-        filterRepository.clearFilter()
-        refreshBills()
+    fun clearFilters(initialValueIsOnline: Boolean){
+        viewModelScope.launch {
+
+            connectivityRepository.isOnline.first { it != initialValueIsOnline }
+            delay(300) //tiempo para darle tiempo a room de pasar el flow
+            filterRepository.clearFilter()
+        }
     }
 }

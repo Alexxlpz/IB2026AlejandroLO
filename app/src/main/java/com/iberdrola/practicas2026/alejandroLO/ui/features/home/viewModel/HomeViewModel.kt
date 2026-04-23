@@ -73,9 +73,9 @@ class HomeViewModel(
         }
     }
 
-    fun updateDirectionsOnline(isOnline: Boolean, clearFilters: () -> Unit){
+    fun updateDirectionsOnline(isOnline: Boolean, clearFilters: (Boolean) -> Unit){
+        clearFilters(isOnline) // espera a que el valor de isOnline cambie y limpia los filtros
         connectivityRepository.setOnlineMode(isOnline) // el collect se encarga de cambiar el valor del uiState
-        clearFilters()
         refreshDirections()
     }
 }
