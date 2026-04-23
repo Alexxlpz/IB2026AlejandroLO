@@ -1,5 +1,6 @@
 package com.iberdrola.practicas2026.alejandroLO.ui.features.main.screens
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -35,6 +36,7 @@ import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.util.Locale
+import kotlin.math.abs
 
 // hay que hacer una UI que almacene selectedOption
 
@@ -56,14 +58,24 @@ fun IberdrolaMainScreen(
     val billsUiState = billsViewModel.uiState.collectAsState()
     val filterUiState = filterViewModel.uiState.collectAsState()
 
-    val filterIsApplied = remember(filterUiState) {
-        filterUiState.value.selectedDateFrom != null ||
-                filterUiState.value.selectedDateTo != null ||
-                filterUiState.value.priceRange != filterUiState.value.minPrice..filterUiState.value.maxPrice ||
-                filterUiState.value.selectedStates != BillStatusEnum.entries
+    // usamos state para forzar a la pantalla a calcular el valor de filterUiState, asi detecta el cambio al borrar el chip
+    val state = filterUiState.value
+    val filterIsApplied = remember(state) {
+        state.selectedDateFrom != null ||
+                state.selectedDateTo != null ||
+                state.priceRange != state.minPrice..state.maxPrice ||
+                state.selectedStates.size != BillStatusEnum.entries.size
+                // con comparar el tamaño basta, nos da igual porque este filtrando, solo si lo
+                // está haciendo o no
     }
 
-    // esta deshabilitado si no hay filtros y no hay facturas
+    if (filterIsApplied) {
+        Log.d("FilterDebug", "Applied because -> Date: ${state.selectedDateFrom != null}, " +
+                "Status: ${state.selectedStates.size != BillStatusEnum.entries.size}, " +
+                "Price: ${abs(state.priceRange.start - state.minPrice) > 0.01f}")
+    }
+
+    // está deshabilitado si no hay filtros y no hay facturas
     val enableFilterButton = filterIsApplied || billsUiState.value.billsList.isNotEmpty()
 
     var showAlert by remember { mutableStateOf(false) }
@@ -145,7 +157,7 @@ fun IberdrolaMainScreen(
                     }
                 },
                 title = { Text(" la factura aún no está disponible") },
-                modifier = Modifier.background(IberdrolaTheme.colors.surface)
+                containerColor = IberdrolaTheme.colors.surface
             )
         }
     }

@@ -1,5 +1,6 @@
 package com.iberdrola.practicas2026.alejandroLO.data.repository.filter
 
+import android.util.Log
 import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.viewModel.FilterUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -31,5 +32,6 @@ class OfflineFilterRepository() : FilterRepository {
         _filterCriteria.value = FilterUiState()
         _maxPrice.value = Float.MAX_VALUE
         _minPrice.value = Float.MIN_VALUE
+        Log.d("FilterRepository", "--------Filter cleared--------")
     }
 }

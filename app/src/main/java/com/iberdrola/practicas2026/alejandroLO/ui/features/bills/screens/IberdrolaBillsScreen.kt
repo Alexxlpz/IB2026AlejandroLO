@@ -238,22 +238,27 @@ fun IberdrolaLastBill(
             }
 
             Spacer(modifier = Modifier.height(16.dp))
+
             val formattedPrice = numberFormat.format(lastBill.price)
+            val euroSymbol = "€"
 
             val annotatedPrice = buildAnnotatedString {
-                val euroSymbol = "€"
-                val pricePart = formattedPrice.replace(euroSymbol, "").trim()
+                if (formattedPrice.contains(euroSymbol)) {
+                    // solo si es € lo ponemos mas chiquitito
+                    val pricePart = formattedPrice.replace(euroSymbol, "").trim()
+                    append(pricePart)
 
-                append(pricePart)
-
-                pushStyle(
-                    SpanStyle(
-                        fontSize = IberdrolaTheme.typography.importe.fontSize * 0.65f,
-                        fontWeight = FontWeight.ExtraBold
+                    pushStyle(
+                        SpanStyle(
+                            fontSize = IberdrolaTheme.typography.importe.fontSize * 0.65f,
+                            fontWeight = FontWeight.ExtraBold
+                        )
                     )
-                )
-                append(" $euroSymbol")
-                pop()
+                    append(" $euroSymbol")
+                    pop()
+                } else {
+                    append(formattedPrice)
+                }
             }
 
             Text(

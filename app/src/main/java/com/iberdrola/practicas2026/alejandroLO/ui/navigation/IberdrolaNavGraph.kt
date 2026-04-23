@@ -73,8 +73,7 @@ fun IberdrolaNavGraph(
                 mostrarSheet = mostrarSheet,
                 homeViewModel = homeViewModel,
                 clearFilters = {
-                    billsViewModel.clearFilters()
-                    filterViewModel.clearFilters()
+                    billsViewModel.clearFilters(it)
                 }
             )
         }

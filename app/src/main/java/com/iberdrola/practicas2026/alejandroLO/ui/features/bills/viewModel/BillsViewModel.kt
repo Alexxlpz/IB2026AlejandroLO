@@ -15,6 +15,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.lang.Math.random
@@ -118,7 +119,6 @@ class BillsViewModel(
 
             observator.cancel()
         }
-        filterCriteriaApply() // antes de terminar filtramos las facturas
     }
 
     fun updateSelectedOption(option: BillTypeEnum) {
@@ -145,9 +145,10 @@ class BillsViewModel(
     }
 
     fun filterCriteriaApply(){
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
 
             Log.d(TAG, "BILLS -> filterCriteria price: ${filterCriteria.value.priceRange}")
+            Log.d(TAG, "BILLS -> filterCriteria max-min: ${filterCriteria.value.maxPrice}-${filterCriteria.value.minPrice}")
             Log.d(TAG, "BILLS -> filterCriteria dateFrom: ${filterCriteria.value.selectedDateFrom}")
             Log.d(TAG, "BILLS -> filterCriteria dateTo: ${filterCriteria.value.selectedDateTo}")
             Log.d(TAG, "BILLS -> filterCriteria states: ${filterCriteria.value.selectedStates}")
@@ -177,8 +178,12 @@ class BillsViewModel(
         }
     }
 
-    fun clearFilters(){
-        filterRepository.clearFilter()
-        refreshBills()
+    fun clearFilters(initialValueIsOnline: Boolean){
+        viewModelScope.launch {
+
+            connectivityRepository.isOnline.first { it != initialValueIsOnline }
+            delay(300) //tiempo para darle tiempo a room de pasar el flow
+            filterRepository.clearFilter()
+        }
     }
 }
