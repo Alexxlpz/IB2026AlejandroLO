@@ -4,6 +4,7 @@ import android.content.Context
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializer
 import com.iberdrola.practicas2026.alejandroLO.BuildConfig
+import com.iberdrola.practicas2026.alejandroLO.R
 import com.iberdrola.practicas2026.alejandroLO.data.network.bill.BillsApiService
 import com.iberdrola.practicas2026.alejandroLO.data.network.direction.DirectionApiService
 import com.iberdrola.practicas2026.alejandroLO.data.repository.bill.BillsRepository
@@ -12,15 +13,25 @@ import com.iberdrola.practicas2026.alejandroLO.data.repository.conectivity.Conne
 import com.iberdrola.practicas2026.alejandroLO.data.repository.conectivity.OfflineConnectivityRepository
 import com.iberdrola.practicas2026.alejandroLO.data.repository.direction.DirectionRepository
 import com.iberdrola.practicas2026.alejandroLO.data.repository.direction.OfflineDirectionRepository
+import com.iberdrola.practicas2026.alejandroLO.data.repository.filter.FilterRepository
+import com.iberdrola.practicas2026.alejandroLO.data.repository.filter.OfflineFilterRepository
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.security.KeyStore
+import java.security.cert.CertificateFactory
 import java.util.Date
+import javax.net.ssl.SSLContext
+import javax.net.ssl.TrustManagerFactory
+import javax.net.ssl.X509TrustManager
 
 
 interface AppContainer {
     val billsRepository: BillsRepository
     val directionsRepository: DirectionRepository
     val connectivityRepository: ConnectivityRepository
+
+    val filterRepository: FilterRepository
 }
 
 class AppDataContainer(private val context: Context) : AppContainer {
@@ -36,8 +47,10 @@ class AppDataContainer(private val context: Context) : AppContainer {
         .setLenient() // para que Gson sea mas tolerable con el json
         .create()
     private val retrofit: Retrofit = Retrofit.Builder()
+        .baseUrl(baseUrl)
+        .client(getUnsafeOkHttpClient(context))
         .addConverterFactory(GsonConverterFactory.create(gson)) // se lo pasamos para que lo use
-        .baseUrl(baseUrl)                                       // para crear los objetos bill
+        // para crear los objetos bill
         .build()
 
     private val billsRetrofitService: BillsApiService by lazy {
@@ -72,4 +85,33 @@ class AppDataContainer(private val context: Context) : AppContainer {
     override val connectivityRepository: ConnectivityRepository by lazy {
         OfflineConnectivityRepository()
     }
+
+    override val filterRepository: FilterRepository by lazy {
+        OfflineFilterRepository()
+    }
+
+    private fun getUnsafeOkHttpClient(context: Context): OkHttpClient {
+        val cf = CertificateFactory.getInstance("X.509")
+        val certInput = context.resources.openRawResource(R.raw.alejandro_cert)
+        val certificate = cf.generateCertificate(certInput)
+        certInput.close()
+
+        val keyStoreType = KeyStore.getDefaultType()
+        val keyStore = KeyStore.getInstance(keyStoreType)
+        keyStore.load(null, null)
+        keyStore.setCertificateEntry("ca", certificate)
+
+        val tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm()
+        val tmf = TrustManagerFactory.getInstance(tmfAlgorithm)
+        tmf.init(keyStore)
+
+        val sslContext = SSLContext.getInstance("TLS")
+        sslContext.init(null, tmf.trustManagers, null)
+
+        return OkHttpClient.Builder()
+            .sslSocketFactory(sslContext.socketFactory, tmf.trustManagers[0] as X509TrustManager)
+            .hostnameVerifier { _, _ -> true }
+            .build()
+    }
+
 }

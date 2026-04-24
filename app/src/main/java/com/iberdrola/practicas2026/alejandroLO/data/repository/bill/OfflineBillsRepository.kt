@@ -27,6 +27,8 @@ class OfflineBillsRepository(
 
     override fun getAllBills(): Flow<List<Bill>> = billDao.getAllBills()
     override fun getAllBillsByDirectionId(directionId: Int): Flow<List<Bill>> = billDao.getAllBillsByDirectionId(directionId)
+    override fun getMaxPrice(): Float = billDao.getMaxPrice()
+    override fun getMinPrice(): Float = billDao.getMinPrice()
     override fun getBillsByType(typeId: Int): Flow<List<Bill>> = billDao.getBillsByType(typeId)
     override fun getBillById(id: Int): Flow<Bill> = billDao.getBill(id)
     override suspend fun insert(bill: Bill) = billDao.insert(bill)
@@ -75,7 +77,7 @@ class OfflineBillsRepository(
         try {
             billDao.deleteAll()
             Log.d(TAG, "Insertando facturas mock...")
-            bills.forEach { billDao.insert(it) }
+            bills?.forEach { billDao.insert(it) }
         } catch (_: SQLiteConstraintException) {
             Log.w(TAG, "Fallo de ForeignKey en mock. Cargando direcciones locales...")
             directionsRepository.insertMockDirectionsFromAssets()
@@ -88,7 +90,7 @@ class OfflineBillsRepository(
             }
 
             billDao.deleteAll()
-            bills.forEach { billDao.insert(it) }
+            bills?.forEach { billDao.insert(it) }
             Log.d(TAG, "Base de datos reparada y facturas insertadas.")
         }
     }
@@ -97,10 +99,10 @@ class OfflineBillsRepository(
     Convierte un string json a una lista de bills, convirtiendo mediante un TypeConverter los
     timestamp en tipos date.
      */
-    private fun JsonToBill(jsonString: String): List<Bill> {
+    private fun JsonToBill(jsonString: String): List<Bill>? {
 
         val listType = object : TypeToken<List<Bill>>() {}.type
-        val bills: List<Bill> = gson.fromJson(jsonString, listType)
+        val bills: List<Bill>? = gson.fromJson(jsonString, listType)
 
         return bills
     }

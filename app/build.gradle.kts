@@ -27,7 +27,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("String", "MOCKOON_URL", "\"http://$mockoonIp:3000/\"")
+        buildConfigField("String", "MOCKOON_URL", "\"https://$mockoonIp:3000/\"")
     }
 
     buildTypes {
