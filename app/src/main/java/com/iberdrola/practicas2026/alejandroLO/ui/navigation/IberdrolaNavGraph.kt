@@ -73,6 +73,8 @@ fun IberdrolaNavGraph(
                 mostrarSheet = mostrarSheet,
                 homeViewModel = homeViewModel,
                 clearFilters = {
+                    // para reiniciar el filtro antes de cambiar de modo
+                    filterViewModel.clearFiltersToChangeMode()
                     billsViewModel.clearFilters(it)
                 }
             )

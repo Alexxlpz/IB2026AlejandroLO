@@ -358,7 +358,8 @@ fun IberdrolaHomeFoot(
                     checkedTrackColor = IberdrolaTheme.colors.primary,
                     uncheckedThumbColor = IberdrolaTheme.colors.background,
                     uncheckedTrackColor = IberdrolaTheme.colors.onSurfaceVariant.copy(alpha = 0.5f)
-                )
+                ),
+                modifier = Modifier.testTag("home_switch")
             )
         }
 

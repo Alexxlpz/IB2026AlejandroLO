@@ -83,6 +83,22 @@ class FilterViewModel(
         filterRepository.setFilterCriteria(_uiState.value)
     }
 
+    fun clearFiltersToChangeMode() {
+        val maxPrice = Float.MAX_VALUE
+        val minPrice = Float.MIN_VALUE
+
+        _uiState.update {
+            it.copy(
+                selectedDateFrom = null,
+                selectedDateTo = null,
+                priceRange = minPrice..maxPrice,
+                maxPrice = maxPrice,
+                minPrice = minPrice,
+                selectedStates = BillStatusEnum.entries
+            )
+        }
+    }
+
     fun sumbmitButtom(
         dateFrom: Date?,
         dateTo: Date?,
