@@ -1,6 +1,5 @@
 package com.iberdrola.practicas2026.alejandroLO.data.model
 
-import androidx.annotation.NonNull
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -39,14 +38,12 @@ data class Bill(
     val id: Int = 0,
     @ColumnInfo(name = "typeId")
     val typeId: Int = 0,
-    @NonNull
     val price: Double = 0.0,
     @ColumnInfo(name = "statusId")
     val statusId: Int = 0,
     @ColumnInfo(name = "directionId")
     val directionId: Int = 0,
-    @NonNull
-    val date: Date = Date(),
-    @NonNull
-    val dueDate: Date = Date()
+    val emissionDate: Date = Date(),
+    val startDate: Date = Date(),
+    val endDate: Date = Date()
 )
