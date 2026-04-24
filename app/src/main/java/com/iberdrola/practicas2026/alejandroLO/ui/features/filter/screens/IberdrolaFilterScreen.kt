@@ -73,6 +73,7 @@ import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillStatu
 import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.viewModel.FilterViewModel
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IB2026AlejandroLOTheme
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
+import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar.getInstance
 import java.util.Date
@@ -82,6 +83,7 @@ import java.util.Locale
 @Composable
 fun IberdrolaFilterScreen(
     onBack: () -> Unit = {},
+    locale: Locale = Locale.forLanguageTag("es-ES"),
     filterViewModel: FilterViewModel = viewModel()
 ) {
 
@@ -233,36 +235,40 @@ fun IberdrolaFilterScreen(
         ) {
             Spacer(Modifier.height(16.dp))
             Text(
-                text = "Filtrar",
+                text = stringResource(R.string.filtrar),
                 style = IberdrolaTheme.typography.tituloGrande
             )
 
             Spacer(Modifier.height(24.dp))
 
             // Sección: Por fecha
-            SectionTitle("Por fecha")
+            SectionTitle(stringResource(R.string.por_fecha))
+            val fromDate:String = stringResource(R.string.desde)
+            val toDate:String = stringResource(R.string.hasta)
             Row(modifier = Modifier.fillMaxWidth()) {
                 DatePickerField(
-                    label = "Desde",
+                    label = fromDate,
                     value = selectedDateFrom,
                     modifier = Modifier.weight(1f),
                     onClick = { setDatePickerFrom(true) },
-                    onClearDate = { onClearDate(0) }
+                    onClearDate = { onClearDate(0) },
+                    locale = locale
                 )
                 Spacer(Modifier.width(24.dp))
                 DatePickerField(
-                    label = "Hasta",
+                    label = toDate,
                     value = selectedDateTo,
                     modifier = Modifier.weight(1f),
                     onClick = { setDatePickerTo(true) },
-                    onClearDate = { onClearDate(1) }
+                    onClearDate = { onClearDate(1) },
+                    locale = locale
                 )
             }
 
             Spacer(Modifier.height(40.dp))
 
             // Sección: Por un importe
-            SectionTitle("Por un importe")
+            SectionTitle(stringResource(R.string.por_un_importe))
             PriceRangeSelector(
                 range = priceRange,
                 maxPrice = filterUiState.maxPrice,
@@ -283,13 +289,16 @@ fun IberdrolaFilterScreen(
 
                         }
                     }
+                },
+                numberFormat = NumberFormat.getCurrencyInstance(locale).apply {
+                    maximumFractionDigits = 0
                 }
             )
 
             Spacer(Modifier.height(40.dp))
 
             // Sección: Por estado
-            SectionTitle("Por estado")
+            SectionTitle(stringResource(R.string.por_estado))
 
             BillStatusEnum.entries.forEach { state ->
                 FilterCheckboxItem(
@@ -327,7 +336,8 @@ fun DatePickerField(
     value: Date?,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
-    onClearDate: () -> Unit
+    onClearDate: () -> Unit,
+    locale: Locale
 ) {
     Column(modifier = modifier.clickable { onClick() }) {
         val transition = updateTransition(targetState = value != null, label = "LabelTransition")
@@ -366,7 +376,7 @@ fun DatePickerField(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                val dateFormat = SimpleDateFormat("dd MMM. yyyy", Locale.forLanguageTag("es-ES"))
+                val dateFormat = SimpleDateFormat("dd MMM. yyyy", locale)
 
                 if (value == null) {
                     Spacer(modifier = Modifier.weight(1f))
@@ -468,12 +478,12 @@ fun IberdrolaDatePickerDialog(
                 }
                 onDismiss()
             }) {
-                Text("OK", color = IberdrolaTheme.colors.primary)
+                Text(stringResource(R.string.ok), color = IberdrolaTheme.colors.primary)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("CANCELAR", color = IberdrolaTheme.colors.primary)
+                Text(stringResource(R.string.cancelar), color = IberdrolaTheme.colors.primary)
             }
         },
         colors = DatePickerDefaults.colors(
@@ -501,7 +511,8 @@ fun PriceRangeSelector(
     range: ClosedFloatingPointRange<Float>,
     maxPrice: Float,
     minPrice: Float,
-    onRangeChange: (ClosedFloatingPointRange<Float>) -> Unit
+    onRangeChange: (ClosedFloatingPointRange<Float>) -> Unit,
+    numberFormat: NumberFormat
 ) {
     val enabled = (maxPrice != minPrice + 1f)
 
@@ -515,7 +526,7 @@ fun PriceRangeSelector(
             modifier = Modifier.padding(bottom = 12.dp)
         ) {
             Text(
-                text = "${range.start.toInt()} € - ${range.endInclusive.toInt()} €",
+                text = "${numberFormat.format(range.start.toInt())} - ${numberFormat.format(range.endInclusive.toInt())}",
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
                 style = IberdrolaTheme.typography.etiquetaPeque.copy(fontWeight = FontWeight.ExtraBold),
                 color = Color.DarkGray
@@ -572,8 +583,8 @@ fun PriceRangeSelector(
                 .padding(top = 4.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("$minPrice €", style = IberdrolaTheme.typography.etiquetaPeque, color = Color.Gray)
-            Text("$maxPrice €", style = IberdrolaTheme.typography.etiquetaPeque, color = Color.Gray)
+            Text("${numberFormat.format(minPrice)}", style = IberdrolaTheme.typography.etiquetaPeque, color = Color.Gray)
+            Text("${numberFormat.format(maxPrice)}", style = IberdrolaTheme.typography.etiquetaPeque, color = Color.Gray)
         }
     }
 }

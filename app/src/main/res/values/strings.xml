@@ -29,4 +29,20 @@
     <string name="aplicar_filtros">Aplicar filtros</string>
     <string name="borrar_filtros">Borrar filtros</string>
     <string name="responder_mas_tarde">Responder más tarde</string>
+    <string name="salir_de_la_app">Salir de la app</string>
+    <string name="seguro_que_quieres_salir_de_la_aplicacion">¿Seguro que quieres salir de la aplicación?</string>
+    <string name="tu_opinion_nos_importa">Tu opinión nos importa</string>
+    <string name="como_de_probable_es_que_recomiendes_esta_app_a_amigos_o_familiares_para_que_realicen_sus_gestiones">¿Cómo de probable es que recomiendes esta app a amigos o familiares para que realicen sus gestiones?</string>
+    <string name="muchas_gracias">¡Muchas gracias!</string>
+    <string name="tu_valoracion_nos_ayuda_a_seguir_mejorando_para_ofrecerte_el_mejor_servicio">Tu valoración nos ayuda a seguir mejorando para ofrecerte el mejor servicio.</string>
+    <string name="no_se_encontraron_direcciones">No se encontraron direcciones</string>
+    <string name="alejandro">" Alejandro"</string>
+    <string name="cerrar">Cerrar</string>
+    <string name="filtrar">Filtrar</string>
+    <string name="por_fecha">Por fecha</string>
+    <string name="desde">Desde</string>
+    <string name="hasta">Hasta</string>
+    <string name="por_un_importe">Por un importe</string>
+    <string name="por_estado">Por estado</string>
+    <string name="ok">OK</string>
 </resources>

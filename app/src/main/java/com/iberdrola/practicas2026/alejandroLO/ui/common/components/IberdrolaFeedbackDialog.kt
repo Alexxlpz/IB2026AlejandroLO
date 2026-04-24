@@ -73,7 +73,7 @@ fun FeedbackDialogContent(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Tu opinión nos importa",
+            text = stringResource(R.string.tu_opinion_nos_importa),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold
         )
@@ -81,7 +81,7 @@ fun FeedbackDialogContent(
         Spacer(modifier = Modifier.height(12.dp))
 
         Text(
-            text = "¿Cómo de probable es que recomiendes esta app a amigos o familiares para que realicen sus gestiones?",
+            text = stringResource(R.string.como_de_probable_es_que_recomiendes_esta_app_a_amigos_o_familiares_para_que_realicen_sus_gestiones),
             style = Typography.bodyMedium,
             textAlign = TextAlign.Center,
             color = Color.Gray
@@ -114,7 +114,7 @@ fun FeedbackDialogContent(
                 fontWeight = FontWeight.Bold
             ),
             modifier = Modifier
-            .clip(RoundedCornerShape(8.dp))
+                .clip(RoundedCornerShape(8.dp))
                 .clickable(
                     interactionSource = interactionSource,
                     indication = ripple(
@@ -234,7 +234,7 @@ fun IberdrolaThanksFeedback() {
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = "¡Muchas gracias!",
+            text = stringResource(R.string.muchas_gracias),
             style = IberdrolaTheme.typography.tituloGrande,
             fontWeight = FontWeight.Bold,
             color = IberdrolaTheme.colors.primary
@@ -243,7 +243,7 @@ fun IberdrolaThanksFeedback() {
         Spacer(modifier = Modifier.height(12.dp))
 
         Text(
-            text = "Tu valoración nos ayuda a seguir mejorando para ofrecerte el mejor servicio.",
+            text = stringResource(R.string.tu_valoracion_nos_ayuda_a_seguir_mejorando_para_ofrecerte_el_mejor_servicio),
             style = IberdrolaTheme.typography.cuerpoMedio,
             textAlign = TextAlign.Center,
             color = Color.Gray

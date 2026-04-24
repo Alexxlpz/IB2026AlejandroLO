@@ -22,8 +22,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.iberdrola.practicas2026.alejandroLO.R
 import com.iberdrola.practicas2026.alejandroLO.data.model.Bill
 import com.iberdrola.practicas2026.alejandroLO.ui.common.components.IberdrolaTopBar
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillStatusEnum
@@ -153,7 +155,7 @@ fun IberdrolaMainScreen(
                 onDismissRequest = { showAlert = false },
                 confirmButton = {
                     TextButton(onClick = { showAlert = false }) {
-                        Text("Cerrar")
+                        Text(stringResource(R.string.cerrar))
                     }
                 },
                 title = { Text(" la factura aún no está disponible") },

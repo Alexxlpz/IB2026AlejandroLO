@@ -108,7 +108,8 @@ fun IberdrolaNavGraph(
         composable(IberdrolaScreens.FILTER.title) {
             IberdrolaFilterScreen(
                 onBack = { navController.navigate(IberdrolaScreens.MAIN.title) },
-                filterViewModel = filterViewModel
+                filterViewModel = filterViewModel,
+                locale = locale
             )
         }
     }

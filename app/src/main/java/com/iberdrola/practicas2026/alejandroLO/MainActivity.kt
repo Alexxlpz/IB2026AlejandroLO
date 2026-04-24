@@ -17,6 +17,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import com.iberdrola.practicas2026.alejandroLO.ui.navigation.IberdrolaNavGraph
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IB2026AlejandroLOTheme
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
@@ -40,18 +41,18 @@ class MainActivity : ComponentActivity() {
                 if (showExitDialog) {
                     AlertDialog(
                         onDismissRequest = { showExitDialog = false },
-                        title = { Text("Salir de la app") },
-                        text = { Text("¿Seguro que quieres salir de la aplicación?") },
+                        title = { Text(stringResource(R.string.salir_de_la_app)) },
+                        text = { Text(stringResource(R.string.seguro_que_quieres_salir_de_la_aplicacion)) },
                         confirmButton = {
                             Button(
                                 onClick = { finish() } // cerramos la Activity
                             ) {
-                                Text("Aceptar")
+                                Text(stringResource(R.string.aceptar))
                             }
                         },
                         dismissButton = {
                             TextButton(onClick = { showExitDialog = false }) {
-                                Text("Cancelar")
+                                Text(stringResource(R.string.cancel))
                             }
                         },
                         containerColor = IberdrolaTheme.colors.surface

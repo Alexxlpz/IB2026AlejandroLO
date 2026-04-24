@@ -131,7 +131,7 @@ fun IberdrolaHomeScreen(
                     if(error == null) {
                         if (directionList.isEmpty()) {
                             Text(
-                                text = "No se encontraron suministros",
+                                text = stringResource(R.string.no_se_encontraron_direcciones),
                                 modifier = Modifier.align(Alignment.Center),
                                 style = IberdrolaTheme.typography.cuerpoMedio,
                                 color = Color.Gray
@@ -239,7 +239,7 @@ fun IberdrolaHomeHeader() {
 
                 Column {
                     Text(
-                        text = stringResource(R.string.hola) + " Alejandro",
+                        text = stringResource(R.string.hola) + stringResource(R.string.alejandro),
                         style = IberdrolaTheme.typography.tituloGrande, // O un headline si prefieres
                         color = IberdrolaTheme.colors.background
                     )
