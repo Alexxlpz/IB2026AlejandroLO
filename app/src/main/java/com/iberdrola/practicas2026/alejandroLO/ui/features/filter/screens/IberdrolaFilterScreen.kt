@@ -33,6 +33,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -474,11 +475,22 @@ fun IberdrolaDatePickerDialog(
             TextButton(onClick = onDismiss) {
                 Text("CANCELAR", color = IberdrolaTheme.colors.primary)
             }
-        }
+        },
+        colors = DatePickerDefaults.colors(
+            containerColor = IberdrolaTheme.colors.surface
+        )
     ) {
         DatePicker(
             state = datePickerState,
-            modifier = Modifier.background(IberdrolaTheme.colors.onSurface)
+            colors = DatePickerDefaults.colors(
+                containerColor = IberdrolaTheme.colors.surface,
+                titleContentColor = IberdrolaTheme.colors.primary,
+                headlineContentColor = IberdrolaTheme.colors.primary,
+                selectedDayContainerColor = IberdrolaTheme.colors.primary,
+                selectedDayContentColor = Color.White,
+                todayContentColor = IberdrolaTheme.colors.primary,
+                todayDateBorderColor = IberdrolaTheme.colors.primary
+            )
         )
     }
 }

@@ -1,5 +1,6 @@
 package com.iberdrola.practicas2026.alejandroLO
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -9,6 +10,7 @@ import com.iberdrola.practicas2026.alejandroLO.data.model.Bill
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillStatusEnum
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeEnum
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.screens.IberdrolaBillsScreen
+import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.viewModel.FilterUiState
 import org.junit.Rule
 import org.junit.Test
 import java.util.Date
@@ -17,160 +19,148 @@ class IberdrolaBillsScreenTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    private fun fakeBill(): Bill {
+    // Mock de parámetros necesarios para los nuevos filtros
+    private val fakeFilterUiState = mutableStateOf(FilterUiState())
+
+    private fun fakeBill(status: BillStatusEnum = BillStatusEnum.PAGADA): Bill {
         return Bill(
+            id = 1,
+            directionId = 1,
             typeId = BillTypeEnum.LUZ.ordinal,
             price = 50.0,
-            statusId = BillStatusEnum.PAGADA.ordinal,
-            date = Date()
+            statusId = status.ordinal,
+            emissionDate = Date(),
+            startDate = Date(),
+            endDate = Date()
         )
     }
 
     @Test
     fun givenLoadingTrue_whenScreenLoaded_thenSkeletonIsDisplayed() {
-
-        // mostrar skeleton (no hay contenido real)
         composeTestRule.setContent {
             IberdrolaBillsScreen(
                 bills = emptyList(),
                 lastBill = null,
                 isLoading = true,
                 onclick = {},
-                onFilterClick = { }
+                // Parámetros obligatorios añadidos tras la refactorización
+                onFilterClick = {},
+                filterUiState = fakeFilterUiState.value,
+                clearFilterField = {},
+                enableFilterButton = true,
+                filterIsApplied = false
             )
         }
 
-        // No hay texto de contenido → implica skeleton visible
-        composeTestRule
-            .onNodeWithText("Histórico de facturas")
-            .assertDoesNotExist()
+        composeTestRule.onNodeWithTag("bills_skeleton").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Histórico de facturas").assertDoesNotExist()
     }
 
     @Test
     fun givenBillsEmpty_whenLoaded_thenShowEmptyMessage() {
-
-        // lista vacía
         composeTestRule.setContent {
             IberdrolaBillsScreen(
                 bills = emptyList(),
                 lastBill = null,
                 isLoading = false,
                 onclick = {},
-                onFilterClick = { }
+                onFilterClick = {},
+                filterUiState = fakeFilterUiState.value,
+                clearFilterField = {},
+                enableFilterButton = true,
+                filterIsApplied = false
             )
         }
 
-        // mostrar mensaje "no hay facturas"
-        composeTestRule
-            .onNodeWithText("No hay facturas")
-            .assertIsDisplayed()
+        composeTestRule.onNodeWithText("No hay facturas").assertIsDisplayed()
     }
 
     @Test
     fun givenBillsWithData_whenLoaded_thenShowLastBill() {
-
         val bill = fakeBill()
-
-        // mostrar última factura
         composeTestRule.setContent {
             IberdrolaBillsScreen(
                 bills = listOf(bill),
                 lastBill = bill,
                 isLoading = false,
                 onclick = {},
-                onFilterClick = { }
+                onFilterClick = {},
+                filterUiState = fakeFilterUiState.value,
+                clearFilterField = {},
+                enableFilterButton = true,
+                filterIsApplied = false
             )
         }
 
-        composeTestRule
-            .onNodeWithText("Última factura")
-            .assertIsDisplayed()
+        composeTestRule.onNodeWithText("Última factura").assertIsDisplayed()
     }
 
     @Test
-    fun givenBillsWithData_whenLoaded_thenShowBillList() {
+    fun givenPaidBill_whenDisplayed_thenShowPagadaStatus() {
+        val bill = fakeBill(BillStatusEnum.PAGADA)
 
-        val bill = fakeBill()
-
-        // mostrar lista de facturas
         composeTestRule.setContent {
             IberdrolaBillsScreen(
-                bills = listOf(bill, bill),
-                lastBill = null,
+                bills = listOf(bill),
+                lastBill = bill,
                 isLoading = false,
                 onclick = {},
-                onFilterClick = { }
+                onFilterClick = {},
+                filterUiState = fakeFilterUiState.value,
+                clearFilterField = {},
+                enableFilterButton = true,
+                filterIsApplied = false
             )
         }
 
         composeTestRule
-            .onNodeWithText("Histórico de facturas")
+            .onNodeWithTag("bill_status_${BillStatusEnum.PAGADA.title}", useUnmergedTree = true)
             .assertIsDisplayed()
     }
 
     @Test
-    fun givenBillsWithData_whenClickOnBill_thenCallbackIsTriggered() {
+    fun givenUnpaidBill_whenDisplayed_thenShowPendienteStatus() {
+        val bill = fakeBill(BillStatusEnum.PENDIENTE)
 
+        composeTestRule.setContent {
+            IberdrolaBillsScreen(
+                bills = listOf(bill),
+                lastBill = bill,
+                isLoading = false,
+                onclick = {},
+                onFilterClick = {},
+                filterUiState = fakeFilterUiState.value,
+                clearFilterField = {},
+                enableFilterButton = true,
+                filterIsApplied = false
+            )
+        }
+
+        composeTestRule
+            .onNodeWithTag("bill_status_${BillStatusEnum.PENDIENTE.title}", useUnmergedTree = true)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun whenClickingOnBill_thenCallbackIsTriggered() {
         val bill = fakeBill()
         var clicked = false
 
-        // click en factura
         composeTestRule.setContent {
             IberdrolaBillsScreen(
                 bills = listOf(bill),
                 lastBill = null,
                 isLoading = false,
                 onclick = { clicked = true },
-                onFilterClick = { }
+                onFilterClick = {},
+                filterUiState = fakeFilterUiState.value,
+                clearFilterField = {},
+                enableFilterButton = true,
+                filterIsApplied = false
             )
         }
 
-        composeTestRule
-            .onNodeWithText("Factura Luz")
-            .performClick()
-
+        composeTestRule.onNodeWithTag("bill_item").performClick()
         assert(clicked)
-    }
-
-    @Test
-    fun givenPaidBill_whenDisplayed_thenShowPagadaStatus() {
-
-        val bill = fakeBill()
-
-        // estado pagada
-        composeTestRule.setContent {
-            IberdrolaBillsScreen(
-                bills = listOf(bill),
-                lastBill = bill,
-                isLoading = false,
-                onclick = {},
-                onFilterClick = { }
-            )
-        }
-
-        composeTestRule
-            .onNodeWithTag("bill_status_"+BillStatusEnum.PAGADA.title, useUnmergedTree = true)
-            .assertIsDisplayed()
-    }
-
-    @Test
-    fun givenUnpaidBill_whenDisplayed_thenShowPendienteStatus() {
-
-        val bill = fakeBill().copy(statusId = BillStatusEnum.PENDIENTE.ordinal)
-
-        // estado pendiente
-        composeTestRule.setContent {
-            IberdrolaBillsScreen(
-                bills = listOf(bill),
-                lastBill = bill,
-                isLoading = false,
-                onclick = {},
-                onFilterClick = { }
-            )
-        }
-
-        composeTestRule
-            .onNodeWithTag("bill_status_"+BillStatusEnum.PENDIENTE.title, useUnmergedTree = true)
-            .assertIsDisplayed()
     }
 }

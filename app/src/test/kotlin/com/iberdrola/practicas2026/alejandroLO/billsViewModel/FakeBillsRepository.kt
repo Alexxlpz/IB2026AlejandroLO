@@ -15,13 +15,14 @@ class FakeBillsRepository : BillsRepository {
     }
 
     override fun getAllBills(): Flow<List<Bill>> = billsFlow
-    
+
     override fun getAllBillsByDirectionId(directionId: Int): Flow<List<Bill>> {
         return billsFlow.map { list -> list.filter { it.directionId == directionId } }
     }
-    
-    override fun getBillById(id: Int): Flow<Bill> = billsFlow.map { it.first { bill -> bill.id == id } }
-    
+
+    override fun getBillById(id: Int): Flow<Bill> =
+        billsFlow.map { it.first { bill -> bill.id == id } }
+
     override fun getBillsByType(typeId: Int): Flow<List<Bill>> {
         return billsFlow.map { list -> list.filter { it.typeId == typeId } }
     }
@@ -31,28 +32,31 @@ class FakeBillsRepository : BillsRepository {
         newList.add(bill)
         billsFlow.emit(newList)
     }
-    
+
     override suspend fun delete(bill: Bill) {
         val newList = billsFlow.value.toMutableList()
         newList.remove(bill)
         billsFlow.emit(newList)
     }
-    
+
     override suspend fun update(bill: Bill) {
         val newList = billsFlow.value.toMutableList()
         newList.removeIf { it.id == bill.id }
         newList.add(bill)
         billsFlow.emit(newList)
     }
-    
+
     override suspend fun deleteAll() {
         billsFlow.emit(emptyList())
     }
-    
+
     override fun deleteAllSync() {
         billsFlow.value = emptyList()
     }
 
-    override suspend fun refreshBillsOnline() { }
-    override suspend fun insertMockBillsFromAssets() { }
+    override suspend fun refreshBillsOnline() {}
+    override suspend fun insertMockBillsFromAssets() {}
+
+    override fun getMaxPrice(): Float = 100f
+    override fun getMinPrice(): Float = 0f
 }
