@@ -54,8 +54,10 @@ import com.iberdrola.practicas2026.alejandroLO.data.model.Direction
 import com.iberdrola.practicas2026.alejandroLO.ui.common.components.IberdrolaFeedbackDialog
 import com.iberdrola.practicas2026.alejandroLO.ui.features.home.screensimport.IberdrolaHomeLoadingScreen
 import com.iberdrola.practicas2026.alejandroLO.ui.features.home.viewModel.HomeViewModel
+import com.iberdrola.practicas2026.alejandroLO.ui.features.home.viewModel.HomeViewModelFactory
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IB2026AlejandroLOTheme
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,7 +66,8 @@ fun IberdrolaHomeScreen(
     onAddressClick: (Int, String) -> Unit,
     setCont: (Int) -> Unit,
     mostrarSheet: Boolean = false,
-    homeViewModel: HomeViewModel
+    homeViewModel: HomeViewModel,
+    clearFilters: (Boolean) -> Unit
 ) {
     val TAG = "IberdrolaHomeScreen"
     val sheetState = rememberModalBottomSheetState()
@@ -85,7 +88,7 @@ fun IberdrolaHomeScreen(
         IberdrolaConfirmDialog(
             onConfirm = {
                 showConfirmDialog.value = false
-                homeViewModel.updateDirectionsOnline(pendingOnlineValue.value)
+                homeViewModel.updateDirectionsOnline(pendingOnlineValue.value, clearFilters)
             },
             onDismiss = {
                 showConfirmDialog.value = false
@@ -112,7 +115,7 @@ fun IberdrolaHomeScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = stringResource(R.string.selecciona_un_punto_de_suministro),
+                    text = stringResource(R.string.selecciona_una_direccion_de_facturacion),
                     style = IberdrolaTheme.typography.tituloMedio,
                     color = IberdrolaTheme.colors.onSurfaceVariant,
                     modifier = Modifier.padding(horizontal = 16.dp)
@@ -128,7 +131,7 @@ fun IberdrolaHomeScreen(
                     if(error == null) {
                         if (directionList.isEmpty()) {
                             Text(
-                                text = "No se encontraron suministros",
+                                text = stringResource(R.string.no_se_encontraron_direcciones),
                                 modifier = Modifier.align(Alignment.Center),
                                 style = IberdrolaTheme.typography.cuerpoMedio,
                                 color = Color.Gray
@@ -186,7 +189,10 @@ fun IberdrolaHomeScreen(
                         }
                     },
                     onRatingSelected = {
-                        scope.launch { sheetState.hide() }.invokeOnCompletion {
+                        scope.launch {
+                            delay(3000)
+                            sheetState.hide()
+                        }.invokeOnCompletion {
                             setCont(10)
                         }
                     },
@@ -233,7 +239,7 @@ fun IberdrolaHomeHeader() {
 
                 Column {
                     Text(
-                        text = stringResource(R.string.hola) + " Alejandro",
+                        text = stringResource(R.string.hola) + stringResource(R.string.alejandro),
                         style = IberdrolaTheme.typography.tituloGrande, // O un headline si prefieres
                         color = IberdrolaTheme.colors.background
                     )
@@ -352,7 +358,8 @@ fun IberdrolaHomeFoot(
                     checkedTrackColor = IberdrolaTheme.colors.primary,
                     uncheckedThumbColor = IberdrolaTheme.colors.background,
                     uncheckedTrackColor = IberdrolaTheme.colors.onSurfaceVariant.copy(alpha = 0.5f)
-                )
+                ),
+                modifier = Modifier.testTag("home_switch")
             )
         }
 
@@ -441,7 +448,7 @@ fun IberdrolaConfirmDialog(
             ) {
                 Text(
                     text = stringResource(R.string.cancelar),
-                    color = IberdrolaTheme.colors.onSurfaceVariant
+                    color = IberdrolaTheme.colors.primary
                 )
             }
         },
@@ -492,7 +499,8 @@ fun PreviewIberdrolaHomeScreen() {
             onAddressClick = { _, _ -> },
             setCont = { },
             mostrarSheet = false,
-            homeViewModel = viewModel()
+            homeViewModel = viewModel(factory = HomeViewModelFactory.Factory),
+            clearFilters = {}
         )
     }
 }
@@ -505,7 +513,9 @@ fun PreviewIberdrolaHomeScreenWithAlert() {
             onAddressClick = { _, _ -> },
             setCont = { },
             mostrarSheet = true,
-            homeViewModel = viewModel()
+            homeViewModel = viewModel(factory = HomeViewModelFactory.Factory),
+            clearFilters = {}
         )
     }
 }
+// mockoon_iberdrola.json

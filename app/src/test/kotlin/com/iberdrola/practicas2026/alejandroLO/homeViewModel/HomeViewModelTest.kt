@@ -73,7 +73,7 @@ class HomeViewModelTest {
         val newOnlineStatus = true
 
         // Act
-        viewModel.updateDirectionsOnline(newOnlineStatus)
+        viewModel.updateDirectionsOnline(newOnlineStatus, {})
 
         // Assert
         fakeConnectivityRepository.isOnline.test {

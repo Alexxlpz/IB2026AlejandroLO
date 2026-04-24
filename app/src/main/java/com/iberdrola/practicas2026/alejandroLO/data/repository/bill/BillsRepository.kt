@@ -16,4 +16,8 @@ interface BillsRepository {
     fun getAllBills(): Flow<List<Bill>> // OBTENER TODAS LAS FACTURAS ORDENADAS POR FECHA DE MANERA DESCENDIENTE
 
     fun getAllBillsByDirectionId(directionId: Int): Flow<List<Bill>> // OBTENER TODAS LAS FACTURAS ORDENADAS POR FECHA DE MANERA DESCENDIENTE
+
+    fun getMaxPrice(): Float // devuelve el precio mas alto para hacer el slider de filtrado
+
+    fun getMinPrice(): Float // devuelve el precio mas bajo para hacer el slider de filtrado
 }
