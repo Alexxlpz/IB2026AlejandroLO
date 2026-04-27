@@ -25,6 +25,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.Eco
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.outlined.Lightbulb
@@ -56,6 +57,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.iberdrola.practicas2026.alejandroLO.R
 import com.iberdrola.practicas2026.alejandroLO.data.model.Bill
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillStatusEnum
@@ -88,7 +90,8 @@ fun IberdrolaBillsScreen(
     filterUiState: FilterUiState,
     clearFilterField: (ActiveFilterItem) -> Unit,
     enableFilterButton: Boolean,
-    filterIsApplied: Boolean
+    filterIsApplied: Boolean,
+    onElectronicBillClick: () -> Unit
 ) {
     val scrollState = rememberScrollState()
     val numberFormat = NumberFormat.getCurrencyInstance(locale)
@@ -133,6 +136,9 @@ fun IberdrolaBillsScreen(
                             lastBill = lastBill ,
                             numberFormat = numberFormat
                         )
+
+                        FacturaElectronicaPromoCard(onClick = onElectronicBillClick)
+
                     }
                     IberdrolaBillList(
                         bills = bills,
@@ -566,6 +572,66 @@ fun FilterChip(
 }
 
 @Composable
+fun FacturaElectronicaPromoCard(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .clickable { onClick() },
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = IberdrolaTheme.colors.primary.copy(alpha = 0.12f)
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Default.Eco,
+                contentDescription = null,
+                tint = IberdrolaTheme.colors.primary,
+                modifier = Modifier.size(32.dp)
+            )
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(id = R.string.factura_electronica),
+                    style = IberdrolaTheme.typography.tituloPeque.copy(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp
+                    ),
+                    color = IberdrolaTheme.colors.primaryDark
+                )
+
+                Spacer(modifier = Modifier.height(2.dp))
+
+                Text(
+                    text = stringResource(id = R.string.activa_servicio_cuida_planeta),
+                    style = IberdrolaTheme.typography.cuerpoPeque,
+                    color = IberdrolaTheme.colors.onSurfaceVariant
+                )
+            }
+
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                contentDescription = stringResource(id = R.string.ir_a_activacion),
+                tint = IberdrolaTheme.colors.primary,
+                modifier = Modifier.size(24.dp)
+            )
+        }
+    }
+}
+
+@Composable
 @Preview(showBackground = true)
 fun PreviewIberdrolaBillsScreen() {
     val bill = Bill(
@@ -586,7 +652,8 @@ fun PreviewIberdrolaBillsScreen() {
             filterUiState = FilterUiState(),
             clearFilterField = {},
             enableFilterButton = true,
-            filterIsApplied = false
+            filterIsApplied = false,
+            onElectronicBillClick = {}
         )
     }
 }
