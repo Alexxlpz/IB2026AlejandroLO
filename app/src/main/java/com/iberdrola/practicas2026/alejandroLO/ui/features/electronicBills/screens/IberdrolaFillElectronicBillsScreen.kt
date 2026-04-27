@@ -44,6 +44,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.iberdrola.practicas2026.alejandroLO.R
+import com.iberdrola.practicas2026.alejandroLO.ui.common.components.IberdrolaNextBackButtons
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -184,56 +185,13 @@ fun IberdrolaFillElectronicBillsScreen(
             }
 
             Spacer(modifier = Modifier.weight(1f))
+            val isNextEnabled = acceptedTerms && email.isNotEmpty()
 
-            // Botones de Acción
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 32.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                OutlinedButton(
-                    onClick = onBackClick,
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(56.dp),
-                    shape = RoundedCornerShape(28.dp),
-                    border = BorderStroke(1.5.dp, IberdrolaTheme.colors.primary)
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.anterior),
-                        style = IberdrolaTheme.typography.tituloPeque,
-                        color = IberdrolaTheme.colors.primary,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-
-                val isNextEnabled = acceptedTerms && email.isNotEmpty()
-                Button(
-                    onClick = onNextClick,
-                    enabled = isNextEnabled,
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(56.dp),
-                    shape = RoundedCornerShape(28.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (isNextEnabled)
-                            IberdrolaTheme.colors.primaryLight.copy(alpha = 0.2f)
-                        else
-                            IberdrolaTheme.colors.disabledContainer
-                    )
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.siguiente),
-                        style = IberdrolaTheme.typography.tituloPeque,
-                        color = if (isNextEnabled)
-                            IberdrolaTheme.colors.primary
-                        else
-                            IberdrolaTheme.colors.onSurfaceVariant,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
+            IberdrolaNextBackButtons(
+                isNextEnabled = isNextEnabled,
+                onBackClick = onBackClick,
+                onNextClick = onNextClick
+            )
         }
     }
 }

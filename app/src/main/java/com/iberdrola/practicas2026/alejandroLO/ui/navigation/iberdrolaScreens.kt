@@ -6,5 +6,7 @@ enum class IberdrolaScreens( val title: String) {
     FILTER(title = "Pagina de filtros"),
     ELECTRONIC_BILLS(title = "Facturas Electronicas"),
     ELECTRONIC_BILLS_MODIFY(title = "Modificar factura electronica"),
-    ELECTRONIC_BILLS_FILL(title = "Crear factura electronica")
+    ELECTRONIC_BILLS_MODIFING_EMAIL(title = "Modificar email factura electronica"),
+    ELECTRONIC_BILLS_FILL(title = "Crear factura electronica"),
+    ELECTRONIC_BILLS_VERIFICATION(title = "Verificar factura electronica")
 }

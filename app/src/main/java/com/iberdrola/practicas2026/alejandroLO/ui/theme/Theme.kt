@@ -8,6 +8,7 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme.colors
 
 
 // Objeto para acceder al tema de forma "local"
@@ -41,7 +42,9 @@ data class IberdrolaColors(
     val iconLuzGas: Color = Color(0xFF004D3F),
     val importeHistorico: Color = Color(0xFF868686),
     val disableFontColor: Color = Color(0xFF514F4F),
-    val disabledContainer: Color = Color(0xFFEEEEEE)
+    val disabledContainer: Color = Color(0xFFEEEEEE),
+    val blueLight: Color = IberdrolaBlueLight,
+    val blueDark: Color = IberdrolaBlueDark
 )
 
 // Estructura de Tipografía Propia

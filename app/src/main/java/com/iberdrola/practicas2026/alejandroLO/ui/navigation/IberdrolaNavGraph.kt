@@ -21,6 +21,8 @@ import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.Bills
 import com.iberdrola.practicas2026.alejandroLO.ui.features.electronicBills.screens.IberdrolaElectronicBillsScreen
 import com.iberdrola.practicas2026.alejandroLO.ui.features.electronicBills.screens.IberdrolaFillElectronicBillsScreen
 import com.iberdrola.practicas2026.alejandroLO.ui.features.electronicBills.screens.IberdrolaModifyElectronicBillsScreen
+import com.iberdrola.practicas2026.alejandroLO.ui.features.electronicBills.screens.IberdrolaModifyEmailElectronicBillScreen
+import com.iberdrola.practicas2026.alejandroLO.ui.features.electronicBills.screens.IberdrolaVerificationEmailElectronicBillsScreen
 import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.screens.IberdrolaFilterScreen
 import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.viewModel.FilterViewModel
 import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.viewModel.FilterViewModelFactory
@@ -133,14 +135,28 @@ fun IberdrolaNavGraph(
         composable(IberdrolaScreens.ELECTRONIC_BILLS_MODIFY.title) {
             IberdrolaModifyElectronicBillsScreen(
                 onBackClick = { navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS.title) }, // todo hacer un backhandler global que gestione el crash de que se vacie la pila y que controle el contador
-                onEditEmailClick = { }
+                onEditEmailClick = { navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS_MODIFING_EMAIL.title) }
+            )
+        }
+        composable(IberdrolaScreens.ELECTRONIC_BILLS_MODIFING_EMAIL.title) {
+            IberdrolaModifyEmailElectronicBillScreen(
+                onCloseClick = { navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS.title) },
+                onBackClick = { navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS_MODIFY.title) },
+                onNextClick = { navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS_VERIFICATION.title) }
             )
         }
         composable(IberdrolaScreens.ELECTRONIC_BILLS_FILL.title) {
             IberdrolaFillElectronicBillsScreen (
                 onBackClick = { navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS.title) },
                 onCloseClick = { navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS.title) },
-                onNextClick = {  } // todo poner que lleve a la siguiente pantalla
+                onNextClick = { navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS_VERIFICATION.title) } // todo poner que lleve a la siguiente pantalla
+            )
+        }
+        composable(IberdrolaScreens.ELECTRONIC_BILLS_VERIFICATION.title) {
+            IberdrolaVerificationEmailElectronicBillsScreen(
+                onCloseClick = { navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS.title) },
+                onBackClick = { navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS_FILL.title) },
+                onNextClick = { navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS.title) }
             )
         }
     }

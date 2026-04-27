@@ -12,6 +12,8 @@ val IberdrolaRedStatus = Color(0xFFF2B3BA)
 val IberdrolaRedText = Color(0xFFC00000)
 val IberdrolaYellow = Color(0xFFFB8C00)
 val IberdrolaBlue = Color(0xFF1E88E5)
+val IberdrolaBlueLight = Color(0xFFE1F5FE)
+val IberdrolaBlueDark = Color(0xFF0288D1)
 val IberdrolaRedIcon = Color(0xFFE53935)
 val IberdrolaGrayIcon = Color(0xFF9E9E9E)
 
