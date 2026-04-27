@@ -9,6 +9,7 @@
     <string name="total">Total: %s</string>
     <string name="submit">Submit</string>
     <string name="atras"><u>Atrás</u></string>
+    <string name="atras_plain">Atrás</string>
     <string name="ultima_factura">Última factura</string>
     <string name="online">Online</string>
     <string name="offline">Offline</string>
@@ -45,4 +46,26 @@
     <string name="por_un_importe">Por un importe</string>
     <string name="por_estado">Por estado</string>
     <string name="ok">OK</string>
+    <string name="factura_electronica">factura electronica</string>
+
+    <!-- Factura Electrónica -->
+    <string name="activa_tu_factura_electronica">Activa tu factura electrónica</string>
+    <string name="email_vinculado_cuenta">Email vinculado a tu cuenta:</string>
+    <string name="en_que_email_deseas_recibir_facturas">¿En qué email deseas recibir tus facturas?</string>
+    <string name="email_label">* Email</string>
+    <string name="info_proteccion_datos_titulo">Información básica sobre protección de datos</string>
+    <string name="info_proteccion_datos_cuerpo">Responsable: Iberdrola Clientes S.A.U. Más info\nFinalidad: Gestión de la factura electrónica. Más info\nDerechos: Acceso, rectificación, supresión…</string>
+    <string name="aceptacion_terminos_factura_electronica">He leído y acepto la Política de privacidad, acepto las Condiciones Generales y Particulares de la oferta y la suscripción a Factura Electrónica.</string>
+    <string name="anterior">Anterior</string>
+    <string name="siguiente">Siguiente</string>
+    <string name="volver">Volver</string>
+    <string name="contrato_de_luz">Contrato de Luz</string>
+    <string name="direccion_placeholder">c/ apartado de correos 184, 5, 1ºb - los dolores-el plan - murcia</string>
+    <string name="recibes_facturas_electronicas_info">Actualmente recibes las facturas electrónicas de este contrato al:</string>
+    <string name="recibes_facturas_email_label">Recibes tus facturas en este email</string>
+    <string name="email_placeholder">pepe2@gmail.com</string>
+    <string name="info_requisito_plan">Recuerda que la factura electrónica es un requisito de este Plan, por lo que no es posible desactivarla.</string>
+    <string name="modificar_email">Modificar email</string>
+    <string name="activa_servicio_cuida_planeta">Activa el servicio y cuida el planeta</string>
+    <string name="ir_a_activacion">Ir a activación</string>
 </resources>

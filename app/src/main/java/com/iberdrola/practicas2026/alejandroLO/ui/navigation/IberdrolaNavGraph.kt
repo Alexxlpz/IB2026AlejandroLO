@@ -10,21 +10,24 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLocale
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.screens.IberdrolaFilterScreen
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsViewModel
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsViewModelFactory
+import com.iberdrola.practicas2026.alejandroLO.ui.features.electronicBills.screens.IberdrolaElectronicBillsScreen
+import com.iberdrola.practicas2026.alejandroLO.ui.features.electronicBills.screens.IberdrolaFillElectronicBillsScreen
+import com.iberdrola.practicas2026.alejandroLO.ui.features.electronicBills.screens.IberdrolaModifyElectronicBillsScreen
+import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.screens.IberdrolaFilterScreen
 import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.viewModel.FilterViewModel
 import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.viewModel.FilterViewModelFactory
 import com.iberdrola.practicas2026.alejandroLO.ui.features.home.screens.IberdrolaHomeScreen
 import com.iberdrola.practicas2026.alejandroLO.ui.features.home.viewModel.HomeViewModel
 import com.iberdrola.practicas2026.alejandroLO.ui.features.home.viewModel.HomeViewModelFactory
 import com.iberdrola.practicas2026.alejandroLO.ui.features.main.screens.IberdrolaMainScreen
-import java.util.Locale
 
 @Composable
 fun IberdrolaNavGraph(
@@ -32,7 +35,7 @@ fun IberdrolaNavGraph(
     startDestination: IberdrolaScreens = IberdrolaScreens.HOME,
     innerPadding: PaddingValues
 ) {
-    val locale = Locale.getDefault()
+    val locale = LocalLocale.current.platformLocale
     val TAG = "IberdrolaNavGraph"
 
     var cont by remember { mutableIntStateOf(1) }
@@ -102,7 +105,10 @@ fun IberdrolaNavGraph(
                 onFilterClick = {
                     navController.navigate(IberdrolaScreens.FILTER.title)
                 },
-                filterViewModel = filterViewModel
+                filterViewModel = filterViewModel,
+                onElectronicBillClick = {
+                    navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS.title)
+                }
             )
         }
         composable(IberdrolaScreens.FILTER.title) {
@@ -110,6 +116,31 @@ fun IberdrolaNavGraph(
                 onBack = { navController.navigate(IberdrolaScreens.MAIN.title) },
                 filterViewModel = filterViewModel,
                 locale = locale
+            )
+        }
+        composable(IberdrolaScreens.ELECTRONIC_BILLS.title) {
+            IberdrolaElectronicBillsScreen (
+                onBackClick = { navController.navigate(IberdrolaScreens.MAIN.title) },
+                onContratoClick = {
+                    if(it) {
+                        navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS_MODIFY.title)
+                    }else {
+                        navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS_FILL.title)
+                    }
+                }
+            )
+        }
+        composable(IberdrolaScreens.ELECTRONIC_BILLS_MODIFY.title) {
+            IberdrolaModifyElectronicBillsScreen(
+                onBackClick = { navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS.title) }, // todo hacer un backhandler global que gestione el crash de que se vacie la pila y que controle el contador
+                onEditEmailClick = { }
+            )
+        }
+        composable(IberdrolaScreens.ELECTRONIC_BILLS_FILL.title) {
+            IberdrolaFillElectronicBillsScreen (
+                onBackClick = { navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS.title) },
+                onCloseClick = { navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS.title) },
+                onNextClick = {  } // todo poner que lleve a la siguiente pantalla
             )
         }
     }

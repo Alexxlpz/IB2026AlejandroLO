@@ -82,6 +82,7 @@ dependencies {
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.uiautomator)
+    implementation(libs.androidx.foundation)
     androidTestImplementation(libs.androidx.navigation.testing)
 
     // DEPENDENCIAS PARA LOS TEST
