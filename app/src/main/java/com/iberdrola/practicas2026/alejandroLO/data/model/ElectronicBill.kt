@@ -22,7 +22,7 @@ import androidx.room.PrimaryKey
 )
 data class ElectronicBill (
     @PrimaryKey(autoGenerate = true)
-    val id: Int,
+    val id: Int = 0,
     @ColumnInfo(name = "directionId")
     val directionId: Int = 0,
     val gasBillEmail: String? = null,

@@ -30,7 +30,7 @@ class OfflineElectronicBillsRepository(
 
 
 
-    override suspend fun refreshBillsOnline(): Unit = withContext(Dispatchers.IO) {
+    override suspend fun refreshElectronicBillsOnline(): Unit = withContext(Dispatchers.IO) {
         try {
             val remoteBills = apiService.getElectronicBills()
 
@@ -38,6 +38,7 @@ class OfflineElectronicBillsRepository(
                 electronicBillDao.deleteAll()
                 Log.d(TAG, "Insertando facturas electronicas desde API...")
                 remoteBills.forEach { electronicBillDao.insert(it) }
+                Log.d(TAG, "Facturas electronicas insertadas: $remoteBills")
             } catch (_: SQLiteConstraintException) {
                 Log.w(TAG, "Fallo de ForeignKey online. Refrescando direcciones desde API...")
                 directionsRepository.refreshDirectionsOnline()
@@ -54,14 +55,15 @@ class OfflineElectronicBillsRepository(
         }
     }
 
-    override suspend fun insertMockBillsFromAssets(): Unit = withContext(Dispatchers.IO) {
+    override suspend fun insertMockElectronicBillsFromAssets(): Unit = withContext(Dispatchers.IO) {
         val jsonString = context.assets.open("electronicBills_mock.json").bufferedReader().use { it.readText() }
         val bills = JsonToElectronicBill(jsonString)
 
         try {
             electronicBillDao.deleteAll()
-            Log.d(TAG, "Insertando facturas mock...")
+            Log.d(TAG, "Insertando facturas electronicas mock...")
             bills?.forEach { electronicBillDao.insert(it) }
+            Log.d(TAG, "Facturas electronicas insertadas: $bills")
         } catch (_: SQLiteConstraintException) {
             Log.w(TAG, "Fallo de ForeignKey en mock. Cargando direcciones locales...")
             directionsRepository.insertMockDirectionsFromAssets()

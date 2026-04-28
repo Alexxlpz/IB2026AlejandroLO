@@ -34,9 +34,10 @@ import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
 fun IberdrolaModifyEmailElectronicBillScreen(
     onCloseClick: () -> Unit,
     onBackClick: () -> Unit,
-    onNextClick: () -> Unit
+    onNextClick: (String) -> Unit,
+    email: String
 ) {
-    var newEmail by remember { mutableStateOf("") }
+    var newEmail by remember { mutableStateOf(email) }
 
     BackHandler(
         onBack = onCloseClick
@@ -100,7 +101,7 @@ fun IberdrolaModifyEmailElectronicBillScreen(
                     IberdrolaNextBackButtons(
                         isNextEnabled = isNextEnabled,
                         onBackClick = onBackClick,
-                        onNextClick = onNextClick
+                        onNextClick = { onNextClick(newEmail) }
                     )
                 }
             }
@@ -114,6 +115,7 @@ fun PreviewIberdrolaModifyEmailElectronicBillScreen() {
     IberdrolaModifyEmailElectronicBillScreen(
         onCloseClick = {},
         onBackClick = {},
-        onNextClick = {}
+        onNextClick = {},
+        email = "emailPrueba@hotmail.com"
     )
 }

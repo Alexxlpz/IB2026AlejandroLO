@@ -51,7 +51,7 @@ fun IberdrolaMainScreen(
     billsViewModel: BillsViewModel = viewModel(factory = BillsViewModelFactory.Factory),
     onFilterClick: () -> Unit,
     filterViewModel: FilterViewModel,
-    onElectronicBillClick: () -> Unit
+    onElectronicBillClick: (String, Int) -> Unit
 ) {
 
     LaunchedEffect(Unit) {
@@ -148,7 +148,7 @@ fun IberdrolaMainScreen(
                     clearFilterField = { filterViewModel.clearFilterField(it) },
                     filterIsApplied = filterIsApplied,
                     enableFilterButton = enableFilterButton,
-                    onElectronicBillClick = onElectronicBillClick
+                    onElectronicBillClick = { onElectronicBillClick(billsUiState.value.directionStreet, billsUiState.value.directionId) },
                 )
             }
         }
@@ -177,6 +177,6 @@ fun PreviewIberdrolaMainScreen() {
         locale = Locale.forLanguageTag("es-ES"),
         onFilterClick = {},
         filterViewModel = viewModel(),
-        onElectronicBillClick = {}
+        onElectronicBillClick = {_, _ ->}
     )
 }

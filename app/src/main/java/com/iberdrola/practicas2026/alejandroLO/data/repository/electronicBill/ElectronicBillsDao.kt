@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
 import com.iberdrola.practicas2026.alejandroLO.data.model.ElectronicBill
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ElectronicBillsDao {
@@ -20,8 +21,8 @@ interface ElectronicBillsDao {
     suspend fun deleteAll()
 
     @Query("SELECT * FROM electronicBills WHERE id = :id")
-    suspend fun getElectronicBillById(id: Int): ElectronicBill?
+    fun getElectronicBillById(id: Int): Flow<ElectronicBill>
 
     @Query("SELECT * FROM electronicBills")
-    suspend fun getAllElectronicBills(): List<ElectronicBill>
+    fun getAllElectronicBills(): Flow<List<ElectronicBill>>
 }
