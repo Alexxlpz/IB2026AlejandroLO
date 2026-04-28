@@ -183,6 +183,37 @@
       "responseMode": null,
       "streamingMode": null,
       "streamingInterval": 0
+    },
+    {
+      "uuid": "873badb8-e7f4-4358-b16a-158d005e3bb0",
+      "type": "http",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "electronicBills",
+      "responses": [
+        {
+          "uuid": "c2986f05-7e2e-49fa-9bd3-4f535bcf2bbb",
+          "body": "[\r\n  {\r\n    \"id\": 1,\r\n    \"directionId\": 1,\r\n    \"gasBillEmail\": null,\r\n    \"electricityBillEmail\": \"calle1.luz@email.com\"\r\n  },\r\n  {\r\n    \"id\": 2,\r\n    \"directionId\": 2,\r\n    \"gasBillEmail\": null,\r\n    \"electricityBillEmail\": \"calle2.luz@email.com\"\r\n  },\r\n  {\r\n    \"id\": 3,\r\n    \"directionId\": 3,\r\n    \"gasBillEmail\": null,\r\n    \"electricityBillEmail\": \"calle3.luz@email.com\"\r\n  }\r\n]",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "se te dan correctamente las electronic bills, uno por calle",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
     }
   ],
   "rootChildren": [
@@ -193,6 +224,10 @@
     {
       "type": "route",
       "uuid": "e7110ed5-47e2-4933-a383-529376e13bca"
+    },
+    {
+      "type": "route",
+      "uuid": "873badb8-e7f4-4358-b16a-158d005e3bb0"
     }
   ],
   "proxyMode": false,
