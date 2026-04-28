@@ -34,13 +34,15 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.iberdrola.practicas2026.alejandroLO.ui.common.components.IberdrolaBar
+import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeEnum
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IberdrolaElectronicBillsScreen(
     onBackClick: () -> Unit,
-    onContratoClick: (Boolean) -> Unit
+    onContratoClick: (Boolean) -> Unit,
+    updateSelectedTypeBill: (BillTypeEnum) -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -58,7 +60,8 @@ fun IberdrolaElectronicBillsScreen(
     ) { paddingValues ->
         FacturaElectronicaContent(
             modifier = Modifier.padding(paddingValues),
-            onContratoClick = onContratoClick
+            onContratoClick = onContratoClick,
+            updateSelectedTypeBill = updateSelectedTypeBill
         )
     }
 }
@@ -66,7 +69,8 @@ fun IberdrolaElectronicBillsScreen(
 @Composable
 fun FacturaElectronicaContent(
     modifier: Modifier = Modifier,
-    onContratoClick: (Boolean) -> Unit
+    onContratoClick: (Boolean) -> Unit,
+    updateSelectedTypeBill: (BillTypeEnum) -> Unit
 ) {
     Column(
         modifier = modifier
@@ -87,7 +91,10 @@ fun FacturaElectronicaContent(
                     estado = "Activa",
                     icon = Icons.Outlined.Lightbulb,
                     isActivo = true,
-                    onClick = { onContratoClick(true) }
+                    onClick = {
+                        onContratoClick(true)
+                        updateSelectedTypeBill(BillTypeEnum.LUZ)
+                    }
                 )
             }
 
@@ -99,7 +106,10 @@ fun FacturaElectronicaContent(
                     estado = "Sin Activar",
                     icon = Icons.Outlined.LocalFireDepartment,
                     isActivo = false,
-                    onClick = { onContratoClick(false) }
+                    onClick = {
+                        onContratoClick(false)
+                        updateSelectedTypeBill(BillTypeEnum.GAS)
+                    }
                 )
             }
 
@@ -183,6 +193,7 @@ fun ContratoStatusBadge(
 fun PreviewIberdrolaElectronicBillsScreen() {
     IberdrolaElectronicBillsScreen(
         onBackClick = {},
-        onContratoClick = {}
+        onContratoClick = {},
+        updateSelectedTypeBill = {}
     )
 }

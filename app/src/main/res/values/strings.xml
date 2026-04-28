@@ -53,6 +53,7 @@
     <string name="email_vinculado_cuenta">Email vinculado a tu cuenta:</string>
     <string name="en_que_email_deseas_recibir_facturas">¿En qué email deseas recibir tus facturas?</string>
     <string name="email_label">* Email</string>
+    <string name="new_email_label">* Nuevo email</string>
     <string name="info_proteccion_datos_titulo">Información básica sobre protección de datos</string>
     <string name="info_proteccion_datos_cuerpo">Responsable: Iberdrola Clientes S.A.U. Más info\nFinalidad: Gestión de la factura electrónica. Más info\nDerechos: Acceso, rectificación, supresión…</string>
     <string name="aceptacion_terminos_factura_electronica">He leído y acepto la Política de privacidad, acepto las Condiciones Generales y Particulares de la oferta y la suscripción a Factura Electrónica.</string>
@@ -68,4 +69,11 @@
     <string name="modificar_email">Modificar email</string>
     <string name="activa_servicio_cuida_planeta">Activa el servicio y cuida el planeta</string>
     <string name="ir_a_activacion">Ir a activación</string>
+    <string name="introduce_codigo_verificacion">Introduce tu código de verificación</string>
+    <string name="instrucciones_codigo_verificacion">Para verificar tu identidad, hemos enviado un código al teléfono ******146 . Por favor, introdúcelo a continuación:</string>
+    <string name="codigo_verificacion_label">* Código de verificación</string>
+    <string name="no_has_recibido_codigo">¿No has recibido el código?</string>
+    <string name="ayuda_reenvio_codigo">Si no lo encuentras, podemos volver a enviar el SMS. Recuerda que hoy te quedan 2 intentos.</string>
+    <string name="volver_a_enviar">Volver a enviar</string>
+    <string name="sms_enviado_exito">Hemos vuelto a enviar un SMS con tu código de verificación.</string>
 </resources>

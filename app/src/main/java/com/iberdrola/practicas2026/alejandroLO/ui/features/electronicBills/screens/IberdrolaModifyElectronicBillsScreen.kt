@@ -1,17 +1,21 @@
 package com.iberdrola.practicas2026.alejandroLO.ui.features.electronicBills.screens
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
@@ -19,11 +23,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,6 +34,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.iberdrola.practicas2026.alejandroLO.R
+import com.iberdrola.practicas2026.alejandroLO.ui.common.components.IberdrolaBar
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
 
 
@@ -40,31 +42,21 @@ import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
 @Composable
 fun IberdrolaModifyElectronicBillsScreen(
     onBackClick: () -> Unit,
-    onEditEmailClick: () -> Unit
+    onEditEmailClick: () -> Unit,
+    selectedStreet: String,
+    email: String
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(id = R.string.atras_plain),
-                        style = IberdrolaTheme.typography.cuerpoMedio,
-                        color = IberdrolaTheme.colors.primary
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(id = R.string.volver),
-                            tint = IberdrolaTheme.colors.primary
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = IberdrolaTheme.colors.background
+            Box(
+                modifier = Modifier
+                    .background(IberdrolaTheme.colors.surface)
+                    .padding(WindowInsets.statusBars.asPaddingValues())
+            ){
+                IberdrolaBar(
+                    onBackButtonClick = onBackClick
                 )
-            )
+            }
         },
         containerColor = IberdrolaTheme.colors.background
     ) { paddingValues ->
@@ -86,7 +78,7 @@ fun IberdrolaModifyElectronicBillsScreen(
             )
 
             Text(
-                text = stringResource(id = R.string.direccion_placeholder),
+                text = selectedStreet,
                 style = IberdrolaTheme.typography.tituloPeque.copy(
                     fontSize = 18.sp,
                     lineHeight = 24.sp
@@ -112,7 +104,7 @@ fun IberdrolaModifyElectronicBillsScreen(
                     color = IberdrolaTheme.colors.onSurface
                 )
                 Text(
-                    text = stringResource(id = R.string.email_placeholder),
+                    text = email,
                     style = IberdrolaTheme.typography.cuerpoMedio,
                     color = IberdrolaTheme.colors.onSurfaceVariant,
                     modifier = Modifier.padding(vertical = 4.dp)
@@ -181,6 +173,8 @@ fun IberdrolaModifyElectronicBillsScreen(
 fun PreviewIberdrolaModifyElectronicBillsScreen() {
     IberdrolaModifyElectronicBillsScreen(
         onBackClick = {},
-        onEditEmailClick = {}
+        onEditEmailClick = {},
+        selectedStreet = "Calle Falsa 123",
+        email = "emailPrueba@hotmail.com"
     )
 }
