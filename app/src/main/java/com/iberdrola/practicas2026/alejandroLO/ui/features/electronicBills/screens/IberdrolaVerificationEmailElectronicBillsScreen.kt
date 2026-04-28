@@ -3,16 +3,37 @@ package com.iberdrola.practicas2026.alejandroLO.ui.features.electronicBills.scre
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.iberdrola.practicas2026.alejandroLO.R
 import com.iberdrola.practicas2026.alejandroLO.ui.common.components.IberdrolaNextBackButtons
+import com.iberdrola.practicas2026.alejandroLO.ui.common.components.VerificationHeader
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -44,24 +66,9 @@ fun IberdrolaVerificationEmailElectronicBillsScreen(
 
     BackHandler(onBack = onCloseClick)
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize().background(IberdrolaTheme.colors.background)) {
         Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { },
-                    actions = {
-                        IconButton(onClick = onCloseClick) {
-                            Icon(
-                                imageVector = Icons.Default.Close,
-                                contentDescription = stringResource(R.string.cerrar),
-                                tint = IberdrolaTheme.colors.primaryDark
-                            )
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(containerColor = IberdrolaTheme.colors.background),
-                    windowInsets = WindowInsets(0, 0, 0, 0) // Elimina el espacio automático de la barra de estado
-                )
-            },
+            topBar = {},
             containerColor = IberdrolaTheme.colors.background
         ) { paddingValues ->
             Column(
@@ -71,7 +78,8 @@ fun IberdrolaVerificationEmailElectronicBillsScreen(
             ) {
                 VerificationHeader(
                     title = stringResource(R.string.activa_tu_factura_electronica),
-                    progress = 0.75f
+                    progress = 0.75f,
+                    onCloseClick = onCloseClick
                 )
 
                 Column(
@@ -80,7 +88,6 @@ fun IberdrolaVerificationEmailElectronicBillsScreen(
                         .weight(1f)
                         .padding(horizontal = 20.dp)
                 ) {
-                    Spacer(modifier = Modifier.height(24.dp))
 
                     VerificationInstructions(
                         instructionTitle = stringResource(R.string.introduce_codigo_verificacion),
@@ -94,7 +101,7 @@ fun IberdrolaVerificationEmailElectronicBillsScreen(
                         onValueChange = { verificationCode = it }
                     )
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(32.dp))
 
                     HelpSection(
                         onResendClick = {
@@ -109,6 +116,7 @@ fun IberdrolaVerificationEmailElectronicBillsScreen(
                     )
                 }
 
+                // Botonera inferior
                 Column(modifier = Modifier.fillMaxWidth()) {
                     if (showSuccessMessage) {
                         SuccessBanner(
@@ -127,37 +135,6 @@ fun IberdrolaVerificationEmailElectronicBillsScreen(
 
         if (isLoading) {
             LoadingOverlay()
-        }
-    }
-}
-
-@Composable
-fun VerificationHeader(title: String, progress: Float) {
-    Column {
-        Text(
-            text = title,
-            style = IberdrolaTheme.typography.tituloGrande.copy(
-                fontSize = 26.sp,
-                fontWeight = FontWeight.Bold
-            ),
-            color = IberdrolaTheme.colors.onSurface,
-            modifier = Modifier
-                .padding(horizontal = 20.dp)
-                .padding(top = 0.dp, bottom = 12.dp) // Reducido para acercarlo a la X
-        )
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(4.dp)
-                .background(IberdrolaTheme.colors.border)
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(progress)
-                    .fillMaxHeight()
-                    .background(IberdrolaTheme.colors.primary)
-            )
         }
     }
 }
