@@ -67,21 +67,22 @@ fun IberdrolaNextBackButtons(
                 shape = RoundedCornerShape(28.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = if (isNextEnabled)
-                        IberdrolaTheme.colors.primaryLight.copy(alpha = 0.2f)
+                        IberdrolaTheme.colors.primaryDark
                     else
-                        IberdrolaTheme.colors.disabledContainer
+                        IberdrolaTheme.colors.primary.copy(alpha = 0.3f)
                 )
             ) {
                 Text(
                     text = stringResource(id = R.string.siguiente),
                     style = IberdrolaTheme.typography.tituloPeque,
                     color = if (isNextEnabled)
-                        IberdrolaTheme.colors.primary
+                        IberdrolaTheme.colors.surfaceVariant
                     else
-                        IberdrolaTheme.colors.onSurfaceVariant,
+                        IberdrolaTheme.colors.primary.copy(alpha = 0.65f),
                     fontWeight = FontWeight.Bold
                 )
             }
         }
     }
+    Spacer(modifier = Modifier.height(50.dp))
 }
