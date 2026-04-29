@@ -8,5 +8,6 @@ enum class IberdrolaScreens( val title: String) {
     ELECTRONIC_BILLS_MODIFY(title = "Modificar factura electronica"),
     ELECTRONIC_BILLS_MODIFING_EMAIL(title = "Modificar email factura electronica"),
     ELECTRONIC_BILLS_FILL(title = "Crear factura electronica"),
-    ELECTRONIC_BILLS_VERIFICATION(title = "Verificar factura electronica")
+    ELECTRONIC_BILLS_VERIFICATION(title = "Verificar factura electronica"),
+    ELECTRONIC_BILLS_THANKS(title = "Verificación completada"),
 }

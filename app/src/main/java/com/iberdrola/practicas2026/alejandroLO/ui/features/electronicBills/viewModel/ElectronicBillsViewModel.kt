@@ -7,6 +7,7 @@ import com.iberdrola.practicas2026.alejandroLO.data.model.ElectronicBill
 import com.iberdrola.practicas2026.alejandroLO.data.repository.conectivity.ConnectivityRepository
 import com.iberdrola.practicas2026.alejandroLO.data.repository.electronicBill.ElectronicBillsRepository
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeEnum
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,8 +25,11 @@ class ElectronicBillsViewModel(
     val uiState: StateFlow<ElectronicBillsUiState> = _uiState.asStateFlow()
 
     init {
-        load_conectivity()
-        refreshElectronicBills()
+        viewModelScope.launch {
+            load_conectivity()
+            delay(1000)
+            refreshElectronicBills()
+        }
     }
     // REFRESCAMOS LAS ELECTRONICBILLS CUANDO CARGAMOS LAS CALLES
     fun load_conectivity() {
