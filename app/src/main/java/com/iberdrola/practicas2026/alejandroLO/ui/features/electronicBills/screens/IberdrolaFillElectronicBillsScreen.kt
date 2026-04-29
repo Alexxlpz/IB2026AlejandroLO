@@ -38,9 +38,10 @@ import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
 fun IberdrolaFillElectronicBillsScreen(
     onCloseClick: () -> Unit,
     onBackClick: () -> Unit,
-    onNextClick: () -> Unit
+    onNextClick: (String) -> Unit,
+    email: String?
 ) {
-    var email by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf(email?:"") }
     var acceptedTerms by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -140,7 +141,7 @@ fun IberdrolaFillElectronicBillsScreen(
                 IberdrolaNextBackButtons(
                     isNextEnabled = isNextEnabled,
                     onBackClick = onBackClick,
-                    onNextClick = onNextClick
+                    onNextClick = { onNextClick(email) }
                 )
             }
         }
@@ -153,6 +154,7 @@ fun PreviewIberdrolaFillElectronicBillsScreen() {
     IberdrolaFillElectronicBillsScreen(
         onCloseClick = {},
         onBackClick = {},
-        onNextClick = {}
+        onNextClick = {},
+        email = null
     )
 }
