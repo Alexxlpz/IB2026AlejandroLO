@@ -1,5 +1,6 @@
 package com.iberdrola.practicas2026.alejandroLO.ui.features.electronicBills.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -61,6 +62,8 @@ fun IberdrolaFillElectronicBillsScreen(
 
     val isEmailValid = android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
     val isError = (email.isNotEmpty() && !isEmailValid)
+
+    BackHandler(onBack = onBackClick)
 
     Scaffold(
         topBar = {},

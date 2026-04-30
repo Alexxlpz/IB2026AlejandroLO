@@ -38,6 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -68,7 +69,13 @@ fun IberdrolaVerificationEmailElectronicBillsScreen(
     val scope = rememberCoroutineScope()
     val counter = electronicBillsUiState.counter
 
-    BackHandler(onBack = onCloseClick)
+    val supressBackStack: (Boolean) -> Unit = {
+        if(!isLoading) {
+            onBackClick()
+        }
+    }
+
+    BackHandler(onBack = { supressBackStack(isLoading) })
 
     Box(modifier = Modifier
         .fillMaxSize()
@@ -269,7 +276,10 @@ fun LoadingOverlay() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.4f)),
+            .background(Color.Black.copy(alpha = 0.4f))
+            .pointerInput(Unit) {
+                // No se podra pulsar nada mientras carga
+            },
         contentAlignment = Alignment.Center
     ) {
         CircularProgressIndicator(
