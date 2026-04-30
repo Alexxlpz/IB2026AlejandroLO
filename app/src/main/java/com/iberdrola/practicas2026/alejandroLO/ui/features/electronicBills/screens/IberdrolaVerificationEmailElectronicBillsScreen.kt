@@ -78,7 +78,8 @@ fun IberdrolaVerificationEmailElectronicBillsScreen(
             ) {
                 VerificationHeader(
                     title = stringResource(R.string.activa_tu_factura_electronica),
-                    progress = 0.75f,
+                    progressStart = 0.5f,
+                    progressEnd = 0.75f,
                     onCloseClick = onCloseClick
                 )
 
@@ -98,7 +99,11 @@ fun IberdrolaVerificationEmailElectronicBillsScreen(
 
                     VerificationCodeField(
                         value = verificationCode,
-                        onValueChange = { verificationCode = it }
+                        onValueChange = { input ->
+                            if (input.all{ it.isDigit() } && input.length <= 6) {
+                                verificationCode = input
+                            }
+                        }
                     )
 
                     Spacer(modifier = Modifier.height(32.dp))
@@ -125,7 +130,7 @@ fun IberdrolaVerificationEmailElectronicBillsScreen(
                         )
                     }
                     IberdrolaNextBackButtons(
-                        isNextEnabled = verificationCode.length >= 4,
+                        isNextEnabled = verificationCode.length == 6,
                         onBackClick = onBackClick,
                         onNextClick = onNextClick
                     )
@@ -180,7 +185,12 @@ fun VerificationCodeField(value: String, onValueChange: (String) -> Unit) {
 fun HelpSection(onResendClick: () -> Unit) {
     Surface(
         color = IberdrolaTheme.colors.blueLight,
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(
+            topStart = 0.dp,
+            topEnd = 20.dp,
+            bottomEnd = 20.dp,
+            bottomStart = 20.dp
+        ),
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(

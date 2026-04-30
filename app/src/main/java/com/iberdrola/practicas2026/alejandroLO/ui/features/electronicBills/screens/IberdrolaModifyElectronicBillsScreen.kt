@@ -91,8 +91,7 @@ fun IberdrolaModifyElectronicBillsScreen(
 
             Text(
                 text = stringResource(id = R.string.recibes_facturas_electronicas_info),
-                style = IberdrolaTheme.typography.cuerpoMedio,
-                color = IberdrolaTheme.colors.onSurfaceVariant
+                style = IberdrolaTheme.typography.cuerpoMedio
             )
 
             Spacer(modifier = Modifier.height(24.dp))

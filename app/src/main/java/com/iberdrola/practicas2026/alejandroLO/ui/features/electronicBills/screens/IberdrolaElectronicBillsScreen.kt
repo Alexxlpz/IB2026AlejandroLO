@@ -31,11 +31,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.iberdrola.practicas2026.alejandroLO.ui.common.components.IberdrolaBar
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeEnum
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
+import com.iberdrola.practicas2026.alejandroLO.R
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,12 +79,15 @@ fun FacturaElectronicaContent(
         modifier = modifier
             .fillMaxSize()
             .padding(horizontal = 20.dp)
+            .padding(top = 10.dp)
     ) {
         Text(
-            text = "Factura electrónica",
+            text = stringResource(R.string.factura_electronica),
             style = IberdrolaTheme.typography.tituloSecundario,
             color = IberdrolaTheme.colors.onSurface
         )
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         LazyColumn {
 
@@ -98,7 +104,7 @@ fun FacturaElectronicaContent(
                 )
             }
 
-            item { HorizontalDivider(color = IberdrolaTheme.colors.border.copy(alpha = 0.5f)) }
+            item { HorizontalDivider(color = IberdrolaTheme.colors.border.copy(alpha = 0.95f)) }
 
             item {
                 ContratoItem(
@@ -138,19 +144,19 @@ fun ContratoItem(
             imageVector = icon,
             contentDescription = null,
             tint = if (isActivo) IberdrolaTheme.colors.primaryDark else IberdrolaTheme.colors.disableFontColor.copy(alpha = 0.65f),
-            modifier = Modifier.size(32.dp)
+            modifier = Modifier.size(40.dp)
         )
 
-        Spacer(modifier = Modifier.width(20.dp))
+        Spacer(modifier = Modifier.width(28.dp))
 
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = titulo,
-                style = IberdrolaTheme.typography.tituloPeque,
+                style = IberdrolaTheme.typography.tituloMedio,
                 color = IberdrolaTheme.colors.onSurface
             )
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             ContratoStatusBadge(estado = estado, isActivo = isActivo)
         }
@@ -159,7 +165,7 @@ fun ContratoItem(
             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
             contentDescription = null,
             tint = IberdrolaTheme.colors.onSurfaceVariant,
-            modifier = Modifier.size(30.dp)
+            modifier = Modifier.size(38.dp)
         )
     }
 }
