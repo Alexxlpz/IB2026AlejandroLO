@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.sp
 import com.iberdrola.practicas2026.alejandroLO.R
 import com.iberdrola.practicas2026.alejandroLO.ui.common.components.IberdrolaNextBackButtons
 import com.iberdrola.practicas2026.alejandroLO.ui.common.components.VerificationHeader
+import com.iberdrola.practicas2026.alejandroLO.ui.features.electronicBills.viewModel.ElectronicBillsUiState
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -57,16 +58,21 @@ import kotlinx.coroutines.launch
 fun IberdrolaVerificationEmailElectronicBillsScreen(
     onCloseClick: () -> Unit,
     onBackClick: () -> Unit,
-    onNextClick: () -> Unit
+    onNextClick: () -> Unit,
+    electronicBillsUiState: ElectronicBillsUiState,
+    updateCounter: () -> Unit
 ) {
     var verificationCode by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
     var showSuccessMessage by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+    val counter = electronicBillsUiState.counter
 
     BackHandler(onBack = onCloseClick)
 
-    Box(modifier = Modifier.fillMaxSize().background(IberdrolaTheme.colors.background)) {
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .background(IberdrolaTheme.colors.background)) {
         Scaffold(
             topBar = {},
             containerColor = IberdrolaTheme.colors.background
@@ -117,7 +123,9 @@ fun IberdrolaVerificationEmailElectronicBillsScreen(
                                 isLoading = false
                                 showSuccessMessage = true
                             }
-                        }
+                        },
+                        counter = counter,
+                        updateCounter = { updateCounter() }
                     )
                 }
 
@@ -182,7 +190,7 @@ fun VerificationCodeField(value: String, onValueChange: (String) -> Unit) {
 }
 
 @Composable
-fun HelpSection(onResendClick: () -> Unit) {
+fun HelpSection(onResendClick: () -> Unit, counter: Int, updateCounter: () -> Unit) {
     Surface(
         color = IberdrolaTheme.colors.blueLight,
         shape = RoundedCornerShape(
@@ -211,22 +219,46 @@ fun HelpSection(onResendClick: () -> Unit) {
                     color = IberdrolaTheme.colors.onSurface
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = stringResource(R.string.ayuda_reenvio_codigo),
-                    style = IberdrolaTheme.typography.cuerpoPeque,
-                    color = IberdrolaTheme.colors.onSurface,
-                    lineHeight = 16.sp
-                )
+                if(counter == 3) {
+                    Text(
+                        text = stringResource(R.string.counter3_helpSelection),
+                        style = IberdrolaTheme.typography.cuerpoPeque,
+                        color = IberdrolaTheme.colors.onSurface,
+                        lineHeight = 16.sp
+                    )
+                }else {
+                    Text(
+                        text = stringResource(R.string.texto_helpSelection, counter),
+                        style = IberdrolaTheme.typography.cuerpoPeque,
+                        color = IberdrolaTheme.colors.onSurface,
+                        lineHeight = 16.sp
+                    )
+                }
+
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = stringResource(R.string.volver_a_enviar),
-                    style = IberdrolaTheme.typography.cuerpoPeque.copy(
-                        fontWeight = FontWeight.ExtraBold,
-                        textDecoration = TextDecoration.Underline
-                    ),
-                    color = IberdrolaTheme.colors.onSurface,
-                    modifier = Modifier.clickable { onResendClick() }
-                )
+                if(counter == 0) {
+                    Text(
+                        text = stringResource(R.string.volver_a_enviar),
+                        style = IberdrolaTheme.typography.cuerpoPeque.copy(
+                            fontWeight = FontWeight.ExtraBold,
+                            textDecoration = TextDecoration.Underline
+                        ),
+                        color = IberdrolaTheme.colors.disableFontColor.copy(alpha = 0.7f)
+                    )
+                }else {
+                    Text(
+                        text = stringResource(R.string.volver_a_enviar),
+                        style = IberdrolaTheme.typography.cuerpoPeque.copy(
+                            fontWeight = FontWeight.ExtraBold,
+                            textDecoration = TextDecoration.Underline
+                        ),
+                        color = IberdrolaTheme.colors.onSurface,
+                        modifier = Modifier.clickable {
+                            onResendClick()
+                            updateCounter()
+                        }
+                    )
+                }
             }
         }
     }
@@ -292,6 +324,8 @@ fun PreviewIberdrolaVerificationScreen() {
     IberdrolaVerificationEmailElectronicBillsScreen(
         onCloseClick = {},
         onBackClick = {},
-        onNextClick = {}
+        onNextClick = {},
+        electronicBillsUiState = ElectronicBillsUiState(),
+        updateCounter = {}
     )
 }

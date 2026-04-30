@@ -55,7 +55,6 @@
     <string name="email_label">* Email</string>
     <string name="new_email_label">* Nuevo email</string>
     <string name="info_proteccion_datos_titulo">Información básica sobre protección de datos</string>
-    <string name="info_proteccion_datos_cuerpo">Responsable: Iberdrola Clientes S.A.U. Más info\nFinalidad: Gestión de la factura electrónica. Más info\nDerechos: Acceso, rectificación, supresión…</string>
     <string name="aceptacion_terminos_factura_electronica">He leído y acepto la Política de privacidad, acepto las Condiciones Generales y Particulares de la oferta y la suscripción a Factura Electrónica.</string>
     <string name="anterior">Anterior</string>
     <string name="siguiente">Siguiente</string>
@@ -73,11 +72,12 @@
     <string name="instrucciones_codigo_verificacion">Para verificar tu identidad, hemos enviado un código al teléfono ******146 . Por favor, introdúcelo a continuación:</string>
     <string name="codigo_verificacion_label">* Código de verificación</string>
     <string name="no_has_recibido_codigo">¿No has recibido el código?</string>
-    <string name="ayuda_reenvio_codigo">Si no lo encuentras, podemos volver a enviar el SMS. Recuerda que hoy te quedan 2 intentos.</string>
     <string name="volver_a_enviar">Volver a enviar</string>
     <string name="sms_enviado_exito">Hemos vuelto a enviar un SMS con tu código de verificación.</string>
     <string name="thanks_modified_email">¡Has modificado correctamente tu email!</string>
     <string name="thanks_activated_electronic_bill">¡Has activado correctamente tu factura electrónica!</string>
     <string name="thanks_email_verification_msg">Pronto recibirás un correo electrónico de verificación para recibir tus facturas en la dirección %1$s</string>
     <string name="mas_info">Más info</string>
+    <string name="texto_helpSelection">Si no lo encuentras, podemos volver a enviar el SMS. Recuerda que hoy te quedan %1$d intentos.</string>
+    <string name="counter3_helpSelection">Si no lo encuentras, podemos volver a enviar el SMS.</string>
 </resources>

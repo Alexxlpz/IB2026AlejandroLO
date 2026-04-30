@@ -59,6 +59,9 @@ fun IberdrolaFillElectronicBillsScreen(
     var dialogTitle by remember { mutableStateOf("") }
     var dialogMessage by remember { mutableStateOf("") }
 
+    val isEmailValid = android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    val isError = (email.isNotEmpty() && !isEmailValid)
+
     Scaffold(
         topBar = {},
         containerColor = IberdrolaTheme.colors.background
@@ -78,6 +81,7 @@ fun IberdrolaFillElectronicBillsScreen(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .weight(1f)
                     .padding(horizontal = 20.dp)
             ) {
                 Text(
@@ -100,10 +104,6 @@ fun IberdrolaFillElectronicBillsScreen(
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
-
-                val isEmailValid = android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
-                val isError = (email.isNotEmpty() && !isEmailValid)
-
 
                 TextField(
                     value = email,
@@ -142,8 +142,6 @@ fun IberdrolaFillElectronicBillsScreen(
                         errorLabelColor = Color.Red
                     )
                 )
-
-                val correctEmail = email.isNotEmpty() && isEmailValid
 
                 Spacer(modifier = Modifier.height(32.dp))
 
@@ -207,14 +205,16 @@ fun IberdrolaFillElectronicBillsScreen(
                 }
 
                 Spacer(modifier = Modifier.weight(1f))
-                val isNextEnabled = acceptedTerms && correctEmail
-
-                IberdrolaNextBackButtons(
-                    isNextEnabled = isNextEnabled,
-                    onBackClick = onBackClick,
-                    onNextClick = { onNextClick(email) }
-                )
             }
+
+            val correctEmail = email.isNotEmpty() && isEmailValid
+            val isNextEnabled = acceptedTerms && correctEmail
+
+            IberdrolaNextBackButtons(
+                isNextEnabled = isNextEnabled,
+                onBackClick = onBackClick,
+                onNextClick = { onNextClick(email) }
+            )
         }
         if (showDialog) {
             AlertDialog(

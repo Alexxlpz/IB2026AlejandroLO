@@ -41,6 +41,9 @@ fun IberdrolaModifyEmailElectronicBillScreen(
 ) {
     var newEmail by remember { mutableStateOf(email) }
 
+    val isEmailValid = android.util.Patterns.EMAIL_ADDRESS.matcher(newEmail).matches()
+    val isError = (newEmail.isNotEmpty() && !isEmailValid) || newEmail.isEmpty()
+
     BackHandler(
         onBack = onCloseClick
     )
@@ -75,9 +78,6 @@ fun IberdrolaModifyEmailElectronicBillScreen(
                     )
 
                     Spacer(modifier = Modifier.height(32.dp))
-
-                    val isEmailValid = android.util.Patterns.EMAIL_ADDRESS.matcher(newEmail).matches()
-                    val isError = (newEmail.isNotEmpty() && !isEmailValid) || newEmail.isEmpty()
 
 
                     TextField(
@@ -118,16 +118,17 @@ fun IberdrolaModifyEmailElectronicBillScreen(
                         )
                     )
 
-                    val isNextEnabled = newEmail.isNotEmpty() && isEmailValid
 
                     Spacer(modifier = Modifier.weight(1f))
 
-                    IberdrolaNextBackButtons(
-                        isNextEnabled = isNextEnabled,
-                        onBackClick = onBackClick,
-                        onNextClick = { onNextClick(newEmail) }
-                    )
                 }
+                val isNextEnabled = newEmail.isNotEmpty() && isEmailValid
+
+                IberdrolaNextBackButtons(
+                    isNextEnabled = isNextEnabled,
+                    onBackClick = onBackClick,
+                    onNextClick = { onNextClick(newEmail) }
+                )
             }
         }
     }
