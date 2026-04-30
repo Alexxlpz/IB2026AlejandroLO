@@ -98,4 +98,24 @@ class ElectronicBillsViewModel(
             Log.d(TAG, "ELECBILL tras refreshElectronicBills -> ${uiState.value.electronicBills}")
         }
     }
+
+    fun updateCounter() {
+        viewModelScope.launch {
+            _uiState.update { currentState ->
+                currentState.copy(
+                    counter = currentState.counter - 1
+                )
+            }
+        }
+    }
+
+    fun resetCounter() {
+        viewModelScope.launch {
+            _uiState.update { currentState ->
+                currentState.copy(
+                    counter = 3
+                )
+            }
+        }
+    }
 }

@@ -115,6 +115,7 @@ fun IberdrolaNavGraph(
             navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS.title)
             delay(1000)
             updateNewEmail(null)
+            electronicBillsViewModel.resetCounter()
         }
     }
 
@@ -197,7 +198,7 @@ fun IberdrolaNavGraph(
         }
         composable(IberdrolaScreens.ELECTRONIC_BILLS_MODIFY.title) {
             IberdrolaModifyElectronicBillsScreen(
-                onBackClick = { navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS.title) }, // todo hacer un backhandler global que gestione el crash de que se vacie la pila y que controle el contador
+                onBackClick = onCloseClick, // todo hacer un backhandler global que gestione el crash de que se vacie la pila y que controle el contador
                 onEditEmailClick = { navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS_MODIFING_EMAIL.title) },
                 selectedStreet = selectedStreet,
                 email = if (typeSelected == BillTypeEnum.LUZ) electronicBills.electricityBillEmail!! else electronicBills.gasBillEmail!!
@@ -260,6 +261,8 @@ fun IberdrolaNavGraph(
 
                     navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS_THANKS.title)
                 },
+                electronicBillsUiState = electronicBillsViewModel.uiState.collectAsState().value,
+                updateCounter = { electronicBillsViewModel.updateCounter() }
             )
         }
         composable(IberdrolaScreens.ELECTRONIC_BILLS_THANKS.title) {
