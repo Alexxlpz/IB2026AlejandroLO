@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
@@ -32,6 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -68,7 +70,8 @@ fun IberdrolaFillElectronicBillsScreen(
         ) {
             VerificationHeader(
                 title = stringResource(R.string.activa_tu_factura_electronica),
-                progress = 0.50f,
+                progressStart = 0f,
+                progressEnd = 0.5f,
                 onCloseClick = onCloseClick
             )
 
@@ -98,18 +101,49 @@ fun IberdrolaFillElectronicBillsScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                val isEmailValid = android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+                val isError = (email.isNotEmpty() && !isEmailValid)
+
+
                 TextField(
                     value = email,
                     onValueChange = { email = it },
-                    label = { Text(stringResource(id = R.string.email_label)) },
+                    isError = isError,
+                    label = {
+                        Text(
+                            text = stringResource(id = R.string.new_email_label),
+                            style = IberdrolaTheme.typography.tituloPeque
+                        )
+                    },
+                    supportingText = {
+                        if (isError) {
+                            Text(
+                                text = "Introduce un formato de email válido (ejemplo@dominio.com)",
+                                style = IberdrolaTheme.typography.etiquetaPeque,
+                                color = Color.Red
+                            )
+                        }
+                    },
                     modifier = Modifier.fillMaxWidth(),
+                    textStyle = IberdrolaTheme.typography.cuerpoMedio.copy(fontSize = 18.sp),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Email
+                    ),
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = Color.Transparent,
                         unfocusedContainerColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent,
+                        errorContainerColor = Color.Transparent,
                         focusedIndicatorColor = IberdrolaTheme.colors.primary,
-                        unfocusedIndicatorColor = IberdrolaTheme.colors.onSurfaceVariant
+                        unfocusedIndicatorColor = IberdrolaTheme.colors.onSurface,
+                        errorIndicatorColor = Color.Red,
+                        focusedLabelColor = Color.Gray,
+                        unfocusedLabelColor = Color.Gray,
+                        errorLabelColor = Color.Red
                     )
                 )
+
+                val correctEmail = email.isNotEmpty() && isEmailValid
 
                 Spacer(modifier = Modifier.height(32.dp))
 
@@ -173,7 +207,7 @@ fun IberdrolaFillElectronicBillsScreen(
                 }
 
                 Spacer(modifier = Modifier.weight(1f))
-                val isNextEnabled = acceptedTerms && email.isNotEmpty()
+                val isNextEnabled = acceptedTerms && correctEmail
 
                 IberdrolaNextBackButtons(
                     isNextEnabled = isNextEnabled,
