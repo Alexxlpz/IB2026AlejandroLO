@@ -44,6 +44,8 @@ fun IberdrolaModifyEmailElectronicBillScreen(
     val isEmailValid = android.util.Patterns.EMAIL_ADDRESS.matcher(newEmail).matches()
     val isError = (newEmail.isNotEmpty() && !isEmailValid) || newEmail.isEmpty()
 
+    val progressStart = if (email.isEmpty()) 0f else 1f
+
     BackHandler(
         onBack = onCloseClick
     )
@@ -60,7 +62,7 @@ fun IberdrolaModifyEmailElectronicBillScreen(
             ) {
                 VerificationHeader(
                     title = stringResource(R.string.modificar_email),
-                    progressStart = 0f,
+                    progressStart = progressStart,
                     progressEnd = 0.5f,
                     onCloseClick = onCloseClick
                 )

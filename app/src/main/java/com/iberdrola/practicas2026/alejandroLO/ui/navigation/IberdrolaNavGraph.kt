@@ -1,6 +1,7 @@
 package com.iberdrola.practicas2026.alejandroLO.ui.navigation
 
 import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -73,6 +74,26 @@ fun IberdrolaNavGraph(
         Log.d(TAG, "decrementarCont: cont = $cont")
     }
 
+    val backStackHandler: (IberdrolaScreens, IberdrolaScreens) -> Unit = { pantallaAct, pantallaDest ->
+        if (navController.currentBackStackEntry?.destination?.route == pantallaAct.title) {
+
+            if(pantallaAct == IberdrolaScreens.MAIN) {
+                decrementarCont()
+                // no puedo ponerback porque si te da tiempo a pulsar varias
+                // veces antes de que cambie de pantalla llegamos a la base de
+                // la pila de navController
+            }
+
+            navController.navigate(pantallaDest.title) {
+                popUpTo(pantallaDest.title) {
+                    inclusive = true
+                }
+            }
+
+
+        }
+    }
+
     var selectedStreet by remember { mutableStateOf("") }
     val updateSelectedStreet: (String) -> Unit = {
         Log.d(TAG, "updateSelectedStreet: $it")
@@ -110,9 +131,12 @@ fun IberdrolaNavGraph(
         newEmail = it
     }
 
-    val onCloseClick: () -> Unit = {
+    val onCloseClick: (IberdrolaScreens) -> Unit = { pantallaAct ->
         scope.launch {
-            navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS.title)
+            backStackHandler(
+                pantallaAct,
+                IberdrolaScreens.ELECTRONIC_BILLS
+            )
             delay(1000)
             updateNewEmail(null)
             electronicBillsViewModel.resetCounter()
@@ -124,7 +148,6 @@ fun IberdrolaNavGraph(
         Log.d(TAG, "updateIsModificacion: $it")
         isModificacion = it
     }
-
 
     NavHost(
         navController = navController,
@@ -154,18 +177,10 @@ fun IberdrolaNavGraph(
                 locale = locale,
                 onBackButtonClick = {
                     Log.d(TAG, "Back button clicked")
-                    if (navController.currentBackStackEntry?.destination?.route == IberdrolaScreens.MAIN.title) {
-                        decrementarCont()
-                        navController.navigate(IberdrolaScreens.HOME.title) {
-                            popUpTo(IberdrolaScreens.HOME.title) {
-                                inclusive = true
-                            }
-                            launchSingleTop = true
-                        }
-                        // no puedo ponerback porque si te da tiempo a pulsar varias
-                        // veces antes de que cambie de pantalla llegamos a la base de
-                        // la pila de navController
-                    }
+                    backStackHandler(
+                        IberdrolaScreens.MAIN,
+                        IberdrolaScreens.HOME
+                    )
                 },
                 modifier = Modifier.padding(innerPadding),
                 billsViewModel = billsViewModel,
@@ -178,14 +193,24 @@ fun IberdrolaNavGraph(
         }
         composable(IberdrolaScreens.FILTER.title) {
             IberdrolaFilterScreen(
-                onBack = { navController.navigate(IberdrolaScreens.MAIN.title) },
+                onBack = {
+                    backStackHandler(
+                        IberdrolaScreens.FILTER,
+                        IberdrolaScreens.MAIN
+                    )
+                },
                 filterViewModel = filterViewModel,
                 locale = locale
             )
         }
         composable(IberdrolaScreens.ELECTRONIC_BILLS.title) {
             IberdrolaElectronicBillsScreen(
-                onBackClick = { navController.navigate(IberdrolaScreens.MAIN.title) },
+                onBackClick = {
+                    backStackHandler(
+                        IberdrolaScreens.ELECTRONIC_BILLS,
+                        IberdrolaScreens.MAIN
+                    )
+                },
                 onContratoClick = {
                     if (it) {
                         navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS_MODIFY.title)
@@ -198,7 +223,7 @@ fun IberdrolaNavGraph(
         }
         composable(IberdrolaScreens.ELECTRONIC_BILLS_MODIFY.title) {
             IberdrolaModifyElectronicBillsScreen(
-                onBackClick = onCloseClick, // todo hacer un backhandler global que gestione el crash de que se vacie la pila y que controle el contador
+                onBackClick = { onCloseClick(IberdrolaScreens.ELECTRONIC_BILLS_MODIFY) },
                 onEditEmailClick = { navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS_MODIFING_EMAIL.title) },
                 selectedStreet = selectedStreet,
                 email = if (typeSelected == BillTypeEnum.LUZ) electronicBills.electricityBillEmail!! else electronicBills.gasBillEmail!!
@@ -206,9 +231,12 @@ fun IberdrolaNavGraph(
         }
         composable(IberdrolaScreens.ELECTRONIC_BILLS_MODIFING_EMAIL.title) {
             IberdrolaModifyEmailElectronicBillScreen(
-                onCloseClick = onCloseClick,
+                onCloseClick = { onCloseClick(IberdrolaScreens.ELECTRONIC_BILLS_MODIFING_EMAIL) },
                 onBackClick = {
-                    navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS_MODIFY.title)
+                    backStackHandler(
+                        IberdrolaScreens.ELECTRONIC_BILLS_MODIFING_EMAIL,
+                        IberdrolaScreens.ELECTRONIC_BILLS_MODIFY
+                    )
                     updateNewEmail(null)
                 },
                 onNextClick = { newEmail ->
@@ -227,8 +255,13 @@ fun IberdrolaNavGraph(
         }
         composable(IberdrolaScreens.ELECTRONIC_BILLS_FILL.title) {
             IberdrolaFillElectronicBillsScreen(
-                onBackClick = { navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS.title) },
-                onCloseClick = onCloseClick,
+                onBackClick = {
+                    backStackHandler(
+                        IberdrolaScreens.ELECTRONIC_BILLS_FILL,
+                        IberdrolaScreens.ELECTRONIC_BILLS
+                    )
+                },
+                onCloseClick = { onCloseClick(IberdrolaScreens.ELECTRONIC_BILLS_FILL) },
                 onNextClick = { newEmail ->
                     navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS_VERIFICATION.title)
                     updateNewEmail(newEmail)
@@ -239,16 +272,21 @@ fun IberdrolaNavGraph(
         }
         composable(IberdrolaScreens.ELECTRONIC_BILLS_VERIFICATION.title) {
             IberdrolaVerificationEmailElectronicBillsScreen(
-                onCloseClick = onCloseClick,
+                onCloseClick = { onCloseClick(IberdrolaScreens.ELECTRONIC_BILLS_VERIFICATION) },
                 onBackClick = {
                     if (isModificacion) {
-                        navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS_MODIFING_EMAIL.title)
+                        backStackHandler(
+                            IberdrolaScreens.ELECTRONIC_BILLS_VERIFICATION,
+                            IberdrolaScreens.ELECTRONIC_BILLS_MODIFING_EMAIL
+                        )
                     } else {
-                        navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS_FILL.title)
+                        backStackHandler(
+                            IberdrolaScreens.ELECTRONIC_BILLS_VERIFICATION,
+                            IberdrolaScreens.ELECTRONIC_BILLS_FILL
+                        )
                     }
                 },
                 onNextClick = {
-                    navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS_THANKS.title)
                     if (isModificacion) {
                         electronicBillsViewModel.updateElectronicBillEmail(
                             email = newEmail!!,
@@ -269,8 +307,8 @@ fun IberdrolaNavGraph(
             IberdrolaThanksScreen(
                 email = newEmail?:"",
                 isModificacion = isModificacion,
-                onAcceptClick = onCloseClick,
-                onCloseClick = onCloseClick
+                onAcceptClick = { onCloseClick(IberdrolaScreens.ELECTRONIC_BILLS_THANKS) },
+                onCloseClick = { onCloseClick(IberdrolaScreens.ELECTRONIC_BILLS_THANKS) }
             )
         }
     }
