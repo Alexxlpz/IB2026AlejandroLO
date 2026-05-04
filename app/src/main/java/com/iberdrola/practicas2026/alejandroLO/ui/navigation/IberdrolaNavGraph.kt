@@ -13,7 +13,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLocale
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -40,14 +39,15 @@ import com.iberdrola.practicas2026.alejandroLO.ui.features.home.viewModel.HomeVi
 import com.iberdrola.practicas2026.alejandroLO.ui.features.main.screens.IberdrolaMainScreen
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 @Composable
 fun IberdrolaNavGraph(
     navController: NavHostController = rememberNavController(),
     startDestination: IberdrolaScreens = IberdrolaScreens.HOME,
-    innerPadding: PaddingValues
+    innerPadding: PaddingValues,
+    locale: Locale
 ) {
-    val locale = LocalLocale.current.platformLocale
     val TAG = "IberdrolaNavGraph"
 
     val billsViewModel: BillsViewModel = viewModel(factory = BillsViewModelFactory.Factory)

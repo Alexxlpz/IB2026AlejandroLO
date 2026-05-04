@@ -148,7 +148,8 @@ fun IberdrolaBillsScreen(
                         filterUiState = filterUiState,
                         clearFilterField = clearFilterField,
                         filterIsApplied = filterIsApplied,
-                        enableFilterButton = enableFilterButton
+                        enableFilterButton = enableFilterButton,
+                        locale = locale
                     )
                 }
 
@@ -315,7 +316,8 @@ fun IberdrolaBillList(
     filterUiState: FilterUiState,
     clearFilterField: (ActiveFilterItem) -> Unit,
     filterIsApplied: Boolean,
-    enableFilterButton: Boolean
+    enableFilterButton: Boolean,
+    locale: Locale
 ) {
     Column(
         modifier = Modifier
@@ -375,7 +377,10 @@ fun IberdrolaBillList(
 
         FilterChipList(
             filterUiState = filterUiState,
-            clearFilterField = clearFilterField
+            clearFilterField = clearFilterField,
+            numberFormat = NumberFormat.getCurrencyInstance(locale).apply {
+                maximumFractionDigits = 0
+            }
         )
 
         Spacer(modifier = Modifier.height(5.dp))
@@ -496,7 +501,8 @@ fun IberdrolaBillItem(
 @Composable
 fun FilterChipList(
     filterUiState: FilterUiState,
-    clearFilterField: (ActiveFilterItem) -> Unit
+    clearFilterField: (ActiveFilterItem) -> Unit,
+    numberFormat: NumberFormat
 ){
     val dateFormat = SimpleDateFormat("dd MMM. yyyy", Locale.forLanguageTag("es-ES"))
     val activeFilters = remember(filterUiState) {
@@ -505,10 +511,10 @@ fun FilterChipList(
             if (filterUiState.selectedDateTo != null) add(ActiveFilterItem(FilterType.DATE_TO, "Hasta: ${dateFormat.format(filterUiState.selectedDateTo)}"))
             if (filterUiState.priceRange != filterUiState.minPrice..filterUiState.maxPrice){
                 // para redondear hacia abajo
-                val maxPrice = floor(filterUiState.priceRange.endInclusive)
+                val maxPrice = numberFormat.format(floor(filterUiState.priceRange.endInclusive))
                 // para redondear hacia abajo
-                val minPrice = floor(filterUiState.priceRange.start)
-                add(ActiveFilterItem(FilterType.PRICE_RANGE, "Precio: $minPrice-$maxPrice"))
+                val minPrice = numberFormat.format(floor(filterUiState.priceRange.start))
+                add(ActiveFilterItem(FilterType.PRICE_RANGE, "Precio: $minPrice - $maxPrice"))
             }
             if (filterUiState.selectedStates != BillStatusEnum.entries && filterUiState.selectedStates.isNotEmpty()){
                 BillStatusEnum.entries.forEach {

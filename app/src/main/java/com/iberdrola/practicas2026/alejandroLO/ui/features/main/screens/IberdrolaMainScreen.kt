@@ -160,7 +160,7 @@ fun IberdrolaMainScreen(
                         Text(stringResource(R.string.cerrar))
                     }
                 },
-                title = { Text(" la factura aún no está disponible") },
+                title = { Text(stringResource(R.string.factura_no_disponible)) },
                 containerColor = IberdrolaTheme.colors.surface
             )
         }
