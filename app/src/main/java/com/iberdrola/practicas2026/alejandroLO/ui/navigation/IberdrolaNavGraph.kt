@@ -1,7 +1,6 @@
 package com.iberdrola.practicas2026.alejandroLO.ui.navigation
 
 import android.util.Log
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -98,6 +97,11 @@ fun IberdrolaNavGraph(
     val updateSelectedStreet: (String) -> Unit = {
         Log.d(TAG, "updateSelectedStreet: $it")
         selectedStreet = it
+    }
+
+    var fromVerification by remember { mutableStateOf(false) }
+    val updateFromVerification: (Boolean) -> Unit = {
+        fromVerification = it
     }
 
     var electronicBills by remember { mutableStateOf(ElectronicBill()) }
@@ -224,7 +228,9 @@ fun IberdrolaNavGraph(
         composable(IberdrolaScreens.ELECTRONIC_BILLS_MODIFY.title) {
             IberdrolaModifyElectronicBillsScreen(
                 onBackClick = { onCloseClick(IberdrolaScreens.ELECTRONIC_BILLS_MODIFY) },
-                onEditEmailClick = { navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS_MODIFING_EMAIL.title) },
+                onEditEmailClick = {
+                    navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS_MODIFING_EMAIL.title)
+                },
                 selectedStreet = selectedStreet,
                 email = if (typeSelected == BillTypeEnum.LUZ) electronicBills.electricityBillEmail!! else electronicBills.gasBillEmail!!
             )
@@ -233,6 +239,7 @@ fun IberdrolaNavGraph(
             IberdrolaModifyEmailElectronicBillScreen(
                 onCloseClick = { onCloseClick(IberdrolaScreens.ELECTRONIC_BILLS_MODIFING_EMAIL) },
                 onBackClick = {
+                    updateFromVerification(false)
                     backStackHandler(
                         IberdrolaScreens.ELECTRONIC_BILLS_MODIFING_EMAIL,
                         IberdrolaScreens.ELECTRONIC_BILLS_MODIFY
@@ -243,6 +250,7 @@ fun IberdrolaNavGraph(
                     navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS_VERIFICATION.title)
                     updateNewEmail(newEmail)
                     updateIsModificacion(true)
+                    updateFromVerification(true)
                 },
                 email = if (newEmail != null) {
                     newEmail!!
@@ -250,12 +258,14 @@ fun IberdrolaNavGraph(
                     electronicBills.electricityBillEmail!!
                 } else {
                     electronicBills.gasBillEmail!!
-                }
+                },
+                fromVerification = fromVerification
             )
         }
         composable(IberdrolaScreens.ELECTRONIC_BILLS_FILL.title) {
             IberdrolaFillElectronicBillsScreen(
                 onBackClick = {
+                    updateFromVerification(false)
                     backStackHandler(
                         IberdrolaScreens.ELECTRONIC_BILLS_FILL,
                         IberdrolaScreens.ELECTRONIC_BILLS
@@ -266,13 +276,18 @@ fun IberdrolaNavGraph(
                     navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS_VERIFICATION.title)
                     updateNewEmail(newEmail)
                     updateIsModificacion(false)
+                    updateFromVerification(true)
                 },
-                email = newEmail
+                email = newEmail,
+                fromVerification = fromVerification
             )
         }
         composable(IberdrolaScreens.ELECTRONIC_BILLS_VERIFICATION.title) {
             IberdrolaVerificationEmailElectronicBillsScreen(
-                onCloseClick = { onCloseClick(IberdrolaScreens.ELECTRONIC_BILLS_VERIFICATION) },
+                onCloseClick = {
+                    updateFromVerification(false)
+                    onCloseClick(IberdrolaScreens.ELECTRONIC_BILLS_VERIFICATION)
+                },
                 onBackClick = {
                     if (isModificacion) {
                         backStackHandler(
@@ -287,6 +302,7 @@ fun IberdrolaNavGraph(
                     }
                 },
                 onNextClick = {
+                    updateFromVerification(false)
                     if (isModificacion) {
                         electronicBillsViewModel.updateElectronicBillEmail(
                             email = newEmail!!,

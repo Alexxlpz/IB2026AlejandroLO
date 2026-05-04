@@ -19,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.ThumbDownOffAlt
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -69,6 +70,8 @@ fun IberdrolaVerificationEmailElectronicBillsScreen(
     val scope = rememberCoroutineScope()
     val counter = electronicBillsUiState.counter
 
+    var finalProgress by remember { mutableStateOf(0.75f) }
+
     val supressBackStack: (Boolean) -> Unit = {
         if(!isLoading) {
             onBackClick()
@@ -92,7 +95,7 @@ fun IberdrolaVerificationEmailElectronicBillsScreen(
                 VerificationHeader(
                     title = stringResource(R.string.activa_tu_factura_electronica),
                     progressStart = 0.5f,
-                    progressEnd = 0.75f,
+                    progressEnd = finalProgress,
                     onCloseClick = onCloseClick
                 )
 
@@ -147,7 +150,17 @@ fun IberdrolaVerificationEmailElectronicBillsScreen(
                     IberdrolaNextBackButtons(
                         isNextEnabled = verificationCode.length == 6,
                         onBackClick = onBackClick,
-                        onNextClick = onNextClick
+                        onNextClick = {
+                            scope.launch {
+                                isLoading = true
+                                finalProgress = 1f
+
+                                delay(1500)
+
+                                isLoading = false
+                                onNextClick()
+                            }
+                        }
                     )
                 }
             }
@@ -199,7 +212,11 @@ fun VerificationCodeField(value: String, onValueChange: (String) -> Unit) {
 @Composable
 fun HelpSection(onResendClick: () -> Unit, counter: Int, updateCounter: () -> Unit) {
     Surface(
-        color = IberdrolaTheme.colors.blueLight,
+        color = if(counter > 0) {
+            IberdrolaTheme.colors.blueLight
+        }else {
+            IberdrolaTheme.colors.warningContainer.copy(alpha = 0.3f)
+        },
         shape = RoundedCornerShape(
             topStart = 0.dp,
             topEnd = 20.dp,
@@ -213,7 +230,7 @@ fun HelpSection(onResendClick: () -> Unit, counter: Int, updateCounter: () -> Un
             verticalAlignment = Alignment.Top
         ) {
             Icon(
-                imageVector = Icons.Outlined.Info,
+                imageVector = if(counter > 0) Icons.Outlined.Info else Icons.Outlined.ThumbDownOffAlt,
                 contentDescription = null,
                 tint = IberdrolaTheme.colors.onSurface,
                 modifier = Modifier.size(25.dp)
@@ -233,7 +250,14 @@ fun HelpSection(onResendClick: () -> Unit, counter: Int, updateCounter: () -> Un
                         color = IberdrolaTheme.colors.onSurface,
                         lineHeight = 16.sp
                     )
-                }else {
+                }else if(counter == 0) {
+                    Text(
+                        text = stringResource(R.string.sin_intentos),
+                        style = IberdrolaTheme.typography.cuerpoPeque,
+                        color = IberdrolaTheme.colors.onSurface,
+                        lineHeight = 16.sp
+                    )
+                } else {
                     Text(
                         text = stringResource(R.string.texto_helpSelection, counter),
                         style = IberdrolaTheme.typography.cuerpoPeque,

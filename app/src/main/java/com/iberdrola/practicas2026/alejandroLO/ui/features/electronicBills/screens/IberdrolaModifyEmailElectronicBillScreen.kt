@@ -37,14 +37,15 @@ fun IberdrolaModifyEmailElectronicBillScreen(
     onCloseClick: () -> Unit,
     onBackClick: () -> Unit,
     onNextClick: (String) -> Unit,
-    email: String
+    email: String,
+    fromVerification: Boolean
 ) {
     var newEmail by remember { mutableStateOf(email) }
 
     val isEmailValid = android.util.Patterns.EMAIL_ADDRESS.matcher(newEmail).matches()
     val isError = (newEmail.isNotEmpty() && !isEmailValid) || newEmail.isEmpty()
 
-    val progressStart = if (email.isEmpty()) 0f else 1f
+    val progressStart = if (fromVerification) 0.75f else 0f
 
     BackHandler(
         onBack = onCloseClick
@@ -143,6 +144,7 @@ fun PreviewIberdrolaModifyEmailElectronicBillScreen() {
         onCloseClick = {},
         onBackClick = {},
         onNextClick = {},
-        email = "emailPrueba@hotmail.com"
+        email = "emailPrueba@hotmail.com",
+        fromVerification = false
     )
 }

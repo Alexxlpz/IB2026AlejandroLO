@@ -51,7 +51,8 @@ fun IberdrolaFillElectronicBillsScreen(
     onCloseClick: () -> Unit,
     onBackClick: () -> Unit,
     onNextClick: (String) -> Unit,
-    email: String?
+    email: String?,
+    fromVerification: Boolean
 ) {
     var email by remember { mutableStateOf(email?:"") }
     var acceptedTerms by remember { mutableStateOf(false) }
@@ -62,6 +63,8 @@ fun IberdrolaFillElectronicBillsScreen(
 
     val isEmailValid = android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
     val isError = (email.isNotEmpty() && !isEmailValid)
+
+    val progressStart = if (fromVerification) 0.75f else 0f
 
     BackHandler(onBack = onBackClick)
 
@@ -76,7 +79,7 @@ fun IberdrolaFillElectronicBillsScreen(
         ) {
             VerificationHeader(
                 title = stringResource(R.string.activa_tu_factura_electronica),
-                progressStart = 0f,
+                progressStart = progressStart,
                 progressEnd = 0.5f,
                 onCloseClick = onCloseClick
             )
@@ -293,6 +296,7 @@ fun PreviewIberdrolaFillElectronicBillsScreen() {
         onCloseClick = {},
         onBackClick = {},
         onNextClick = {},
-        email = null
+        email = null,
+        fromVerification = false
     )
 }
