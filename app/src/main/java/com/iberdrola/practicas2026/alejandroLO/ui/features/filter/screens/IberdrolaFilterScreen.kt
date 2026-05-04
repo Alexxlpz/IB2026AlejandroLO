@@ -220,7 +220,7 @@ fun IberdrolaFilterScreen(
                                 filterViewModel.clearFilters()
                             }
                         )
-                        .padding(horizontal = 12.dp, vertical = 4.dp)
+                        .padding(horizontal = 24.dp, vertical = 8.dp)
                 )
             }
         }
@@ -339,7 +339,12 @@ fun DatePickerField(
     onClearDate: () -> Unit,
     locale: Locale
 ) {
-    Column(modifier = modifier.clickable { onClick() }) {
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(8.dp))
+            .clickable { onClick() }
+            .padding(horizontal = 4.dp)
+    ) {
         val transition = updateTransition(targetState = value != null, label = "LabelTransition")
 
         val labelOffsetY by transition.animateDp(label = "LabelOffset") { isSelected ->
@@ -399,7 +404,9 @@ fun DatePickerField(
                         tint = Color.Gray,
                         modifier = Modifier
                             .size(24.dp)
+                            .clip(CircleShape)
                             .clickable { onClearDate() }
+                            .padding(4.dp),
                     )
                 }
             }
@@ -594,8 +601,9 @@ fun FilterCheckboxItem(label: String, isSelected: Boolean, onClick: () -> Unit) 
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
             .clickable { onClick() }
-            .padding(vertical = 12.dp),
+            .padding(vertical = 12.dp, horizontal = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(

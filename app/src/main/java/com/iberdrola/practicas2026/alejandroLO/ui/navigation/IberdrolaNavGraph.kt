@@ -232,7 +232,8 @@ fun IberdrolaNavGraph(
                     navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS_MODIFING_EMAIL.title)
                 },
                 selectedStreet = selectedStreet,
-                email = if (typeSelected == BillTypeEnum.LUZ) electronicBills.electricityBillEmail!! else electronicBills.gasBillEmail!!
+                email = if (typeSelected == BillTypeEnum.LUZ) electronicBills.electricityBillEmail!! else electronicBills.gasBillEmail!!,
+                type = typeSelected
             )
         }
         composable(IberdrolaScreens.ELECTRONIC_BILLS_MODIFING_EMAIL.title) {

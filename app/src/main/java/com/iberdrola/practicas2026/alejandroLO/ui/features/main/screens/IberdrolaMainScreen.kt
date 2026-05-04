@@ -31,9 +31,13 @@ import com.iberdrola.practicas2026.alejandroLO.ui.common.components.IberdrolaTop
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillStatusEnum
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeEnum
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.screens.IberdrolaBillsScreen
+import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsUiState
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsViewModel
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsViewModelFactory
+import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.viewModel.ActiveFilterItem
+import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.viewModel.FilterUiState
 import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.viewModel.FilterViewModel
+import com.iberdrola.practicas2026.alejandroLO.ui.theme.IB2026AlejandroLOTheme
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -46,40 +50,67 @@ import kotlin.math.abs
 @Composable
 fun IberdrolaMainScreen(
     onBackButtonClick: () -> Unit,
+    onFilterClick: () -> Unit,
+    filterViewModel: FilterViewModel,
+    onElectronicBillClick: (String, Int) -> Unit,
     modifier: Modifier = Modifier,
     locale: Locale = Locale.forLanguageTag("es-ES"),
     billsViewModel: BillsViewModel = viewModel(factory = BillsViewModelFactory.Factory),
-    onFilterClick: () -> Unit,
-    filterViewModel: FilterViewModel,
-    onElectronicBillClick: (String, Int) -> Unit
 ) {
 
     LaunchedEffect(Unit) {
         billsViewModel.refreshBills()
     }
 
-    val billsUiState = billsViewModel.uiState.collectAsState()
-    val filterUiState = filterViewModel.uiState.collectAsState()
+    val billsUiState by billsViewModel.uiState.collectAsState()
+    val filterUiState by filterViewModel.uiState.collectAsState()
 
+    IberdrolaMainScreenContent(
+        billsUiState = billsUiState,
+        filterUiState = filterUiState,
+        onBackButtonClick = onBackButtonClick,
+        onFilterClick = onFilterClick,
+        onOptionSelected = { billsViewModel.updateSelectedOption(it) },
+        onRefresh = { billsViewModel.refreshBills() },
+        onClearFilterField = { filterViewModel.clearFilterField(it) },
+        onElectronicBillClick = onElectronicBillClick,
+        modifier = modifier,
+        locale = locale
+    )
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun IberdrolaMainScreenContent(
+    billsUiState: BillsUiState,
+    filterUiState: FilterUiState,
+    onBackButtonClick: () -> Unit,
+    onFilterClick: () -> Unit,
+    onOptionSelected: (BillTypeEnum) -> Unit,
+    onRefresh: () -> Unit,
+    onClearFilterField: (ActiveFilterItem) -> Unit,
+    onElectronicBillClick: (String, Int) -> Unit,
+    modifier: Modifier = Modifier,
+    locale: Locale = Locale.forLanguageTag("es-ES")
+) {
     // usamos state para forzar a la pantalla a calcular el valor de filterUiState, asi detecta el cambio al borrar el chip
-    val state = filterUiState.value
-    val filterIsApplied = remember(state) {
-        state.selectedDateFrom != null ||
-                state.selectedDateTo != null ||
-                state.priceRange != state.minPrice..state.maxPrice ||
-                state.selectedStates.size != BillStatusEnum.entries.size
+    val filterIsApplied = remember(filterUiState) {
+        filterUiState.selectedDateFrom != null ||
+                filterUiState.selectedDateTo != null ||
+                filterUiState.priceRange != filterUiState.minPrice..filterUiState.maxPrice ||
+                filterUiState.selectedStates.size != BillStatusEnum.entries.size
                 // con comparar el tamaño basta, nos da igual porque este filtrando, solo si lo
                 // está haciendo o no
     }
 
     if (filterIsApplied) {
-        Log.d("FilterDebug", "Applied because -> Date: ${state.selectedDateFrom != null}, " +
-                "Status: ${state.selectedStates.size != BillStatusEnum.entries.size}, " +
-                "Price: ${abs(state.priceRange.start - state.minPrice) > 0.01f}")
+        Log.d("FilterDebug", "Applied because -> Date: ${filterUiState.selectedDateFrom != null}, " +
+                "Status: ${filterUiState.selectedStates.size != BillStatusEnum.entries.size}, " +
+                "Price: ${abs(filterUiState.priceRange.start - filterUiState.minPrice) > 0.01f}")
     }
 
     // está deshabilitado si no hay filtros y no hay facturas
-    val enableFilterButton = filterIsApplied || billsUiState.value.billsList.isNotEmpty()
+    val enableFilterButton = filterIsApplied || billsUiState.billsList.isNotEmpty()
 
     var showAlert by remember { mutableStateOf(false) }
     val selectingBill: (Bill) -> Unit = remember {
@@ -89,16 +120,16 @@ fun IberdrolaMainScreen(
     }
 
     val pagerState = rememberPagerState(
-        initialPage = if (billsUiState.value.selectedOption == BillTypeEnum.LUZ) 0 else 1,
+        initialPage = if (billsUiState.selectedOption == BillTypeEnum.LUZ) 0 else 1,
         pageCount = { 2 }
     )
 
     LaunchedEffect(pagerState.currentPage) {
         val option = if (pagerState.currentPage == 0) BillTypeEnum.LUZ else BillTypeEnum.GAS
-        billsViewModel.updateSelectedOption(option)
+        onOptionSelected(option)
     }
 
-    BackHandler { // quiero que tambien cuente el contador si le das al boton back
+    BackHandler { // quiero que también cuente el contador si le das al botón back
         onBackButtonClick()
     }
 
@@ -112,9 +143,9 @@ fun IberdrolaMainScreen(
         ) {
 //            Log.d("MainScreen", "is sync enabled: ${billsUiState.value.isOnline}")
             IberdrolaTopBar(
-                selectedOption = billsUiState.value.selectedOption,
-                streetName = billsUiState.value.directionStreet,
-                options = billsUiState.value.options,
+                selectedOption = billsUiState.selectedOption,
+                streetName = billsUiState.directionStreet,
+                options = billsUiState.options,
                 onOptionSelected = { option ->
                     val page = if (option == BillTypeEnum.LUZ) 0 else 1
                     scope.launch { pagerState.animateScrollToPage(page) }
@@ -128,7 +159,7 @@ fun IberdrolaMainScreen(
             ) { page ->
 
 
-                val filteredBills = billsUiState.value.billsList.filter {
+                val filteredBills = billsUiState.billsList.filter {
                     it.typeId == page // 0 = Luz, 1 = Gas
                 }
 
@@ -137,18 +168,18 @@ fun IberdrolaMainScreen(
                 IberdrolaBillsScreen(
                     bills = filteredBills,
                     lastBill = lastBill,
-                    isLoading = billsUiState.value.isLoading,
+                    isLoading = billsUiState.isLoading,
                     onclick = { selectingBill(it) },
-                    refresh = { billsViewModel.refreshBills() },
+                    refresh = onRefresh,
                     modifier = Modifier.fillMaxSize(),
-                    error = billsUiState.value.errorMessage,
+                    error = billsUiState.errorMessage,
                     locale = locale,
                     onFilterClick = onFilterClick,
-                    filterUiState = filterUiState.value,
-                    clearFilterField = { filterViewModel.clearFilterField(it) },
+                    filterUiState = filterUiState,
+                    clearFilterField = onClearFilterField,
                     filterIsApplied = filterIsApplied,
                     enableFilterButton = enableFilterButton,
-                    onElectronicBillClick = { onElectronicBillClick(billsUiState.value.directionStreet, billsUiState.value.directionId) },
+                    onElectronicBillClick = { onElectronicBillClick(billsUiState.directionStreet, billsUiState.directionId) },
                 )
             }
         }
@@ -171,12 +202,21 @@ fun IberdrolaMainScreen(
 @Composable
 @Preview
 fun PreviewIberdrolaMainScreen() {
-    IberdrolaMainScreen(
-        modifier = Modifier,
-        onBackButtonClick = { },
-        locale = Locale.forLanguageTag("es-ES"),
-        onFilterClick = {},
-        filterViewModel = viewModel(),
-        onElectronicBillClick = {_, _ ->}
-    )
+    IB2026AlejandroLOTheme {
+        IberdrolaMainScreenContent(
+            billsUiState = BillsUiState(
+                directionStreet = "Calle de la energía",
+                options = BillTypeEnum.entries.toList()
+            ),
+            filterUiState = FilterUiState(),
+            onBackButtonClick = { },
+            onFilterClick = {},
+            onOptionSelected = {},
+            onRefresh = {},
+            onClearFilterField = {},
+            onElectronicBillClick = { _, _ -> },
+            modifier = Modifier,
+            locale = Locale.forLanguageTag("es-ES")
+        )
+    }
 }

@@ -1,14 +1,15 @@
 package com.iberdrola.practicas2026.alejandroLO.ui.features.bills.screens
 
-import android.annotation.SuppressLint
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -51,10 +53,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -319,10 +323,12 @@ fun IberdrolaBillList(
     enableFilterButton: Boolean,
     locale: Locale
 ) {
+    val yearFormat = SimpleDateFormat("yyyy", Locale.forLanguageTag("es-ES"))
+    var auxyear = ""
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 0.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -337,14 +343,14 @@ fun IberdrolaBillList(
 
             OutlinedButton(
                 onClick = onFilterClick,
-                border = if(!enableFilterButton){
+                border = if (!enableFilterButton) {
                     BorderStroke(2.dp, IberdrolaTheme.colors.disableFontColor)
-                }else {
+                } else {
                     BorderStroke(2.dp, IberdrolaTheme.colors.primary)
                 },
                 shape = RoundedCornerShape(20.dp),
                 enabled = enableFilterButton,
-                colors = if(filterIsApplied){
+                colors = if (filterIsApplied) {
                     ButtonDefaults.outlinedButtonColors(
                         containerColor = IberdrolaTheme.colors.primary,
                         contentColor = IberdrolaTheme.colors.surfaceVariant,
@@ -365,9 +371,9 @@ fun IberdrolaBillList(
                     modifier = Modifier.size(18.dp)
                 )
                 Spacer(Modifier.width(8.dp))
-                if(filterIsApplied){
+                if (filterIsApplied) {
                     Text("Filtrar º")
-                }else {
+                } else {
                     Text("Filtrar")
                 }
             }
@@ -382,29 +388,57 @@ fun IberdrolaBillList(
                 maximumFractionDigits = 0
             }
         )
+    }
 
-        Spacer(modifier = Modifier.height(5.dp))
-
-        val yearFormat = SimpleDateFormat("yyyy", Locale.forLanguageTag("es-ES"))
-        var auxyear = ""
-
-        if (bills.isEmpty()) {
+    if (bills.isEmpty()) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .padding(horizontal = 16.dp, vertical = 50.dp)
+                .fillMaxSize()
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.no_factures),
+                contentDescription = "No hay facturas"
+            )
             Text(
                 text = stringResource(R.string.no_hay_facturas),
-                style = IberdrolaTheme.typography.cuerpoGrande,
-                color = IberdrolaTheme.colors.onSurfaceVariant
+                style = IberdrolaTheme.typography.tituloGrande,
+                color = IberdrolaTheme.colors.onSurface,
+                fontWeight = FontWeight.ExtraBold
             )
-        } else {
+            Text(
+                text = "Aquí verás tus facturas de luz.\n" +
+                        "Cuando tengas alguna, aparecerá en este listado",
+                modifier = Modifier
+                    .widthIn(max = 280.dp)
+                    .padding(top = 16.dp), // No se extiende más de 280dp
+                style = IberdrolaTheme.typography.cuerpoMedio,
+                color = IberdrolaTheme.colors.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.ExtraBold
+            )
+        }
+    } else {
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+        ) {
             bills.forEach { bill ->
                 val currentYear = yearFormat.format(bill.emissionDate)
                 if (currentYear != auxyear) {
                     auxyear = currentYear
-                    Text(
-                        text = auxyear,
-                        style = IberdrolaTheme.typography.tituloMedio,
-                        color = IberdrolaTheme.colors.onSurface,
-                        modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
-                    )
+                    Box(
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp, vertical = 0.dp)
+                    ) {
+                        Text(
+                            text = auxyear,
+                            style = IberdrolaTheme.typography.tituloMedio,
+                            color = IberdrolaTheme.colors.onSurface,
+                            modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
+                        )
+                    }
                 }
 
                 IberdrolaBillItem(bill = bill, onclick = onclick, numberFormat = numberFormat)
@@ -418,7 +452,6 @@ fun IberdrolaBillList(
     }
 }
 
-@SuppressLint("DefaultLocale")
 @Composable
 fun IberdrolaBillItem(
     bill: Bill,
@@ -449,7 +482,7 @@ fun IberdrolaBillItem(
                 indication = ripple(color = IberdrolaTheme.colors.onSurface),
                 onClick = { onclick(bill) }
             )
-            .padding(vertical = 8.dp)
+            .padding(start = 8.dp, end = 0.dp, top = 8.dp, bottom = 8.dp)
             .testTag("bill_item"),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -653,6 +686,27 @@ fun PreviewIberdrolaBillsScreen() {
             isLoading = false,
             onclick = {},
             lastBill = bill,
+            locale = Locale.forLanguageTag("es-ES"),
+            onFilterClick = {},
+            filterUiState = FilterUiState(),
+            clearFilterField = {},
+            enableFilterButton = true,
+            filterIsApplied = false,
+            onElectronicBillClick = {}
+        )
+    }
+}
+
+@Composable
+@Preview(showBackground = true)
+fun PreviewIberdrolaBillsScreenWithNoBills() {
+    val bills = emptyList<Bill>()
+    IB2026AlejandroLOTheme {
+        IberdrolaBillsScreen(
+            bills = bills,
+            isLoading = false,
+            onclick = {},
+            lastBill = null,
             locale = Locale.forLanguageTag("es-ES"),
             onFilterClick = {},
             filterUiState = FilterUiState(),
