@@ -1,5 +1,6 @@
 package com.iberdrola.practicas2026.alejandroLO.ui.features.electronicBills.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -36,6 +37,9 @@ fun IberdrolaThanksScreen(
     LaunchedEffect(Unit) {
         visible = true
     }
+
+    BackHandler(onBack = onCloseClick)
+
 
     Box(
         modifier = Modifier

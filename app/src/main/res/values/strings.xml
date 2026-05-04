@@ -80,4 +80,5 @@
     <string name="mas_info">Más info</string>
     <string name="texto_helpSelection">Si no lo encuentras, podemos volver a enviar el SMS. Recuerda que hoy te quedan %1$d intentos.</string>
     <string name="counter3_helpSelection">Si no lo encuentras, podemos volver a enviar el SMS.</string>
+    <string name="sin_intentos">Se ha quedado sin intentos, llame a la línea de atención al cliente</string>
 </resources>

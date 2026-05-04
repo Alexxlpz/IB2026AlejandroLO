@@ -19,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.ThumbDownOffAlt
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -38,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -68,7 +70,15 @@ fun IberdrolaVerificationEmailElectronicBillsScreen(
     val scope = rememberCoroutineScope()
     val counter = electronicBillsUiState.counter
 
-    BackHandler(onBack = onCloseClick)
+    var finalProgress by remember { mutableStateOf(0.75f) }
+
+    val supressBackStack: (Boolean) -> Unit = {
+        if(!isLoading) {
+            onBackClick()
+        }
+    }
+
+    BackHandler(onBack = { supressBackStack(isLoading) })
 
     Box(modifier = Modifier
         .fillMaxSize()
@@ -85,7 +95,7 @@ fun IberdrolaVerificationEmailElectronicBillsScreen(
                 VerificationHeader(
                     title = stringResource(R.string.activa_tu_factura_electronica),
                     progressStart = 0.5f,
-                    progressEnd = 0.75f,
+                    progressEnd = finalProgress,
                     onCloseClick = onCloseClick
                 )
 
@@ -140,7 +150,17 @@ fun IberdrolaVerificationEmailElectronicBillsScreen(
                     IberdrolaNextBackButtons(
                         isNextEnabled = verificationCode.length == 6,
                         onBackClick = onBackClick,
-                        onNextClick = onNextClick
+                        onNextClick = {
+                            scope.launch {
+                                isLoading = true
+                                finalProgress = 1f
+
+                                delay(1500)
+
+                                isLoading = false
+                                onNextClick()
+                            }
+                        }
                     )
                 }
             }
@@ -192,7 +212,11 @@ fun VerificationCodeField(value: String, onValueChange: (String) -> Unit) {
 @Composable
 fun HelpSection(onResendClick: () -> Unit, counter: Int, updateCounter: () -> Unit) {
     Surface(
-        color = IberdrolaTheme.colors.blueLight,
+        color = if(counter > 0) {
+            IberdrolaTheme.colors.blueLight
+        }else {
+            IberdrolaTheme.colors.warningContainer.copy(alpha = 0.3f)
+        },
         shape = RoundedCornerShape(
             topStart = 0.dp,
             topEnd = 20.dp,
@@ -206,7 +230,7 @@ fun HelpSection(onResendClick: () -> Unit, counter: Int, updateCounter: () -> Un
             verticalAlignment = Alignment.Top
         ) {
             Icon(
-                imageVector = Icons.Outlined.Info,
+                imageVector = if(counter > 0) Icons.Outlined.Info else Icons.Outlined.ThumbDownOffAlt,
                 contentDescription = null,
                 tint = IberdrolaTheme.colors.onSurface,
                 modifier = Modifier.size(25.dp)
@@ -226,7 +250,14 @@ fun HelpSection(onResendClick: () -> Unit, counter: Int, updateCounter: () -> Un
                         color = IberdrolaTheme.colors.onSurface,
                         lineHeight = 16.sp
                     )
-                }else {
+                }else if(counter == 0) {
+                    Text(
+                        text = stringResource(R.string.sin_intentos),
+                        style = IberdrolaTheme.typography.cuerpoPeque,
+                        color = IberdrolaTheme.colors.onSurface,
+                        lineHeight = 16.sp
+                    )
+                } else {
                     Text(
                         text = stringResource(R.string.texto_helpSelection, counter),
                         style = IberdrolaTheme.typography.cuerpoPeque,
@@ -269,7 +300,10 @@ fun LoadingOverlay() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.4f)),
+            .background(Color.Black.copy(alpha = 0.4f))
+            .pointerInput(Unit) {
+                // No se podra pulsar nada mientras carga
+            },
         contentAlignment = Alignment.Center
     ) {
         CircularProgressIndicator(

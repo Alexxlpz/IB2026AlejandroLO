@@ -78,14 +78,15 @@ fun FacturaElectronicaContent(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 20.dp)
             .padding(top = 10.dp)
     ) {
-        Text(
-            text = stringResource(R.string.factura_electronica),
-            style = IberdrolaTheme.typography.tituloSecundario,
-            color = IberdrolaTheme.colors.onSurface
-        )
+        Box(Modifier.padding(horizontal = 20.dp)) {
+            Text(
+                text = stringResource(R.string.factura_electronica),
+                style = IberdrolaTheme.typography.tituloSecundario,
+                color = IberdrolaTheme.colors.onSurface
+            )
+        }
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -104,7 +105,12 @@ fun FacturaElectronicaContent(
                 )
             }
 
-            item { HorizontalDivider(color = IberdrolaTheme.colors.border.copy(alpha = 0.95f)) }
+            item {
+                HorizontalDivider(
+                    color = IberdrolaTheme.colors.border.copy(alpha = 0.95f),
+                    thickness = 1.5.dp
+                )
+            }
 
             item {
                 ContratoItem(
@@ -119,7 +125,12 @@ fun FacturaElectronicaContent(
                 )
             }
 
-            item { HorizontalDivider(color = IberdrolaTheme.colors.border.copy(alpha = 0.5f)) }
+            item {
+                HorizontalDivider(
+                    color = IberdrolaTheme.colors.border.copy(alpha = 0.95f),
+                    thickness = 1.5.dp
+                )
+            }
         }
     }
 }
@@ -137,8 +148,8 @@ fun ContratoItem(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() }
-            .padding(vertical = 20.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .padding(vertical = 20.dp, horizontal = 10.dp),
+        verticalAlignment = Alignment.Top
     ) {
         Icon(
             imageVector = icon,
@@ -147,7 +158,7 @@ fun ContratoItem(
             modifier = Modifier.size(40.dp)
         )
 
-        Spacer(modifier = Modifier.width(28.dp))
+        Spacer(modifier = Modifier.width(15.dp))
 
         Column(modifier = Modifier.weight(1f)) {
             Text(
@@ -156,7 +167,7 @@ fun ContratoItem(
                 color = IberdrolaTheme.colors.onSurface
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(13.dp))
 
             ContratoStatusBadge(estado = estado, isActivo = isActivo)
         }
@@ -184,8 +195,8 @@ fun ContratoStatusBadge(
     ) {
         Text(
             text = estado,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-            style = IberdrolaTheme.typography.etiquetaPeque,
+            modifier = Modifier.padding(horizontal = 15.dp, vertical = 6.dp),
+            style = IberdrolaTheme.typography.etiquetaGrande,
             color = if (isActivo)
                 IberdrolaTheme.colors.primaryDark
             else
