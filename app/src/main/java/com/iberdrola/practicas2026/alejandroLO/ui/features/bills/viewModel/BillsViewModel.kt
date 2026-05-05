@@ -11,6 +11,7 @@ import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeE
 import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.enums.FilterType
 import com.iberdrola.practicas2026.alejandroLO.ui.features.main.viewModel.ActiveFilterItem
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,6 +25,7 @@ import java.lang.Math.random
 import java.util.Date
 import kotlin.math.ceil
 import kotlin.math.floor
+import kotlinx.coroutines.flow.debounce
 
 class BillsViewModel(
     private val billsRepository: BillsRepository,
@@ -56,6 +58,7 @@ class BillsViewModel(
         _billsUiState.update { it.copy(options = BillTypeEnum.entries.toTypedArray().toList()) }
     }
 
+    @OptIn(FlowPreview::class)
     fun refreshBills() {
         billsJob?.cancel()
         val isOnline = _billsUiState.value.isOnline
@@ -68,7 +71,9 @@ class BillsViewModel(
         }
 
             billsJob = launch {// solo coger aquellas que coincidan con la calle
-                billsRepository.getAllBillsByDirectionId(directionId).collect { bills ->
+                billsRepository.getAllBillsByDirectionId(directionId)
+                    .debounce(600)
+                    .collect { bills ->
                     _billsUiState.update {
                         it.copy(
                             billsList = bills
@@ -82,6 +87,10 @@ class BillsViewModel(
                             // para redondear hacia abajo
                             val minPrice = floor(bills.minOf { it.price }).toFloat()
 
+                            val maxDate = bills.maxOf { it.emissionDate }
+                            val minDate = bills.minOf { it.emissionDate }
+
+                            setDateLimits(minDate, maxDate)
                             setPriceLimits(minPrice, maxPrice)
                             filterCriteriaApply()
                         }
@@ -103,7 +112,17 @@ class BillsViewModel(
                 billsRepository.insertMockBillsFromAssets()
                 delay((1000 + (random() * 2000)).toLong()) // delay entre 1 y 3 seg
             }
+            delay(700)
             _billsUiState.update { it.copy(isLoading = false) }
+        }
+    }
+
+    fun setDateLimits(minDate: Date, maxDate: Date){
+        _filterUiState.update { currentState ->
+            currentState.copy(
+                minDate = minDate,
+                maxDate = maxDate
+            )
         }
     }
 
@@ -120,10 +139,10 @@ class BillsViewModel(
 
             val newRange = if (wasAtLimits || isFirstLoad) {
                 minPrice..safeMax
-            } else {
-                currentState.priceRange.start.coerceIn(minPrice, safeMax)..
-                        currentState.priceRange.endInclusive.coerceIn(minPrice, safeMax)
-            }
+            } else currentState.priceRange //else {
+//                currentState.priceRange.start.coerceIn(minPrice, safeMax)..
+//                        currentState.priceRange.endInclusive.coerceIn(minPrice, safeMax)
+//            }
 
             currentState.copy(
                 minPrice = minPrice,

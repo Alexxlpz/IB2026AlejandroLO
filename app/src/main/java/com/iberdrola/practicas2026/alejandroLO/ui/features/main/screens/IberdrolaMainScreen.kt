@@ -167,7 +167,9 @@ fun IberdrolaMainScreenContent(
                     it.typeId == page // 0 = Luz, 1 = Gas
                 }
 
-                val lastBill = billsUiState.billsList.maxByOrNull { it.emissionDate.time }
+                val lastBill = billsUiState.billsList.filter {
+                    it.typeId == page
+                }.maxByOrNull { it.emissionDate.time }
 
                 IberdrolaBillsScreen(
                     bills = filteredBills,
