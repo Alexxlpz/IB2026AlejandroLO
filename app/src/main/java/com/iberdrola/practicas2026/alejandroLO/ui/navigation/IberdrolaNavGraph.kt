@@ -101,16 +101,16 @@ fun IberdrolaNavGraph(
         fromVerification = it
     }
 
-    var electronicBills by remember { mutableStateOf(ElectronicBill()) }
+    var electronicBills: ElectronicBill? by remember { mutableStateOf(ElectronicBill()) }
     val updateElectronicBills: (Int) -> Unit = { directionId ->
         Log.d(TAG, "updateElectronicBills, directionid: $directionId")
-        electronicBills = electronicBillsUiState.value.electronicBills.first { it.directionId == directionId }
+        electronicBills = electronicBillsUiState.value.electronicBills.firstOrNull{ it.directionId == directionId }
     }
     val refreshElectronicBill:(String, BillTypeEnum) -> Unit = { email, type ->
         electronicBills = if(type == BillTypeEnum.LUZ){
-            electronicBills.copy(electricityBillEmail = email)
+            electronicBills?.copy(electricityBillEmail = email)
         }else {
-            electronicBills.copy(gasBillEmail = email)
+            electronicBills?.copy(gasBillEmail = email)
         }
     }
 
@@ -166,7 +166,7 @@ fun IberdrolaNavGraph(
                 setCont = setCont,
                 mostrarSheet = mostrarSheet,
                 homeViewModel = homeViewModel,
-                clearFilters = {
+                changeMode = {
                     // para reiniciar el filtro antes de cambiar de modo
                     billsViewModel.clearFilters(it)
                 }
@@ -181,6 +181,10 @@ fun IberdrolaNavGraph(
                         IberdrolaScreens.MAIN,
                         IberdrolaScreens.HOME
                     )
+                    scope.launch {
+                        delay(500) // para que no se vea la limpieza del filtro
+                        billsViewModel.clearFilters() // para reiniciar el filtro al cambiar de calle
+                    }
                 },
                 modifier = Modifier.padding(innerPadding),
                 billsViewModel = billsViewModel,
@@ -217,7 +221,8 @@ fun IberdrolaNavGraph(
                         navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS_FILL.title)
                     }
                 },
-                updateSelectedTypeBill = updateSelectedTypeBill
+                updateSelectedTypeBill = updateSelectedTypeBill,
+                electronicBillError = electronicBills == null
             )
         }
         composable(IberdrolaScreens.ELECTRONIC_BILLS_MODIFY.title) {
@@ -227,7 +232,7 @@ fun IberdrolaNavGraph(
                     navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS_MODIFING_EMAIL.title)
                 },
                 selectedStreet = selectedStreet,
-                email = if (typeSelected == BillTypeEnum.LUZ) electronicBills.electricityBillEmail!! else electronicBills.gasBillEmail!!,
+                email = if (typeSelected == BillTypeEnum.LUZ) electronicBills?.electricityBillEmail!! else electronicBills?.gasBillEmail!!,
                 type = typeSelected
             )
         }
@@ -251,9 +256,9 @@ fun IberdrolaNavGraph(
                 email = if (newEmail != null) {
                     newEmail!!
                 } else if (typeSelected == BillTypeEnum.LUZ) {
-                    electronicBills.electricityBillEmail!!
+                    electronicBills?.electricityBillEmail!!
                 } else {
-                    electronicBills.gasBillEmail!!
+                    electronicBills?.gasBillEmail!!
                 },
                 fromVerification = fromVerification
             )
@@ -303,7 +308,7 @@ fun IberdrolaNavGraph(
                         electronicBillsViewModel.updateElectronicBillEmail(
                             email = newEmail!!,
                             type = typeSelected,
-                            electronicBill = electronicBills
+                            electronicBill = electronicBills!!
                         )
                         // simula la recarga sin esperar a room
                         refreshElectronicBill(newEmail!!, typeSelected)
