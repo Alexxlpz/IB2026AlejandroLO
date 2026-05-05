@@ -5,6 +5,7 @@ import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeE
 
 data class BillsUiState (
     val billsList: List<Bill> = emptyList(),
+    val filteredBillList: List<Bill> = emptyList(),
     val selectedOption: BillTypeEnum = BillTypeEnum.LUZ,
     val isLoading: Boolean = false,
     val isOnline: Boolean = false,

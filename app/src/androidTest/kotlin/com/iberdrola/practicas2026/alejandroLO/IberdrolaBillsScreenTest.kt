@@ -10,7 +10,8 @@ import com.iberdrola.practicas2026.alejandroLO.data.model.Bill
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillStatusEnum
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeEnum
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.screens.IberdrolaBillsScreen
-import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.viewModel.FilterUiState
+import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.FilterUiState
+import com.iberdrola.practicas2026.alejandroLO.ui.theme.IB2026AlejandroLOTheme
 import org.junit.Rule
 import org.junit.Test
 import java.util.Date
@@ -19,7 +20,7 @@ class IberdrolaBillsScreenTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    // Mock de parámetros necesarios para los nuevos filtros
+    // Mock del estado que ahora se gestiona en el BillsViewModel
     private val fakeFilterUiState = mutableStateOf(FilterUiState())
 
     private fun fakeBill(status: BillStatusEnum = BillStatusEnum.PAGADA): Bill {
@@ -38,18 +39,20 @@ class IberdrolaBillsScreenTest {
     @Test
     fun givenLoadingTrue_whenScreenLoaded_thenSkeletonIsDisplayed() {
         composeTestRule.setContent {
-            IberdrolaBillsScreen(
-                bills = emptyList(),
-                lastBill = null,
-                isLoading = true,
-                onclick = {},
-                // Parámetros obligatorios añadidos tras la refactorización
-                onFilterClick = {},
-                filterUiState = fakeFilterUiState.value,
-                clearFilterField = {},
-                enableFilterButton = true,
-                filterIsApplied = false
-            )
+            IB2026AlejandroLOTheme {
+                IberdrolaBillsScreen(
+                    bills = emptyList(),
+                    lastBill = null,
+                    isLoading = true,
+                    onclick = {},
+                    onFilterClick = {},
+                    filterUiState = fakeFilterUiState.value,
+                    clearFilterField = {},
+                    enableFilterButton = true,
+                    filterIsApplied = false,
+                    onElectronicBillClick = {}
+                )
+            }
         }
 
         composeTestRule.onNodeWithTag("bills_skeleton").assertIsDisplayed()
@@ -59,17 +62,20 @@ class IberdrolaBillsScreenTest {
     @Test
     fun givenBillsEmpty_whenLoaded_thenShowEmptyMessage() {
         composeTestRule.setContent {
-            IberdrolaBillsScreen(
-                bills = emptyList(),
-                lastBill = null,
-                isLoading = false,
-                onclick = {},
-                onFilterClick = {},
-                filterUiState = fakeFilterUiState.value,
-                clearFilterField = {},
-                enableFilterButton = true,
-                filterIsApplied = false
-            )
+            IB2026AlejandroLOTheme {
+                IberdrolaBillsScreen(
+                    bills = emptyList(),
+                    lastBill = null,
+                    isLoading = false,
+                    onclick = {},
+                    onFilterClick = {},
+                    filterUiState = fakeFilterUiState.value,
+                    clearFilterField = {},
+                    enableFilterButton = true,
+                    filterIsApplied = false,
+                    onElectronicBillClick = {}
+                )
+            }
         }
 
         composeTestRule.onNodeWithText("No hay facturas").assertIsDisplayed()
@@ -79,17 +85,20 @@ class IberdrolaBillsScreenTest {
     fun givenBillsWithData_whenLoaded_thenShowLastBill() {
         val bill = fakeBill()
         composeTestRule.setContent {
-            IberdrolaBillsScreen(
-                bills = listOf(bill),
-                lastBill = bill,
-                isLoading = false,
-                onclick = {},
-                onFilterClick = {},
-                filterUiState = fakeFilterUiState.value,
-                clearFilterField = {},
-                enableFilterButton = true,
-                filterIsApplied = false
-            )
+            IB2026AlejandroLOTheme {
+                IberdrolaBillsScreen(
+                    bills = listOf(bill),
+                    lastBill = bill,
+                    isLoading = false,
+                    onclick = {},
+                    onFilterClick = {},
+                    filterUiState = fakeFilterUiState.value,
+                    clearFilterField = {},
+                    enableFilterButton = true,
+                    filterIsApplied = false,
+                    onElectronicBillClick = {}
+                )
+            }
         }
 
         composeTestRule.onNodeWithText("Última factura").assertIsDisplayed()
@@ -100,17 +109,20 @@ class IberdrolaBillsScreenTest {
         val bill = fakeBill(BillStatusEnum.PAGADA)
 
         composeTestRule.setContent {
-            IberdrolaBillsScreen(
-                bills = listOf(bill),
-                lastBill = bill,
-                isLoading = false,
-                onclick = {},
-                onFilterClick = {},
-                filterUiState = fakeFilterUiState.value,
-                clearFilterField = {},
-                enableFilterButton = true,
-                filterIsApplied = false
-            )
+            IB2026AlejandroLOTheme {
+                IberdrolaBillsScreen(
+                    bills = listOf(bill),
+                    lastBill = bill,
+                    isLoading = false,
+                    onclick = {},
+                    onFilterClick = {},
+                    filterUiState = fakeFilterUiState.value,
+                    clearFilterField = {},
+                    enableFilterButton = true,
+                    filterIsApplied = false,
+                    onElectronicBillClick = {}
+                )
+            }
         }
 
         composeTestRule
@@ -123,17 +135,20 @@ class IberdrolaBillsScreenTest {
         val bill = fakeBill(BillStatusEnum.PENDIENTE)
 
         composeTestRule.setContent {
-            IberdrolaBillsScreen(
-                bills = listOf(bill),
-                lastBill = bill,
-                isLoading = false,
-                onclick = {},
-                onFilterClick = {},
-                filterUiState = fakeFilterUiState.value,
-                clearFilterField = {},
-                enableFilterButton = true,
-                filterIsApplied = false
-            )
+            IB2026AlejandroLOTheme {
+                IberdrolaBillsScreen(
+                    bills = listOf(bill),
+                    lastBill = bill,
+                    isLoading = false,
+                    onclick = {},
+                    onFilterClick = {},
+                    filterUiState = fakeFilterUiState.value,
+                    clearFilterField = {},
+                    enableFilterButton = true,
+                    filterIsApplied = false,
+                    onElectronicBillClick = {}
+                )
+            }
         }
 
         composeTestRule
@@ -147,17 +162,20 @@ class IberdrolaBillsScreenTest {
         var clicked = false
 
         composeTestRule.setContent {
-            IberdrolaBillsScreen(
-                bills = listOf(bill),
-                lastBill = null,
-                isLoading = false,
-                onclick = { clicked = true },
-                onFilterClick = {},
-                filterUiState = fakeFilterUiState.value,
-                clearFilterField = {},
-                enableFilterButton = true,
-                filterIsApplied = false
-            )
+            IB2026AlejandroLOTheme {
+                IberdrolaBillsScreen(
+                    bills = listOf(bill),
+                    lastBill = null,
+                    isLoading = false,
+                    onclick = { clicked = true },
+                    onFilterClick = {},
+                    filterUiState = fakeFilterUiState.value,
+                    clearFilterField = {},
+                    enableFilterButton = true,
+                    filterIsApplied = false,
+                    onElectronicBillClick = {}
+                )
+            }
         }
 
         composeTestRule.onNodeWithTag("bill_item").performClick()

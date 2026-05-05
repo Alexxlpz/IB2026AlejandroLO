@@ -70,7 +70,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.iberdrola.practicas2026.alejandroLO.R
 import com.iberdrola.practicas2026.alejandroLO.ui.common.components.IberdrolaBar
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillStatusEnum
-import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.viewModel.FilterViewModel
+import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsViewModel
+import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsViewModelFactory
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IB2026AlejandroLOTheme
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
 import java.text.NumberFormat
@@ -84,10 +85,10 @@ import java.util.Locale
 fun IberdrolaFilterScreen(
     onBack: () -> Unit = {},
     locale: Locale = Locale.forLanguageTag("es-ES"),
-    filterViewModel: FilterViewModel = viewModel()
+    billsViewModel: BillsViewModel = viewModel(factory = BillsViewModelFactory.Factory),
 ) {
 
-    val filterUiState = filterViewModel.uiState.collectAsState().value
+    val filterUiState = billsViewModel.filterUiState.collectAsState().value
     val statesToShow = if(filterUiState.selectedStates.containsAll(BillStatusEnum.entries)){
         emptyList()
     }else {
@@ -179,7 +180,7 @@ fun IberdrolaFilterScreen(
             ) {
                 Button(
                     onClick = {
-                        filterViewModel.sumbmitButtom(
+                        billsViewModel.sumbmitButtom(
                             dateFrom = selectedDateFrom,
                             dateTo = selectedDateTo,
                             priceRange = priceRange,
@@ -217,7 +218,7 @@ fun IberdrolaFilterScreen(
                                 selectedDateTo = null
                                 priceRange = filterUiState.minPrice..filterUiState.maxPrice
                                 selectedStates = emptyList()
-                                filterViewModel.clearFilters()
+                                billsViewModel.clearFilters()
                             }
                         )
                         .padding(horizontal = 24.dp, vertical = 8.dp)
@@ -640,7 +641,7 @@ fun FilterScreenPreview() {
     IB2026AlejandroLOTheme {
         IberdrolaFilterScreen(
             onBack = { },
-            filterViewModel = viewModel()
+            billsViewModel = viewModel(factory = BillsViewModelFactory.Factory)
         )
     }
 }

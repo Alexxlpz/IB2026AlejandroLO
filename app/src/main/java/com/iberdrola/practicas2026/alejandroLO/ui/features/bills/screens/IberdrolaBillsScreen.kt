@@ -67,8 +67,8 @@ import com.iberdrola.practicas2026.alejandroLO.data.model.Bill
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillStatusEnum
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeEnum
 import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.enums.FilterType
-import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.viewModel.ActiveFilterItem
-import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.viewModel.FilterUiState
+import com.iberdrola.practicas2026.alejandroLO.ui.features.main.viewModel.ActiveFilterItem
+import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.FilterUiState
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IB2026AlejandroLOTheme
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
 import com.valentinilk.shimmer.ShimmerBounds
@@ -618,13 +618,13 @@ fun FacturaElectronicaPromoCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .clickable { onClick() },
+            .padding(horizontal = 16.dp, vertical = 8.dp),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
             containerColor = IberdrolaTheme.colors.primary.copy(alpha = 0.12f)
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        onClick = onClick
     ) {
         Row(
             modifier = Modifier

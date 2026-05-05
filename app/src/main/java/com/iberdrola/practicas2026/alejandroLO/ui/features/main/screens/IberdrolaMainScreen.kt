@@ -34,9 +34,8 @@ import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.screens.Iberdro
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsUiState
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsViewModel
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsViewModelFactory
-import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.viewModel.ActiveFilterItem
-import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.viewModel.FilterUiState
-import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.viewModel.FilterViewModel
+import com.iberdrola.practicas2026.alejandroLO.ui.features.main.viewModel.ActiveFilterItem
+import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.FilterUiState
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IB2026AlejandroLOTheme
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
 import kotlinx.coroutines.CoroutineScope
@@ -51,7 +50,6 @@ import kotlin.math.abs
 fun IberdrolaMainScreen(
     onBackButtonClick: () -> Unit,
     onFilterClick: () -> Unit,
-    filterViewModel: FilterViewModel,
     onElectronicBillClick: (String, Int) -> Unit,
     modifier: Modifier = Modifier,
     locale: Locale = Locale.forLanguageTag("es-ES"),
@@ -62,8 +60,8 @@ fun IberdrolaMainScreen(
         billsViewModel.refreshBills()
     }
 
-    val billsUiState by billsViewModel.uiState.collectAsState()
-    val filterUiState by filterViewModel.uiState.collectAsState()
+    val billsUiState by billsViewModel.billsUiState.collectAsState()
+    val filterUiState by billsViewModel.filterUiState.collectAsState()
 
     IberdrolaMainScreenContent(
         billsUiState = billsUiState,
@@ -72,7 +70,10 @@ fun IberdrolaMainScreen(
         onFilterClick = onFilterClick,
         onOptionSelected = { billsViewModel.updateSelectedOption(it) },
         onRefresh = { billsViewModel.refreshBills() },
-        onClearFilterField = { filterViewModel.clearFilterField(it) },
+        onClearFilterField = {
+            billsViewModel.clearFilterField(it)
+            billsViewModel.refreshBills()
+        },
         onElectronicBillClick = onElectronicBillClick,
         modifier = modifier,
         locale = locale
@@ -102,6 +103,9 @@ fun IberdrolaMainScreenContent(
                 // con comparar el tamaño basta, nos da igual porque este filtrando, solo si lo
                 // está haciendo o no
     }
+
+    val billsToShow = if (filterIsApplied) billsUiState.filteredBillList else billsUiState.billsList
+
 
     if (filterIsApplied) {
         Log.d("FilterDebug", "Applied because -> Date: ${filterUiState.selectedDateFrom != null}, " +
@@ -159,11 +163,11 @@ fun IberdrolaMainScreenContent(
             ) { page ->
 
 
-                val filteredBills = billsUiState.billsList.filter {
+                val filteredBills = billsToShow.filter {
                     it.typeId == page // 0 = Luz, 1 = Gas
                 }
 
-                val lastBill = filteredBills.maxByOrNull { it.emissionDate.time }
+                val lastBill = billsUiState.billsList.maxByOrNull { it.emissionDate.time }
 
                 IberdrolaBillsScreen(
                     bills = filteredBills,

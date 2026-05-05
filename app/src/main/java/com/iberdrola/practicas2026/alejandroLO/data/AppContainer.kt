@@ -16,8 +16,6 @@ import com.iberdrola.practicas2026.alejandroLO.data.repository.direction.Directi
 import com.iberdrola.practicas2026.alejandroLO.data.repository.direction.OfflineDirectionRepository
 import com.iberdrola.practicas2026.alejandroLO.data.repository.electronicBill.ElectronicBillsRepository
 import com.iberdrola.practicas2026.alejandroLO.data.repository.electronicBill.OfflineElectronicBillsRepository
-import com.iberdrola.practicas2026.alejandroLO.data.repository.filter.FilterRepository
-import com.iberdrola.practicas2026.alejandroLO.data.repository.filter.OfflineFilterRepository
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -33,8 +31,6 @@ interface AppContainer {
     val billsRepository: BillsRepository
     val directionsRepository: DirectionRepository
     val connectivityRepository: ConnectivityRepository
-
-    val filterRepository: FilterRepository
     val electronicBillsRepository: ElectronicBillsRepository
 }
 
@@ -103,11 +99,6 @@ class AppDataContainer(private val context: Context) : AppContainer {
     override
     val connectivityRepository: ConnectivityRepository by lazy {
         OfflineConnectivityRepository()
-    }
-
-    override
-    val filterRepository: FilterRepository by lazy {
-        OfflineFilterRepository()
     }
 
     private fun getUnsafeOkHttpClient(context: Context): OkHttpClient {

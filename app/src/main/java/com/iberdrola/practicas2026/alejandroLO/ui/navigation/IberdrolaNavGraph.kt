@@ -31,8 +31,6 @@ import com.iberdrola.practicas2026.alejandroLO.ui.features.electronicBills.scree
 import com.iberdrola.practicas2026.alejandroLO.ui.features.electronicBills.viewModel.ElectronicBillsViewModel
 import com.iberdrola.practicas2026.alejandroLO.ui.features.electronicBills.viewModel.ElectronicBillsViewModelFactory
 import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.screens.IberdrolaFilterScreen
-import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.viewModel.FilterViewModel
-import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.viewModel.FilterViewModelFactory
 import com.iberdrola.practicas2026.alejandroLO.ui.features.home.screens.IberdrolaHomeScreen
 import com.iberdrola.practicas2026.alejandroLO.ui.features.home.viewModel.HomeViewModel
 import com.iberdrola.practicas2026.alejandroLO.ui.features.home.viewModel.HomeViewModelFactory
@@ -52,7 +50,6 @@ fun IberdrolaNavGraph(
 
     val billsViewModel: BillsViewModel = viewModel(factory = BillsViewModelFactory.Factory)
     val homeViewModel: HomeViewModel = viewModel(factory = HomeViewModelFactory.Factory)
-    val filterViewModel: FilterViewModel = viewModel(factory = FilterViewModelFactory.Factory)
     val electronicBillsViewModel: ElectronicBillsViewModel = viewModel(factory = ElectronicBillsViewModelFactory.Factory)
     val electronicBillsUiState = electronicBillsViewModel.uiState.collectAsState()
     val scope = rememberCoroutineScope()
@@ -171,7 +168,6 @@ fun IberdrolaNavGraph(
                 homeViewModel = homeViewModel,
                 clearFilters = {
                     // para reiniciar el filtro antes de cambiar de modo
-                    filterViewModel.clearFiltersToChangeMode()
                     billsViewModel.clearFilters(it)
                 }
             )
@@ -191,7 +187,6 @@ fun IberdrolaNavGraph(
                 onFilterClick = {
                     navController.navigate(IberdrolaScreens.FILTER.title)
                 },
-                filterViewModel = filterViewModel,
                 onElectronicBillClick = onElectronicBillClick
             )
         }
@@ -203,7 +198,7 @@ fun IberdrolaNavGraph(
                         IberdrolaScreens.MAIN
                     )
                 },
-                filterViewModel = filterViewModel,
+                billsViewModel = billsViewModel,
                 locale = locale
             )
         }
