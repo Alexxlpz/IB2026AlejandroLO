@@ -2,6 +2,7 @@ package com.iberdrola.practicas2026.alejandroLO.ui.features.filter.screens
 
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.updateTransition
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -70,7 +71,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.iberdrola.practicas2026.alejandroLO.R
 import com.iberdrola.practicas2026.alejandroLO.ui.common.components.IberdrolaBar
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillStatusEnum
-import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.viewModel.FilterViewModel
+import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsViewModel
+import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsViewModelFactory
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IB2026AlejandroLOTheme
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
 import java.text.NumberFormat
@@ -84,10 +86,10 @@ import java.util.Locale
 fun IberdrolaFilterScreen(
     onBack: () -> Unit = {},
     locale: Locale = Locale.forLanguageTag("es-ES"),
-    filterViewModel: FilterViewModel = viewModel()
+    billsViewModel: BillsViewModel = viewModel(factory = BillsViewModelFactory.Factory),
 ) {
 
-    val filterUiState = filterViewModel.uiState.collectAsState().value
+    val filterUiState = billsViewModel.filterUiState.collectAsState().value
     val statesToShow = if(filterUiState.selectedStates.containsAll(BillStatusEnum.entries)){
         emptyList()
     }else {
@@ -138,8 +140,8 @@ fun IberdrolaFilterScreen(
         IberdrolaDatePickerDialog(
             onDateSelected = { updateDateFrom(it) },
             onDismiss = { setDatePickerFrom(false) },
-            minDate = null,
-            maxDate = selectedDateTo,
+            minDate = filterUiState.minDate,
+            maxDate = selectedDateTo?: filterUiState.maxDate,
             actual = selectedDateFrom?: selectedDateTo?: Date()
         )
     }
@@ -148,8 +150,8 @@ fun IberdrolaFilterScreen(
         IberdrolaDatePickerDialog(
             onDateSelected = { updateDateTo(it) },
             onDismiss = { setDatePickerTo(false) },
-            minDate = selectedDateFrom,
-            maxDate = null,
+            minDate = selectedDateFrom?: filterUiState.minDate,
+            maxDate = filterUiState.maxDate,
             actual = selectedDateTo?: selectedDateFrom?: Date()
         )
     }
@@ -179,7 +181,7 @@ fun IberdrolaFilterScreen(
             ) {
                 Button(
                     onClick = {
-                        filterViewModel.sumbmitButtom(
+                        billsViewModel.sumbmitButtom(
                             dateFrom = selectedDateFrom,
                             dateTo = selectedDateTo,
                             priceRange = priceRange,
@@ -217,10 +219,10 @@ fun IberdrolaFilterScreen(
                                 selectedDateTo = null
                                 priceRange = filterUiState.minPrice..filterUiState.maxPrice
                                 selectedStates = emptyList()
-                                filterViewModel.clearFilters()
+                                billsViewModel.clearFilters()
                             }
                         )
-                        .padding(horizontal = 12.dp, vertical = 4.dp)
+                        .padding(horizontal = 24.dp, vertical = 8.dp)
                 )
             }
         }
@@ -252,6 +254,7 @@ fun IberdrolaFilterScreen(
                     modifier = Modifier.weight(1f),
                     onClick = { setDatePickerFrom(true) },
                     onClearDate = { onClearDate(0) },
+                    disable = filterUiState.minDate == filterUiState.maxDate,
                     locale = locale
                 )
                 Spacer(Modifier.width(24.dp))
@@ -261,6 +264,7 @@ fun IberdrolaFilterScreen(
                     modifier = Modifier.weight(1f),
                     onClick = { setDatePickerTo(true) },
                     onClearDate = { onClearDate(1) },
+                    disable = filterUiState.minDate == filterUiState.maxDate,
                     locale = locale
                 )
             }
@@ -337,9 +341,21 @@ fun DatePickerField(
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
     onClearDate: () -> Unit,
+    disable: Boolean,
     locale: Locale
 ) {
-    Column(modifier = modifier.clickable { onClick() }) {
+    val disabledGrey = IberdrolaTheme.colors.onSurfaceVariant // Gris oscuro del tema
+    val backgroundColor = if (disable) IberdrolaTheme.colors.onSurface.copy(alpha = 0.05f) else Color.Transparent
+
+    Column(
+        modifier = modifier
+            .graphicsLayer(alpha = if (disable) 0.8f else 1f)
+            .clip(RoundedCornerShape(8.dp))
+            .background(backgroundColor)
+            .clickable(enabled = !disable) { onClick() }
+            .padding(horizontal = 4.dp, vertical = 2.dp)
+
+    ) {
         val transition = updateTransition(targetState = value != null, label = "LabelTransition")
 
         val labelOffsetY by transition.animateDp(label = "LabelOffset") { isSelected ->
@@ -350,7 +366,11 @@ fun DatePickerField(
             Text(
                 text = "* $label",
                 style = IberdrolaTheme.typography.etiquetaPeque,
-                color = if (value == null) Color.Gray else IberdrolaTheme.colors.primary,
+                color = when {
+                    disable -> disabledGrey
+                    value == null -> Color.Gray
+                    else -> IberdrolaTheme.colors.primary
+                },
                 modifier = Modifier
                     .graphicsLayer {
                         translationY = labelOffsetY.toPx()
@@ -366,7 +386,7 @@ fun DatePickerField(
                     .padding(top = 22.dp)
                     .drawBehind {
                         drawLine(
-                            color = Color.LightGray,
+                            color = if (disable) disabledGrey.copy(alpha = 0.3f) else Color.LightGray,
                             start = Offset(0f, size.height),
                             end = Offset(size.width, size.height),
                             strokeWidth = 1.dp.toPx()
@@ -383,7 +403,7 @@ fun DatePickerField(
                     Icon(
                         imageVector = Icons.Default.CalendarMonth,
                         contentDescription = null,
-                        tint = Color.Gray,
+                        tint = if (disable) disabledGrey.copy(alpha = 0.5f) else Color.Gray,
                         modifier = Modifier.size(24.dp)
                     )
                 } else {
@@ -399,7 +419,23 @@ fun DatePickerField(
                         tint = Color.Gray,
                         modifier = Modifier
                             .size(24.dp)
+                            .clip(CircleShape)
                             .clickable { onClearDate() }
+                            .padding(4.dp),
+                    )
+                }
+            }
+            if (disable) {
+                Canvas(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .padding(top = 10.dp)
+                ) {
+                    drawLine(
+                        color = disabledGrey.copy(alpha = 0.6f),
+                        start = Offset(x = 0f, y = size.height / 2),
+                        end = Offset(x = size.width, y = size.height / 2),
+                        strokeWidth = 1.5.dp.toPx()
                     )
                 }
             }
@@ -407,7 +443,6 @@ fun DatePickerField(
     }
 }
 
-@Suppress("DEPRECATION")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IberdrolaDatePickerDialog(
@@ -594,8 +629,9 @@ fun FilterCheckboxItem(label: String, isSelected: Boolean, onClick: () -> Unit) 
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
             .clickable { onClick() }
-            .padding(vertical = 12.dp),
+            .padding(vertical = 12.dp, horizontal = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
@@ -632,7 +668,7 @@ fun FilterScreenPreview() {
     IB2026AlejandroLOTheme {
         IberdrolaFilterScreen(
             onBack = { },
-            filterViewModel = viewModel()
+            billsViewModel = viewModel(factory = BillsViewModelFactory.Factory)
         )
     }
 }

@@ -1,158 +1,191 @@
 package com.iberdrola.practicas2026.alejandroLO.billsViewModel
 
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.MutableCreationExtras
-import app.cash.turbine.test
-import com.iberdrola.practicas2026.alejandroLO.IberdrolaApplication
 import com.iberdrola.practicas2026.alejandroLO.MainDispatcherRule
-import com.iberdrola.practicas2026.alejandroLO.data.AppContainer
-import com.iberdrola.practicas2026.alejandroLO.data.model.Bill
 import com.iberdrola.practicas2026.alejandroLO.data.repository.bill.BillsRepository
 import com.iberdrola.practicas2026.alejandroLO.data.repository.conectivity.ConnectivityRepository
-import com.iberdrola.practicas2026.alejandroLO.data.repository.filter.FilterRepository
-import com.iberdrola.practicas2026.alejandroLO.homeViewModel.FakeConnectivityRepository
+import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillStatusEnum
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeEnum
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsViewModel
-import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsViewModelFactory
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.spyk
-import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.util.Date
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class BillsViewModelTest {
-    @get:Rule
-    val dispatcherRule = MainDispatcherRule()
 
-    private lateinit var fakeRepository: FakeBillsRepository
-    private lateinit var fakeConnectivityRepository: FakeConnectivityRepository
-    private lateinit var fakeFilterRepository: FakeFilterRepository
+    @get:Rule
+    val mainDispatcherRule = MainDispatcherRule()
+
+    private lateinit var billsRepository: BillsRepository
+    private lateinit var connectivityRepository: ConnectivityRepository
     private lateinit var viewModel: BillsViewModel
 
     @Before
-    fun setUp() {
-        fakeRepository = FakeBillsRepository()
-        fakeConnectivityRepository = FakeConnectivityRepository()
-        fakeFilterRepository = spyk(FakeFilterRepository())
+    fun setup() {
+        billsRepository = mockk(relaxed = true)
+        connectivityRepository = mockk(relaxed = true)
+
+        // Mock mandatory flows for init block
+        every { connectivityRepository.isOnline } returns MutableStateFlow(true)
+        every { billsRepository.getAllBillsByDirectionId(any()) } returns flowOf(emptyList())
 
         viewModel = BillsViewModel(
-            billsRepository = fakeRepository,
-            connectivityRepository = fakeConnectivityRepository,
-            filterRepository = fakeFilterRepository
+            billsRepository = billsRepository,
+            connectivityRepository = connectivityRepository
         )
     }
 
     @Test
-    fun givenBills_whenRefreshBills_thenUiStateIsUpdated() = runTest {
-        // Arrange
-        viewModel.uiState.test {
-            // Act
-            val first = awaitItem()
+    fun given_onlineConnectivity_when_viewModelIsCreated_then_uiStateIsOnline() = runTest {
+        // Act
+        advanceUntilIdle()
 
-            // Assert
-            assertTrue(first.isLoading)
-            cancelAndIgnoreRemainingEvents()
-        }
+        // Assert
+        assertTrue(viewModel.billsUiState.value.isOnline)
     }
 
     @Test
-    fun givenSelectedOption_whenChangeSelectedOption_thenUiStateIsUpdated() = runTest {
+    fun given_billTypes_when_loadOptions_then_optionsAreLoaded() = runTest {
+        // Act
+        viewModel.load_options()
+
+        // Assert
+        assertEquals(
+            BillTypeEnum.entries.toList(),
+            viewModel.billsUiState.value.options
+        )
+    }
+
+    @Test
+    fun given_onlineMode_when_refreshBills_then_refreshOnlineIsCalled() = runTest {
+        // Arrange
+        every { connectivityRepository.isOnline } returns MutableStateFlow(true)
+
+        // Act
+        viewModel.refreshBills()
+        advanceUntilIdle()
+
+        // Assert
+        coVerify { billsRepository.refreshBillsOnline() }
+    }
+
+    @Test
+    fun given_offlineMode_when_refreshBills_then_insertMockBillsIsCalled() = runTest {
+        // Arrange
+        every { connectivityRepository.isOnline } returns MutableStateFlow(false)
+        // Re-instantiate to apply the new mock state in init/load_connectivity
+        viewModel = BillsViewModel(billsRepository, connectivityRepository)
+
+        // Act
+        viewModel.refreshBills()
+        advanceUntilIdle()
+
+        // Assert
+        coVerify { billsRepository.insertMockBillsFromAssets() }
+    }
+
+    @Test
+    fun given_priceLimits_when_setPriceLimits_then_filterUiStateIsUpdated() = runTest {
+        // Arrange
+        val minPrice = 10f
+        val maxPrice = 50f
+
+        // Act
+        viewModel.setPriceLimits(minPrice, maxPrice)
+
+        // Assert
+        assertEquals(minPrice, viewModel.filterUiState.value.minPrice)
+        assertEquals(maxPrice, viewModel.filterUiState.value.maxPrice)
+        assertEquals(minPrice..maxPrice, viewModel.filterUiState.value.priceRange)
+    }
+
+    @Test
+    fun given_selectedOption_when_updateSelectedOption_then_uiStateReflectsChange() = runTest {
         // Arrange
         val option = BillTypeEnum.GAS
 
         // Act
         viewModel.updateSelectedOption(option)
-        val uiState = viewModel.uiState.value
 
         // Assert
-        assertEquals(option, uiState.selectedOption)
+        assertEquals(option, viewModel.billsUiState.value.selectedOption)
     }
 
     @Test
-    fun givenIsNotOnline_whenUpdateDataBase_thenUiStateIsUpdated() = runTest {
+    fun given_newDirection_when_updateDirection_then_directionIsUpdated() = runTest {
         // Arrange
-        val isOnline = true
+        val directionId = 3
+        val directionStreet = "Gran Via"
 
         // Act
-        viewModel.updateDataBase(isOnline)
-        val uiState = viewModel.uiState.value
+        viewModel.updateDirection(directionId, directionStreet)
 
         // Assert
-        assertTrue(uiState.isOnline)
+        assertEquals(directionId, viewModel.billsUiState.value.directionId)
+        assertEquals(directionStreet, viewModel.billsUiState.value.directionStreet)
     }
 
     @Test
-    fun givenBills_whenGetAllBillsByDirectionId_thenUiStateIsUpdated() = runTest {
+    fun given_emptySelectedStates_when_submitButton_then_allStatesAreApplied() = runTest {
         // Arrange
-        val directionId = 10
-        viewModel.updateDirection(directionId, "Calle Inventada")
-        val bill1 = Bill(id = 1, price = 50.0, directionId = directionId)
-        val bill2 = Bill(id = 2, price = 100.0, directionId = 20)
+        val priceRange = 0f..100f
 
         // Act
-        fakeRepository.emit(listOf(bill1, bill2))
-        viewModel.refreshBills()
+        viewModel.sumbmitButtom(
+            dateFrom = null,
+            dateTo = null,
+            priceRange = priceRange,
+            selectedStates = emptyList()
+        )
 
         // Assert
-        viewModel.uiState.test {
-            val emission = awaitItem()
-            assertEquals(1, emission.billsList.size)
-            assertEquals(1, emission.billsList[0].id)
-            cancelAndIgnoreRemainingEvents()
-        }
+        assertEquals(
+            BillStatusEnum.entries,
+            viewModel.filterUiState.value.selectedStates
+        )
     }
 
     @Test
-    fun givenFactory_whenCreateViewModel_thenReturnsBillsViewModelWithRepository() {
+    fun given_selectedDateFrom_when_onClearDate_then_dateFromIsCleared() = runTest {
         // Arrange
-        val mockApplication = mockk<IberdrolaApplication>(relaxed = true)
-        val mockContainer = mockk<AppContainer>()
-        val mockRepository = mockk<BillsRepository>()
-        val mockConnectivity = mockk<ConnectivityRepository>()
-        val mockFilter = mockk<FilterRepository>()
-
-        every { mockFilter.filterCriteria } returns MutableStateFlow(com.iberdrola.practicas2026.alejandroLO.ui.features.filter.viewModel.FilterUiState()).asStateFlow()
-        every { mockFilter.maxPrice } returns MutableStateFlow(0f).asStateFlow()
-        every { mockFilter.minPrice } returns MutableStateFlow(0f).asStateFlow()
-        every { mockConnectivity.isOnline } returns MutableStateFlow(true).asStateFlow()
-        every { mockApplication.container } returns mockContainer
-        every { mockContainer.billsRepository } returns mockRepository
-        every { mockContainer.connectivityRepository } returns mockConnectivity
-        every { mockContainer.filterRepository } returns mockFilter
-
-        val extras = MutableCreationExtras().apply {
-            set(ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY, mockApplication)
-        }
+        viewModel.sumbmitButtom(
+            dateFrom = Date(),
+            dateTo = null,
+            priceRange = 0f..100f,
+            selectedStates = BillStatusEnum.entries
+        )
 
         // Act
-        val factory = BillsViewModelFactory.Factory
-        val createdViewModel = factory.create(BillsViewModel::class.java, extras)
+        viewModel.onClearDate(0)
 
         // Assert
-        assertNotNull(createdViewModel)
+        assertNull(viewModel.filterUiState.value.selectedDateFrom)
     }
 
     @Test
-    fun givenClearFilters_whenOnlineStatusChanges_thenFiltersAreCleared() = runTest {
+    fun given_priceRangeModified_when_onClearPriceRange_then_rangeResetsToLimits() = runTest {
         // Arrange
-        fakeConnectivityRepository.setOnlineMode(true)
+        viewModel.setPriceLimits(10f, 50f)
 
         // Act
-        viewModel.clearFilters(initialValueIsOnline = true)
+        viewModel.onClearPriceRange()
 
         // Assert
-        verify(exactly = 0) { fakeFilterRepository.clearFilter() }
-        fakeConnectivityRepository.setOnlineMode(false)
-        advanceTimeBy(301)
-        verify(exactly = 1) { fakeFilterRepository.clearFilter() }
+        assertEquals(
+            10f..50f,
+            viewModel.filterUiState.value.priceRange
+        )
     }
 }

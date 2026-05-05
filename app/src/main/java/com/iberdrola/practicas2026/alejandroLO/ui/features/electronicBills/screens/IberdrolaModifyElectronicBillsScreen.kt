@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.iberdrola.practicas2026.alejandroLO.R
 import com.iberdrola.practicas2026.alejandroLO.ui.common.components.IberdrolaBar
+import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeEnum
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
 
 
@@ -44,7 +45,8 @@ fun IberdrolaModifyElectronicBillsScreen(
     onBackClick: () -> Unit,
     onEditEmailClick: () -> Unit,
     selectedStreet: String,
-    email: String
+    email: String,
+    type: BillTypeEnum
 ) {
     Scaffold(
         topBar = {
@@ -69,7 +71,7 @@ fun IberdrolaModifyElectronicBillsScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = stringResource(id = R.string.contrato_de_luz),
+                text = stringResource(R.string.contrato_title) +" "+ type.title,
                 style = IberdrolaTheme.typography.tituloGrande.copy(
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold
@@ -174,6 +176,7 @@ fun PreviewIberdrolaModifyElectronicBillsScreen() {
         onBackClick = {},
         onEditEmailClick = {},
         selectedStreet = "Calle Falsa 123",
-        email = "emailPrueba@hotmail.com"
+        email = "emailPrueba@hotmail.com",
+        type = BillTypeEnum.LUZ
     )
 }

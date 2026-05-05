@@ -59,7 +59,6 @@
     <string name="anterior">Anterior</string>
     <string name="siguiente">Siguiente</string>
     <string name="volver">Volver</string>
-    <string name="contrato_de_luz">Contrato de Luz</string>
     <string name="direccion_placeholder">c/ apartado de correos 184, 5, 1ºb - los dolores-el plan - murcia</string>
     <string name="recibes_facturas_electronicas_info">Actualmente recibes las facturas electrónicas de este contrato al:</string>
     <string name="recibes_facturas_email_label">Recibes tus facturas en este email</string>
@@ -81,4 +80,6 @@
     <string name="texto_helpSelection">Si no lo encuentras, podemos volver a enviar el SMS. Recuerda que hoy te quedan %1$d intentos.</string>
     <string name="counter3_helpSelection">Si no lo encuentras, podemos volver a enviar el SMS.</string>
     <string name="sin_intentos">Se ha quedado sin intentos, llame a la línea de atención al cliente</string>
+    <string name="factura_no_disponible">La factura aún no está disponible. Intentelo mas adelante</string>
+    <string name="contrato_title">Contrato de</string>
 </resources>
