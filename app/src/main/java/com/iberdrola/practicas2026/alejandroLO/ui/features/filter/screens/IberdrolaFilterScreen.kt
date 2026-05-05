@@ -67,12 +67,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.iberdrola.practicas2026.alejandroLO.R
 import com.iberdrola.practicas2026.alejandroLO.ui.common.components.IberdrolaBar
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillStatusEnum
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsViewModel
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsViewModelFactory
+import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.FilterUiState
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IB2026AlejandroLOTheme
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
 import java.text.NumberFormat
@@ -88,8 +90,42 @@ fun IberdrolaFilterScreen(
     locale: Locale = Locale.forLanguageTag("es-ES"),
     billsViewModel: BillsViewModel = viewModel(factory = BillsViewModelFactory.Factory),
 ) {
+    // Refactored to separate state collection from UI content to avoid ViewModel issues in Previews
+    val filterUiState by billsViewModel.filterUiState.collectAsState()
 
-    val filterUiState = billsViewModel.filterUiState.collectAsState().value
+    IberdrolaFilterScreenContent(
+        filterUiState = filterUiState,
+        onBack = onBack,
+        locale = locale,
+        onApplyFilters = { dateFrom, dateTo, priceRange, selectedStates ->
+            // Use the ViewModel's submit method (keeping typo sumbmitButtom for consistency)
+            billsViewModel.sumbmitButtom(
+                dateFrom = dateFrom,
+                dateTo = dateTo,
+                priceRange = priceRange,
+                selectedStates = selectedStates
+            )
+            onBack()
+        },
+        onClearFilters = {
+            billsViewModel.clearFilters()
+        }
+    )
+}
+
+/**
+ * Stateless version of IberdrolaFilterScreen for better testability and Preview support.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun IberdrolaFilterScreenContent(
+    filterUiState: FilterUiState,
+    onBack: () -> Unit = {},
+    locale: Locale = Locale.forLanguageTag("es-ES"),
+    onApplyFilters: (Date?, Date?, ClosedFloatingPointRange<Float>, List<BillStatusEnum>) -> Unit,
+    onClearFilters: () -> Unit
+) {
+
     val statesToShow = if(filterUiState.selectedStates.containsAll(BillStatusEnum.entries)){
         emptyList()
     }else {
@@ -181,13 +217,12 @@ fun IberdrolaFilterScreen(
             ) {
                 Button(
                     onClick = {
-                        billsViewModel.sumbmitButtom(
-                            dateFrom = selectedDateFrom,
-                            dateTo = selectedDateTo,
-                            priceRange = priceRange,
-                            selectedStates = selectedStates
+                        onApplyFilters(
+                            selectedDateFrom,
+                            selectedDateTo,
+                            priceRange,
+                            selectedStates
                         )
-                        onBack()
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -219,7 +254,7 @@ fun IberdrolaFilterScreen(
                                 selectedDateTo = null
                                 priceRange = filterUiState.minPrice..filterUiState.maxPrice
                                 selectedStates = emptyList()
-                                billsViewModel.clearFilters()
+                                onClearFilters()
                             }
                         )
                         .padding(horizontal = 24.dp, vertical = 8.dp)
@@ -238,7 +273,11 @@ fun IberdrolaFilterScreen(
             Spacer(Modifier.height(16.dp))
             Text(
                 text = stringResource(R.string.filtrar),
-                style = IberdrolaTheme.typography.tituloGrande
+                style = IberdrolaTheme.typography.tituloGrande.copy(
+                    fontSize = 22.sp
+                ),
+                fontWeight = FontWeight.Bold,
+                color = IberdrolaTheme.colors.onSurface
             )
 
             Spacer(Modifier.height(24.dp))
@@ -327,8 +366,9 @@ fun IberdrolaFilterScreen(
 fun SectionTitle(text: String) {
     Text(
         text = text,
-        style = IberdrolaTheme.typography.tituloPeque,
-        fontWeight = FontWeight.Bold,
+        style = IberdrolaTheme.typography.tituloPeque.copy(
+            fontSize = 18.sp
+        ),
         color = IberdrolaTheme.colors.onSurface,
         modifier = Modifier.padding(bottom = 16.dp)
     )
@@ -666,9 +706,16 @@ fun FilterCheckboxItem(label: String, isSelected: Boolean, onClick: () -> Unit) 
 @Composable
 fun FilterScreenPreview() {
     IB2026AlejandroLOTheme {
-        IberdrolaFilterScreen(
+        // Use the stateless content version in Preview to avoid ViewModel instantiation errors
+        IberdrolaFilterScreenContent(
+            filterUiState = FilterUiState(
+                minPrice = 0f,
+                maxPrice = 100f,
+                priceRange = 0f..100f
+            ),
             onBack = { },
-            billsViewModel = viewModel(factory = BillsViewModelFactory.Factory)
+            onApplyFilters = { _, _, _, _ -> },
+            onClearFilters = { }
         )
     }
 }

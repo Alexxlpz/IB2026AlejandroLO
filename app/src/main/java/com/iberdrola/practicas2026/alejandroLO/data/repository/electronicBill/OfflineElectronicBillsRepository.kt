@@ -51,7 +51,7 @@ class OfflineElectronicBillsRepository(
         } catch (e: Exception) {
             electronicBillDao.deleteAll()
             Log.e(TAG, "Error en refreshBillsOnline: ${e.message}")
-            throw e
+            throw Exception("Error en refreshBillsOnline")
         }
     }
 

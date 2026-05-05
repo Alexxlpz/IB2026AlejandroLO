@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -603,6 +604,7 @@ fun FilterChip(
                 contentDescription = "Quitar filtro",
                 modifier = Modifier
                     .size(18.dp)
+                    .clip(CircleShape)
                     .clickable { onRemove() },
                 tint = IberdrolaTheme.colors.primary
             )
@@ -615,10 +617,12 @@ fun FacturaElectronicaPromoCard(
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
+    val shape = RoundedCornerShape(20.dp)
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .clip(shape),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
             containerColor = IberdrolaTheme.colors.primary.copy(alpha = 0.12f)
@@ -628,8 +632,8 @@ fun FacturaElectronicaPromoCard(
     ) {
         Row(
             modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(

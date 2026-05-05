@@ -7,6 +7,7 @@ import com.iberdrola.practicas2026.alejandroLO.data.model.ElectronicBill
 import com.iberdrola.practicas2026.alejandroLO.data.repository.conectivity.ConnectivityRepository
 import com.iberdrola.practicas2026.alejandroLO.data.repository.electronicBill.ElectronicBillsRepository
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeEnum
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,6 +24,8 @@ class ElectronicBillsViewModel(
 
     private val _uiState = MutableStateFlow(ElectronicBillsUiState())
     val uiState: StateFlow<ElectronicBillsUiState> = _uiState.asStateFlow()
+
+    private var billsJob: Job? = null
 
     init {
         viewModelScope.launch {
@@ -68,6 +71,7 @@ class ElectronicBillsViewModel(
     }
 
     fun refreshElectronicBills() {
+        billsJob?.cancel()
         val isOnline = _uiState.value.isOnline
         viewModelScope.launch {
             _uiState.update { it.copy(
@@ -75,7 +79,7 @@ class ElectronicBillsViewModel(
             )
             }
 
-            launch {
+            billsJob = launch {
                 electronicBillsRepository.getAllElectronicBills().collect { electronicBills ->
                     _uiState.update {
                         it.copy(

@@ -1,5 +1,6 @@
 package com.iberdrola.practicas2026.alejandroLO.ui.features.electronicBills.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -19,6 +20,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.outlined.Lightbulb
 import androidx.compose.material.icons.outlined.LocalFireDepartment
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -31,6 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -39,13 +42,13 @@ import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeE
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
 import com.iberdrola.practicas2026.alejandroLO.R
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IberdrolaElectronicBillsScreen(
     onBackClick: () -> Unit,
     onContratoClick: (Boolean) -> Unit,
-    updateSelectedTypeBill: (BillTypeEnum) -> Unit
+    updateSelectedTypeBill: (BillTypeEnum) -> Unit,
+    electronicBillError: Boolean
 ) {
     Scaffold(
         topBar = {
@@ -64,7 +67,8 @@ fun IberdrolaElectronicBillsScreen(
         FacturaElectronicaContent(
             modifier = Modifier.padding(paddingValues),
             onContratoClick = onContratoClick,
-            updateSelectedTypeBill = updateSelectedTypeBill
+            updateSelectedTypeBill = updateSelectedTypeBill,
+            electronicBillError = electronicBillError
         )
     }
 }
@@ -73,7 +77,8 @@ fun IberdrolaElectronicBillsScreen(
 fun FacturaElectronicaContent(
     modifier: Modifier = Modifier,
     onContratoClick: (Boolean) -> Unit,
-    updateSelectedTypeBill: (BillTypeEnum) -> Unit
+    updateSelectedTypeBill: (BillTypeEnum) -> Unit,
+    electronicBillError: Boolean
 ) {
     Column(
         modifier = modifier
@@ -90,46 +95,51 @@ fun FacturaElectronicaContent(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        LazyColumn {
-
-            item {
-                ContratoItem(
-                    titulo = "Contrato de Luz",
-                    estado = "Activa",
-                    icon = Icons.Outlined.Lightbulb,
-                    isActivo = true,
-                    onClick = {
-                        onContratoClick(true)
-                        updateSelectedTypeBill(BillTypeEnum.LUZ)
-                    }
-                )
+        if (electronicBillError) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                ErrorMessageShowing(stringResource(R.string.error_al_cargar_los_contratos))
             }
+        } else {
+            LazyColumn {
+                item {
+                    ContratoItem(
+                        titulo = "Contrato de Luz",
+                        estado = "Activa",
+                        icon = Icons.Outlined.Lightbulb,
+                        isActivo = true,
+                        onClick = {
+                            onContratoClick(true)
+                            updateSelectedTypeBill(BillTypeEnum.LUZ)
+                        }
+                    )
+                }
 
-            item {
-                HorizontalDivider(
-                    color = IberdrolaTheme.colors.border.copy(alpha = 0.95f),
-                    thickness = 1.5.dp
-                )
-            }
+                item {
+                    HorizontalDivider(
+                        color = IberdrolaTheme.colors.border.copy(alpha = 0.95f),
+                        thickness = 1.5.dp
+                    )
+                }
 
-            item {
-                ContratoItem(
-                    titulo = "Contrato de Gas",
-                    estado = "Sin Activar",
-                    icon = Icons.Outlined.LocalFireDepartment,
-                    isActivo = false,
-                    onClick = {
-                        onContratoClick(false)
-                        updateSelectedTypeBill(BillTypeEnum.GAS)
-                    }
-                )
-            }
+                item {
+                    ContratoItem(
+                        titulo = "Contrato de Gas",
+                        estado = "Sin Activar",
+                        icon = Icons.Outlined.LocalFireDepartment,
+                        isActivo = false,
+                        onClick = {
+                            onContratoClick(false)
+                            updateSelectedTypeBill(BillTypeEnum.GAS)
+                        }
+                    )
+                }
 
-            item {
-                HorizontalDivider(
-                    color = IberdrolaTheme.colors.border.copy(alpha = 0.95f),
-                    thickness = 1.5.dp
-                )
+                item {
+                    HorizontalDivider(
+                        color = IberdrolaTheme.colors.border.copy(alpha = 0.95f),
+                        thickness = 1.5.dp
+                    )
+                }
             }
         }
     }
@@ -206,11 +216,57 @@ fun ContratoStatusBadge(
 }
 
 @Composable
+fun ErrorMessageShowing(error: String?) {
+    error?.let { message ->
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+                .testTag("error_message_surface"),
+            color = IberdrolaTheme.colors.errorContainer,
+            shape = RoundedCornerShape(12.dp),
+            border = BorderStroke(1.dp, IberdrolaTheme.colors.onErrorContainer.copy(alpha = 0.2f)),
+            shadowElevation = 2.dp
+        ) {
+            Row(
+                modifier = Modifier.padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Error,
+                    contentDescription = null,
+                    tint = IberdrolaTheme.colors.onErrorContainer,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(
+                    text = message,
+                    style = IberdrolaTheme.typography.cuerpoMedio,
+                    color = IberdrolaTheme.colors.onErrorContainer
+                )
+            }
+        }
+    }
+}
+
+@Composable
 @Preview(showBackground = true)
 fun PreviewIberdrolaElectronicBillsScreen() {
     IberdrolaElectronicBillsScreen(
         onBackClick = {},
         onContratoClick = {},
-        updateSelectedTypeBill = {}
+        updateSelectedTypeBill = {},
+        electronicBillError = false
+    )
+}
+
+@Composable
+@Preview(showBackground = true)
+fun PreviewIberdrolaElectronicBillsScreenError() {
+    IberdrolaElectronicBillsScreen(
+        onBackClick = {},
+        onContratoClick = {},
+        updateSelectedTypeBill = {},
+        electronicBillError = true
     )
 }
