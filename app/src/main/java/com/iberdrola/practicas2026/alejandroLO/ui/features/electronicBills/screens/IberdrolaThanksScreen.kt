@@ -3,12 +3,12 @@ package com.iberdrola.practicas2026.alejandroLO.ui.features.electronicBills.scre
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -106,11 +107,9 @@ private fun ThanksMainContent(
                     scaleIn(initialScale = 0.8f, animationSpec = tween(800))
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(
-                    imageVector = Icons.Default.ThumbUp,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(120.dp)
+                Image(
+                    painter = painterResource(id = R.drawable.thumbup),
+                    contentDescription = "ThumbsUp",
                 )
 
                 Spacer(modifier = Modifier.height(40.dp))

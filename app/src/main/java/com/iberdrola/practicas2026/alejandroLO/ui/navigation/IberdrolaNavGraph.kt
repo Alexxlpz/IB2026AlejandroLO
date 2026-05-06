@@ -138,9 +138,9 @@ fun IberdrolaNavGraph(
                 pantallaAct,
                 IberdrolaScreens.ELECTRONIC_BILLS
             )
-            delay(1000)
+            delay(300)
             updateNewEmail(null)
-            electronicBillsViewModel.resetCounter()
+            //electronicBillsViewModel.resetCounter()
         }
     }
 
@@ -226,13 +226,18 @@ fun IberdrolaNavGraph(
             )
         }
         composable(IberdrolaScreens.ELECTRONIC_BILLS_MODIFY.title) {
+            val emailToDisplay = if (typeSelected == BillTypeEnum.LUZ) {
+                electronicBills?.electricityBillEmail ?: ""
+            } else {
+                electronicBills?.gasBillEmail ?: ""
+            }
             IberdrolaModifyElectronicBillsScreen(
                 onBackClick = { onCloseClick(IberdrolaScreens.ELECTRONIC_BILLS_MODIFY) },
                 onEditEmailClick = {
                     navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS_MODIFING_EMAIL.title)
                 },
                 selectedStreet = selectedStreet,
-                email = if (typeSelected == BillTypeEnum.LUZ) electronicBills?.electricityBillEmail!! else electronicBills?.gasBillEmail!!,
+                email = emailToDisplay,
                 type = typeSelected
             )
         }
@@ -314,7 +319,9 @@ fun IberdrolaNavGraph(
                     navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS_THANKS.title)
                 },
                 electronicBillsUiState = electronicBillsViewModel.uiState.collectAsState().value,
-                updateCounter = { electronicBillsViewModel.updateCounter() }
+                updateCounter = { electronicBillsViewModel.updateCounter() },
+                reviewCoolDown = { electronicBillsViewModel.reviewCooldown() },
+                resetTimerUpdate = { electronicBillsViewModel.resetTimerUpdate() }
             )
         }
         composable(IberdrolaScreens.ELECTRONIC_BILLS_THANKS.title) {

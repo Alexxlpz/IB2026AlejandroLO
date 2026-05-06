@@ -169,7 +169,7 @@ fun IberdrolaFillElectronicBillsScreen(
                                     )
                                 }
                             },
-                            contentPadding = PaddingValues(start = 0.dp, end = 0.dp, top = 20.dp, bottom = 8.dp),
+                            contentPadding = PaddingValues(start = 0.dp, end = 0.dp, top = 28.dp, bottom = 4.dp),
                             colors = TextFieldDefaults.colors(
                                 focusedContainerColor = Color.Transparent,
                                 unfocusedContainerColor = Color.Transparent,

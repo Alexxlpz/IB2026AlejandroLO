@@ -1,5 +1,6 @@
 package com.iberdrola.practicas2026.alejandroLO.ui.features.electronicBills.screens
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -33,6 +34,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -60,6 +62,8 @@ import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -68,7 +72,9 @@ fun IberdrolaVerificationEmailElectronicBillsScreen(
     onBackClick: () -> Unit,
     onNextClick: () -> Unit,
     electronicBillsUiState: ElectronicBillsUiState,
-    updateCounter: () -> Unit
+    updateCounter: () -> Unit,
+    reviewCoolDown: () -> Unit,
+    resetTimerUpdate: () -> Unit
 ) {
     var verificationCode by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
@@ -87,6 +93,26 @@ fun IberdrolaVerificationEmailElectronicBillsScreen(
     val bannerJob = remember { mutableStateOf<Job?>(null) }
 
     val focusManager = LocalFocusManager.current
+
+    LaunchedEffect(Unit) {
+        reviewCoolDown()
+        if(electronicBillsUiState.resetTimer != null){
+            val date = Date(electronicBillsUiState.resetTimer)
+            val format = SimpleDateFormat("yyyy.MM.dd HH:mm")
+            val fecha = format.format(date)
+            Log.d("IberdrolaVerificationEmailElectronicBillsScreen", "hay que esperar hasta: "+ fecha)
+        }else {
+            Log.d("IberdrolaVerificationEmailElectronicBillsScreen", "reset no seteado aún")
+        }
+    }
+
+    LaunchedEffect(counter) {
+        if(counter == 0 && electronicBillsUiState.resetTimer == null){
+            resetTimerUpdate()
+        }
+    }
+
+
 
     BackHandler(onBack = { supressBackStack(isLoading) })
 
@@ -425,6 +451,8 @@ fun PreviewIberdrolaVerificationScreen() {
         onBackClick = {},
         onNextClick = {},
         electronicBillsUiState = ElectronicBillsUiState(),
-        updateCounter = {}
+        updateCounter = {},
+        reviewCoolDown = {},
+        resetTimerUpdate = {}
     )
 }
