@@ -83,4 +83,6 @@
     <string name="factura_no_disponible">La factura aún no está disponible. Intentelo mas adelante</string>
     <string name="contrato_title">Contrato de</string>
     <string name="error_al_cargar_los_contratos">Error al cargar los contratos</string>
+    <string name="email_dueño">a*****a@a.com</string>
+    <string name="email_mal_estructurado">Introduce un formato de email válido (ejemplo@dominio.com)</string>
 </resources>

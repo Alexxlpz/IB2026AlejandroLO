@@ -267,10 +267,7 @@ fun IberdrolaNavGraph(
             IberdrolaFillElectronicBillsScreen(
                 onBackClick = {
                     updateFromVerification(false)
-                    backStackHandler(
-                        IberdrolaScreens.ELECTRONIC_BILLS_FILL,
-                        IberdrolaScreens.ELECTRONIC_BILLS
-                    )
+                    onCloseClick(IberdrolaScreens.ELECTRONIC_BILLS_FILL)
                 },
                 onCloseClick = { onCloseClick(IberdrolaScreens.ELECTRONIC_BILLS_FILL) },
                 onNextClick = { newEmail ->

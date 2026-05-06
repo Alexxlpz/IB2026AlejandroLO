@@ -1,8 +1,12 @@
 package com.iberdrola.practicas2026.alejandroLO.ui.features.electronicBills.screens
 
+import android.util.Patterns.EMAIL_ADDRESS
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,9 +14,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
@@ -20,7 +27,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -30,11 +36,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -61,10 +71,14 @@ fun IberdrolaFillElectronicBillsScreen(
     var dialogTitle by remember { mutableStateOf("") }
     var dialogMessage by remember { mutableStateOf("") }
 
-    val isEmailValid = android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+
+    val isEmailValid = EMAIL_ADDRESS.matcher(email.trim()).matches()
     val isError = (email.isNotEmpty() && !isEmailValid)
 
     val progressStart = if (fromVerification) 0.75f else 0f
+
+    val focusManager = LocalFocusManager.current
+    val scrollState = rememberScrollState()
 
     BackHandler(onBack = onBackClick)
 
@@ -76,6 +90,11 @@ fun IberdrolaFillElectronicBillsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .pointerInput(Unit) {
+                    detectTapGestures(onTap = {
+                        focusManager.clearFocus()
+                    })
+                }
         ) {
             VerificationHeader(
                 title = stringResource(R.string.activa_tu_factura_electronica),
@@ -89,6 +108,7 @@ fun IberdrolaFillElectronicBillsScreen(
                     .fillMaxWidth()
                     .weight(1f)
                     .padding(horizontal = 20.dp)
+                    .verticalScroll(scrollState)
             ) {
                 Text(
                     text = stringResource(id = R.string.email_vinculado_cuenta),
@@ -96,7 +116,7 @@ fun IberdrolaFillElectronicBillsScreen(
                     color = IberdrolaTheme.colors.onSurfaceVariant
                 )
                 Text(
-                    text = "a*****a@a.com",
+                    text = stringResource(R.string.email_dueño),
                     style = IberdrolaTheme.typography.cuerpoMedio.copy(fontWeight = FontWeight.Bold),
                     color = IberdrolaTheme.colors.onSurface
                 )
@@ -111,42 +131,72 @@ fun IberdrolaFillElectronicBillsScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                TextField(
+                val interactionSource = remember { MutableInteractionSource() }
+
+                BasicTextField(
                     value = email,
-                    onValueChange = { email = it },
-                    isError = isError,
-                    label = {
-                        Text(
-                            text = stringResource(id = R.string.new_email_label),
-                            style = IberdrolaTheme.typography.tituloPeque
-                        )
-                    },
-                    supportingText = {
-                        if (isError) {
-                            Text(
-                                text = "Introduce un formato de email válido (ejemplo@dominio.com)",
-                                style = IberdrolaTheme.typography.etiquetaPeque,
-                                color = Color.Red
-                            )
-                        }
-                    },
+                    onValueChange = { email = it.filter { char -> !char.isWhitespace() } },
                     modifier = Modifier.fillMaxWidth(),
-                    textStyle = IberdrolaTheme.typography.cuerpoMedio.copy(fontSize = 18.sp),
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Email
+                    textStyle = IberdrolaTheme.typography.cuerpoMedio.copy(
+                        fontSize = 18.sp,
+                        color = IberdrolaTheme.colors.onSurface
                     ),
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent,
-                        disabledContainerColor = Color.Transparent,
-                        errorContainerColor = Color.Transparent,
-                        focusedIndicatorColor = IberdrolaTheme.colors.primary,
-                        unfocusedIndicatorColor = IberdrolaTheme.colors.onSurface,
-                        errorIndicatorColor = Color.Red,
-                        focusedLabelColor = Color.Gray,
-                        unfocusedLabelColor = Color.Gray,
-                        errorLabelColor = Color.Red
-                    )
+                    interactionSource = interactionSource,
+                    enabled = true,
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    decorationBox = { innerTextField ->
+                        TextFieldDefaults.DecorationBox(
+                            value = email,
+                            innerTextField = innerTextField,
+                            enabled = true,
+                            singleLine = true,
+                            visualTransformation = VisualTransformation.None,
+                            interactionSource = interactionSource,
+                            isError = isError,
+                            label = {
+                                Text(
+                                    text = stringResource(id = R.string.new_email_label),
+                                    style = IberdrolaTheme.typography.tituloPeque
+                                )
+                            },
+                            supportingText = {
+                                if (isError) {
+                                    Text(
+                                        text = stringResource(R.string.email_mal_estructurado),
+                                        style = IberdrolaTheme.typography.etiquetaPeque,
+                                        color = Color.Red
+                                    )
+                                }
+                            },
+                            contentPadding = PaddingValues(start = 0.dp, end = 0.dp, top = 20.dp, bottom = 8.dp),
+                            colors = TextFieldDefaults.colors(
+                                focusedContainerColor = Color.Transparent,
+                                unfocusedContainerColor = Color.Transparent,
+                                disabledContainerColor = Color.Transparent,
+                                errorContainerColor = Color.Transparent,
+                                focusedIndicatorColor = IberdrolaTheme.colors.primary,
+                                unfocusedIndicatorColor = IberdrolaTheme.colors.onSurface,
+                                errorIndicatorColor = Color.Red,
+                                focusedLabelColor = Color.Gray,
+                                unfocusedLabelColor = Color.Gray,
+                                errorLabelColor = Color.Red
+                            ),
+                            container = {
+                                TextFieldDefaults.Container(
+                                    enabled = true,
+                                    isError = isError,
+                                    interactionSource = interactionSource,
+                                    colors = TextFieldDefaults.colors(
+                                        focusedContainerColor = Color.Transparent,
+                                        unfocusedContainerColor = Color.Transparent,
+                                        errorContainerColor = Color.Transparent
+                                    ),
+                                    shape = RectangleShape,
+                                )
+                            }
+                        )
+                    }
                 )
 
                 Spacer(modifier = Modifier.height(32.dp))
@@ -159,34 +209,23 @@ fun IberdrolaFillElectronicBillsScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                val onMoreInfoClick = { tag: String ->
-                    dialogTitle = tag
-                    dialogMessage = when (tag) {
-                        "Responsable" -> "Iberdrola Clientes S.A.U. con domicilio social en Bilbao, Plaza Euskadi número 5. Para más detalles puede contactar con nuestro Delegado de Protección de Datos."
-                        "Finalidad" -> "Tratamos sus datos para gestionar el alta en la factura electrónica, así como el envío de comunicaciones comerciales si así lo ha consentido."
-                        "Derechos" -> "Podrá ejercitar sus derechos de acceso, rectificación, supresión, limitación del tratamiento, portabilidad de datos u oposición en cualquier momento a través de nuestros canales oficiales."
-                        else -> ""
-                    }
-                    showDialog = true
-                }
-
                 Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     InfoLegalLine(
                         label = "Responsable:",
                         content = " Iberdrola Clientes S.A.U. ",
-                        onLinkClick = { onMoreInfoClick("Responsable") }
+                        description = "Iberdrola Clientes S.A.U. con domicilio social en Bilbao, Plaza Euskadi número 5. Para más detalles puede contactar con nuestro Delegado de Protección de Datos."
                     )
 
                     InfoLegalLine(
                         label = "Finalidad:",
                         content = " Gestión de la factura electrónica. ",
-                        onLinkClick = { onMoreInfoClick("Finalidad") }
+                        description = "Tratamos sus datos para gestionar el alta en la factura electrónica, así como el envío de comunicaciones comerciales si así lo ha consentido."
                     )
 
                     InfoLegalLine(
                         label = "Derechos:",
-                        content = " Acceso, rectificación, supresión, limitación del tratamiento, portabilidad de datos u oposición, incluida la oposición a decisiones individuales automatizadas. ",
-                        onLinkClick = { onMoreInfoClick("Derechos") }
+                        content = " Acceso, rectificación, supresión, limitación del tratamiento, portabilidad de datos y oposición, incluida la oposición a decisiones individuales automatizadas.",
+                        description = "Se podrá ejercitar sus derechos en cualquier momento a través de nuestros canales oficiales."
                     )
                 }
 
@@ -199,7 +238,8 @@ fun IberdrolaFillElectronicBillsScreen(
                     Checkbox(
                         checked = acceptedTerms,
                         onCheckedChange = { acceptedTerms = it },
-                        colors = CheckboxDefaults.colors(checkedColor = IberdrolaTheme.colors.primary)
+                        colors = CheckboxDefaults.colors(checkedColor = IberdrolaTheme.colors.primary),
+                        modifier = Modifier.padding(bottom = 16.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
@@ -255,16 +295,29 @@ fun IberdrolaFillElectronicBillsScreen(
 
 @Composable
 fun InfoLegalLine(
-    label: String,
-    content: String,
-    onLinkClick: () -> Unit
+label: String,
+content: String,
+description: String
 ) {
+    var isExpanded by remember { mutableStateOf(false) }
+
     val annotatedString = buildAnnotatedString {
-        append(label)
+        withStyle(
+            style = SpanStyle(
+                fontWeight = FontWeight.Bold,
+                color = IberdrolaTheme.colors.onSurface
+            )
+        ) {
+            append(label)
+        }
 
-        append(content)
+        append(" $content")
 
-        pushStringAnnotation(tag = "more_info", annotation = "more_info")
+        if (isExpanded) {
+            append(" $description")
+        }
+
+        pushStringAnnotation(tag = "expand", annotation = "expand")
         withStyle(
             style = SpanStyle(
                 color = IberdrolaTheme.colors.primary,
@@ -272,18 +325,24 @@ fun InfoLegalLine(
                 fontWeight = FontWeight.Bold
             )
         ) {
-            append(stringResource(id = R.string.mas_info))
+            append(if (isExpanded) " Leer menos" else " Más info")
         }
         pop()
     }
 
     ClickableText(
         text = annotatedString,
-        style = IberdrolaTheme.typography.cuerpoMedio,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 6.dp),
+        style = IberdrolaTheme.typography.cuerpoMedio.copy(
+            color = IberdrolaTheme.colors.onSurfaceVariant,
+            lineHeight = 22.sp
+        ),
         onClick = { offset ->
-            annotatedString.getStringAnnotations(tag = "more_info", start = offset, end = offset)
+            annotatedString.getStringAnnotations(tag = "expand", start = offset, end = offset)
                 .firstOrNull()?.let {
-                    onLinkClick()
+                    isExpanded = !isExpanded
                 }
         }
     )
