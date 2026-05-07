@@ -34,6 +34,7 @@ fun IberdrolaThanksScreen(
     onCloseClick: () -> Unit
 ) {
     var visible by remember { mutableStateOf(false) }
+    val modified_email = modifyEmail(email)
 
     LaunchedEffect(Unit) {
         visible = true
@@ -52,7 +53,7 @@ fun IberdrolaThanksScreen(
         ThanksMainContent(
             visible = visible,
             isModificacion = isModificacion,
-            email = email
+            email = modified_email
         )
 
         ThanksAcceptButton(
@@ -164,5 +165,24 @@ private fun ThanksAcceptButton(
             style = IberdrolaTheme.typography.tituloPeque,
             fontWeight = FontWeight.Bold
         )
+    }
+}
+
+fun modifyEmail(email:String):String {
+    val parts = email.split("@")
+    return if (parts.size == 2) {
+        val localPart = parts[0]
+        val domainPart = parts[1]
+
+        if (localPart.length > 2) {
+            val firstChar = localPart.first()
+            val lastChar = localPart.last()
+            val maskedMiddle = "*".repeat(localPart.length - 2)
+            "$firstChar$maskedMiddle$lastChar@$domainPart"
+        } else {
+            email
+        }
+    } else {
+        email
     }
 }

@@ -84,7 +84,7 @@ fun IberdrolaNextBackButtons(
             }
         }
     }
-    Spacer(modifier = Modifier.height(50.dp))
+    Spacer(modifier = Modifier.height(40.dp))
 
     HorizontalDivider(
         color = IberdrolaTheme.colors.border.copy(alpha = 0.7f),

@@ -1,5 +1,6 @@
 package com.iberdrola.practicas2026.alejandroLO.ui.features.electronicBills.screens
 
+import android.content.Intent
 import android.util.Patterns.EMAIL_ADDRESS
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -33,13 +35,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -50,6 +53,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import com.iberdrola.practicas2026.alejandroLO.R
 import com.iberdrola.practicas2026.alejandroLO.ui.common.components.IberdrolaNextBackButtons
 import com.iberdrola.practicas2026.alejandroLO.ui.common.components.VerificationHeader
@@ -79,6 +83,9 @@ fun IberdrolaFillElectronicBillsScreen(
 
     val focusManager = LocalFocusManager.current
     val scrollState = rememberScrollState()
+
+    val condiciones_generales_url = "https://www.tarifasgasyluz.com/pdf/condiciones_generals.pdf"
+    val context = LocalContext.current
 
     BackHandler(onBack = onBackClick)
 
@@ -129,7 +136,7 @@ fun IberdrolaFillElectronicBillsScreen(
                     color = IberdrolaTheme.colors.onSurface
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(15.dp))
 
                 val interactionSource = remember { MutableInteractionSource() }
 
@@ -154,7 +161,7 @@ fun IberdrolaFillElectronicBillsScreen(
                             visualTransformation = VisualTransformation.None,
                             interactionSource = interactionSource,
                             isError = isError,
-                            label = {
+                            placeholder = {
                                 Text(
                                     text = stringResource(id = R.string.new_email_label),
                                     style = IberdrolaTheme.typography.tituloPeque
@@ -169,7 +176,12 @@ fun IberdrolaFillElectronicBillsScreen(
                                     )
                                 }
                             },
-                            contentPadding = PaddingValues(start = 0.dp, end = 0.dp, top = 28.dp, bottom = 4.dp),
+                            contentPadding = PaddingValues(
+                                start = 0.dp,
+                                end = 0.dp,
+                                top = 10.dp,
+                                bottom = 10.dp
+                            ),
                             colors = TextFieldDefaults.colors(
                                 focusedContainerColor = Color.Transparent,
                                 unfocusedContainerColor = Color.Transparent,
@@ -209,7 +221,7 @@ fun IberdrolaFillElectronicBillsScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
                     InfoLegalLine(
                         label = "Responsable:",
                         content = " Iberdrola Clientes S.A.U. ",
@@ -232,22 +244,65 @@ fun IberdrolaFillElectronicBillsScreen(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.Top
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Checkbox(
                         checked = acceptedTerms,
                         onCheckedChange = { acceptedTerms = it },
-                        colors = CheckboxDefaults.colors(checkedColor = IberdrolaTheme.colors.primary),
-                        modifier = Modifier.padding(bottom = 16.dp)
+                        modifier = Modifier
+                            .offset(y = (-18).dp),
+                        colors = CheckboxDefaults.colors(
+                            checkedColor = IberdrolaTheme.colors.primary,
+                            uncheckedColor = IberdrolaTheme.colors.primary
+                        )
                     )
+
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = stringResource(id = R.string.aceptacion_terminos_factura_electronica),
-                        style = IberdrolaTheme.typography.cuerpoPeque.copy(fontSize = 12.sp),
-                        color = IberdrolaTheme.colors.onSurface,
-                        lineHeight = 18.sp
+
+
+                    val annotatedText = buildAnnotatedString {
+                        append("He leído y acepto la Política de privacidad, acepto las ")
+
+                        pushStringAnnotation(
+                            tag = "CONDICIONES",
+                            annotation = condiciones_generales_url
+                        )
+                        withStyle(
+                            style = SpanStyle(
+                                color = IberdrolaTheme.colors.primary,
+                                textDecoration = TextDecoration.Underline,
+                                fontWeight = FontWeight.Bold
+                            )
+                        ) {
+                            append("Condiciones Generales")
+                        }
+                        pop()
+
+                        append(" y Particulares de la oferta y la suscripción a Factura Electrónica.")
+                    }
+
+
+
+                    ClickableText(
+                        text = annotatedText,
+                        style = IberdrolaTheme.typography.cuerpoMedio.copy(
+                            fontSize = 17.sp,
+                            color = IberdrolaTheme.colors.onSurface
+                        ),
+                        onClick = { offset ->
+                            annotatedText
+                                .getStringAnnotations("CONDICIONES", offset, offset)
+                                .firstOrNull()
+                                ?.let { annotation ->
+                                    val intent = Intent(
+                                        Intent.ACTION_VIEW,
+                                        annotation.item.toUri()
+                                    )
+                                    context.startActivity(intent)
+                                }
+                        }
                     )
+
                 }
 
                 Spacer(modifier = Modifier.weight(1f))
@@ -293,36 +348,50 @@ fun IberdrolaFillElectronicBillsScreen(
     }
 }
 
+
 @Composable
 fun InfoLegalLine(
-label: String,
-content: String,
-description: String
+    label: String,
+    content: String,
+    description: String
 ) {
     var isExpanded by remember { mutableStateOf(false) }
 
+    val textStyle = IberdrolaTheme.typography.cuerpoMedio.copy(
+        fontSize = 16.sp
+    )
+
     val annotatedString = buildAnnotatedString {
         withStyle(
-            style = SpanStyle(
-                fontWeight = FontWeight.Bold,
-                color = IberdrolaTheme.colors.onSurface
+            style = ParagraphStyle(
+                lineHeight = textStyle.lineHeight
             )
         ) {
-            append(label)
-        }
+            withStyle(
+                style = SpanStyle(
+                    fontFamily = textStyle.fontFamily,
+                    fontSize = textStyle.fontSize,
+                    fontWeight = textStyle.fontWeight,
+                    color = Color(0xFF1A1A1A)
+                )
+            ) {
+                append(label)
+                append(" $content")
 
-        append(" $content")
-
-        if (isExpanded) {
-            append(" $description")
+                if (isExpanded) {
+                    append(" $description")
+                }
+            }
         }
 
         pushStringAnnotation(tag = "expand", annotation = "expand")
         withStyle(
             style = SpanStyle(
+                fontFamily = textStyle.fontFamily,
+                fontSize = textStyle.fontSize,
+                fontWeight = FontWeight.Bold,
                 color = IberdrolaTheme.colors.primary,
-                textDecoration = TextDecoration.Underline,
-                fontWeight = FontWeight.Bold
+                textDecoration = TextDecoration.Underline
             )
         ) {
             append(if (isExpanded) " Leer menos" else " Más info")
@@ -335,18 +404,18 @@ description: String
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 6.dp),
-        style = IberdrolaTheme.typography.cuerpoMedio.copy(
-            color = IberdrolaTheme.colors.onSurfaceVariant,
-            lineHeight = 22.sp
+        style = textStyle.copy(
+            color = IberdrolaTheme.colors.onSurfaceVariant
         ),
         onClick = { offset ->
-            annotatedString.getStringAnnotations(tag = "expand", start = offset, end = offset)
-                .firstOrNull()?.let {
-                    isExpanded = !isExpanded
-                }
+            annotatedString
+                .getStringAnnotations("expand", offset, offset)
+                .firstOrNull()
+                ?.let { isExpanded = !isExpanded }
         }
     )
 }
+
 
 @Composable
 @Preview(showBackground = true)

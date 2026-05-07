@@ -17,7 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -108,7 +108,7 @@ fun IberdrolaModifyElectronicBillsScreen(
                     text = email,
                     style = IberdrolaTheme.typography.cuerpoMedio,
                     color = IberdrolaTheme.colors.onSurfaceVariant,
-                    modifier = Modifier.padding(vertical = 4.dp)
+                    modifier = Modifier.padding(vertical = 8.dp)
                 )
                 HorizontalDivider(
                     modifier = Modifier.padding(top = 8.dp),
@@ -123,7 +123,7 @@ fun IberdrolaModifyElectronicBillsScreen(
                 verticalAlignment = Alignment.Top
             ) {
                 Icon(
-                    imageVector = Icons.Default.Info,
+                    imageVector = Icons.Outlined.Info,
                     contentDescription = null,
                     tint = IberdrolaTheme.colors.onSurfaceVariant,
                     modifier = Modifier.size(20.dp)

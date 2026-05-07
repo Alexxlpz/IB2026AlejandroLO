@@ -94,7 +94,7 @@ fun IberdrolaModifyEmailElectronicBillScreen(
                         color = IberdrolaTheme.colors.onSurface
                     )
 
-                    Spacer(modifier = Modifier.height(32.dp))
+                    Spacer(modifier = Modifier.height(5.dp))
 
                     val interactionSource = remember { MutableInteractionSource() }
 
@@ -119,7 +119,7 @@ fun IberdrolaModifyEmailElectronicBillScreen(
                                 visualTransformation = androidx.compose.ui.text.input.VisualTransformation.None,
                                 interactionSource = interactionSource,
                                 isError = isError,
-                                label = {
+                                placeholder = {
                                     Text(
                                         text = stringResource(id = R.string.new_email_label),
                                         style = IberdrolaTheme.typography.tituloPeque
@@ -134,8 +134,7 @@ fun IberdrolaModifyEmailElectronicBillScreen(
                                         )
                                     }
                                 },
-                                // ESTA ES LA CLAVE: Forzamos el padding horizontal a 0.dp
-                                contentPadding = PaddingValues(start = 0.dp, end = 0.dp, top = 20.dp, bottom = 8.dp),
+                                contentPadding = PaddingValues(start = 0.dp, end = 0.dp, top = 10.dp, bottom = 10.dp),
                                 colors = TextFieldDefaults.colors(
                                     focusedContainerColor = Color.Transparent,
                                     unfocusedContainerColor = Color.Transparent,
