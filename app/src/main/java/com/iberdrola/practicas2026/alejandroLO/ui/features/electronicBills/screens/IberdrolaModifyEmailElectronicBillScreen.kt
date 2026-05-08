@@ -94,7 +94,7 @@ fun IberdrolaModifyEmailElectronicBillScreen(
                         color = IberdrolaTheme.colors.onSurface
                     )
 
-                    Spacer(modifier = Modifier.height(5.dp))
+                    Spacer(modifier = Modifier.height(25.dp))
 
                     val interactionSource = remember { MutableInteractionSource() }
 

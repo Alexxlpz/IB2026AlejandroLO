@@ -233,7 +233,7 @@ fun VerificationInstructions(instructionTitle: String, instructionBody: String) 
         Text(
             text = instructionBody,
             style = IberdrolaTheme.typography.cuerpoPeque,
-            color = IberdrolaTheme.colors.onSurfaceVariant,
+            color = IberdrolaTheme.colors.onSurface,
             lineHeight = 18.sp
         )
     }
@@ -262,13 +262,13 @@ fun VerificationCodeField(value: String, onValueChange: (String) -> Unit) {
                 singleLine = true,
                 visualTransformation = androidx.compose.ui.text.input.VisualTransformation.None,
                 interactionSource = interactionSource,
-                label = {
+                placeholder = {
                     Text(
                         text = stringResource(R.string.codigo_verificacion_label),
                         style = IberdrolaTheme.typography.etiquetaGrande
                     )
                 },
-                contentPadding = PaddingValues(start = 0.dp, end = 0.dp, top = 20.dp, bottom = 8.dp),
+                contentPadding = PaddingValues(start = 0.dp, end = 0.dp, top = 10.dp, bottom = 10.dp),
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.Transparent,
                     unfocusedContainerColor = Color.Transparent,
