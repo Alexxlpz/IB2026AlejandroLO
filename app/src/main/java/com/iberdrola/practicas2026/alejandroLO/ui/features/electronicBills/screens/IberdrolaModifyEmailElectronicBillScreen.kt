@@ -1,0 +1,193 @@
+package com.iberdrola.practicas2026.alejandroLO.ui.features.electronicBills.screens
+
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.iberdrola.practicas2026.alejandroLO.R
+import com.iberdrola.practicas2026.alejandroLO.ui.common.components.IberdrolaNextBackButtons
+import com.iberdrola.practicas2026.alejandroLO.ui.common.components.VerificationHeader
+import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun IberdrolaModifyEmailElectronicBillScreen(
+    onCloseClick: () -> Unit,
+    onBackClick: () -> Unit,
+    onNextClick: (String) -> Unit,
+    email: String,
+    fromVerification: Boolean
+) {
+    var newEmail by remember { mutableStateOf(email) }
+
+    val isEmailValid = android.util.Patterns.EMAIL_ADDRESS.matcher(newEmail).matches()
+    val isError = (newEmail.isNotEmpty() && !isEmailValid) || newEmail.isEmpty()
+
+    val progressStart = if (fromVerification) 0.75f else 0f
+
+    BackHandler(
+        onBack = onCloseClick
+    )
+
+    val focusManager = LocalFocusManager.current
+
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .pointerInput(Unit) {
+            detectTapGestures(onTap = {
+                focusManager.clearFocus()
+            })
+        }
+    ) {
+        Scaffold(
+            topBar = {},
+            containerColor = IberdrolaTheme.colors.background
+        ) { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+            ) {
+                VerificationHeader(
+                    title = stringResource(R.string.modificar_email),
+                    progressStart = progressStart,
+                    progressEnd = 0.5f,
+                    onCloseClick = onCloseClick
+                )
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .padding(horizontal = 20.dp)
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.en_que_email_deseas_recibir_facturas),
+                        style = IberdrolaTheme.typography.tituloGrande,
+                        color = IberdrolaTheme.colors.onSurface
+                    )
+
+                    Spacer(modifier = Modifier.height(25.dp))
+
+                    val interactionSource = remember { MutableInteractionSource() }
+
+                    BasicTextField(
+                        value = newEmail,
+                        onValueChange = { newEmail = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        textStyle = IberdrolaTheme.typography.cuerpoMedio.copy(
+                            fontSize = 18.sp,
+                            color = IberdrolaTheme.colors.onSurface
+                        ),
+                        interactionSource = interactionSource,
+                        enabled = true,
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                        decorationBox = { innerTextField ->
+                            TextFieldDefaults.DecorationBox(
+                                value = newEmail,
+                                innerTextField = innerTextField,
+                                enabled = true,
+                                singleLine = true,
+                                visualTransformation = androidx.compose.ui.text.input.VisualTransformation.None,
+                                interactionSource = interactionSource,
+                                isError = isError,
+                                placeholder = {
+                                    Text(
+                                        text = stringResource(id = R.string.new_email_label),
+                                        style = IberdrolaTheme.typography.tituloPeque
+                                    )
+                                },
+                                supportingText = {
+                                    if (isError) {
+                                        Text(
+                                            text = "Introduce un formato de email válido (ejemplo@dominio.com)",
+                                            style = IberdrolaTheme.typography.etiquetaPeque,
+                                            color = Color.Red
+                                        )
+                                    }
+                                },
+                                contentPadding = PaddingValues(start = 0.dp, end = 0.dp, top = 10.dp, bottom = 10.dp),
+                                colors = TextFieldDefaults.colors(
+                                    focusedContainerColor = Color.Transparent,
+                                    unfocusedContainerColor = Color.Transparent,
+                                    disabledContainerColor = Color.Transparent,
+                                    errorContainerColor = Color.Transparent,
+                                    focusedIndicatorColor = IberdrolaTheme.colors.primary,
+                                    unfocusedIndicatorColor = IberdrolaTheme.colors.onSurface,
+                                    errorIndicatorColor = Color.Red,
+                                    focusedLabelColor = Color.Gray,
+                                    unfocusedLabelColor = Color.Gray,
+                                    errorLabelColor = Color.Red
+                                ),
+                                container = {
+                                    TextFieldDefaults.Container(
+                                        enabled = true,
+                                        isError = isError,
+                                        interactionSource = interactionSource,
+                                        colors = TextFieldDefaults.colors(
+                                            focusedContainerColor = Color.Transparent,
+                                            unfocusedContainerColor = Color.Transparent,
+                                            errorContainerColor = Color.Transparent
+                                        ),
+                                        shape = androidx.compose.ui.graphics.RectangleShape,
+                                    )
+                                }
+                            )
+                        }
+                    )
+
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                }
+                val isNextEnabled = newEmail.isNotEmpty() && isEmailValid
+
+                IberdrolaNextBackButtons(
+                    isNextEnabled = isNextEnabled,
+                    onBackClick = onBackClick,
+                    onNextClick = { onNextClick(newEmail) }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+@Preview(showBackground = true)
+fun PreviewIberdrolaModifyEmailElectronicBillScreen() {
+    IberdrolaModifyEmailElectronicBillScreen(
+        onCloseClick = {},
+        onBackClick = {},
+        onNextClick = {},
+        email = "emailPrueba@hotmail.com",
+        fromVerification = false
+    )
+}

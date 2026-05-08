@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "directionId": 1,
+    "gasBillEmail": null,
+    "electricityBillEmail": "calle1.luz@email.com"
+  },
+  {
+    "id": 2,
+    "directionId": 2,
+    "gasBillEmail": null,
+    "electricityBillEmail": "calle2.luz@email.com"
+  },
+  {
+    "id": 3,
+    "directionId": 3,
+    "gasBillEmail": null,
+    "electricityBillEmail": "calle3.luz@email.com"
+  }
+]

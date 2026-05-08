@@ -36,6 +36,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.iberdrola.practicas2026.alejandroLO.R
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeEnum
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IB2026AlejandroLOTheme
@@ -88,12 +89,11 @@ fun IberdrolaBar(onBackButtonClick: () -> Unit) {
             .fillMaxWidth()
             .height(56.dp)
             .padding(horizontal = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
     ){
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(0.dp),
             modifier = Modifier
                 .clip(RoundedCornerShape(50))
                 .background(backgroundColor)
@@ -104,13 +104,16 @@ fun IberdrolaBar(onBackButtonClick: () -> Unit) {
             Icon(
                 imageVector = Icons.Default.ChevronLeft,
                 contentDescription = stringResource(R.string.back_button),
-                modifier = Modifier.size(27.dp),
-                tint = IberdrolaTheme.colors.primary
+                modifier = Modifier.size(40.dp),
+                tint = IberdrolaTheme.colors.primary,
+
             )
 
             Text(
                 text = stringResource(R.string.atras),
-                style = IberdrolaTheme.typography.tituloPeque,
+                style = IberdrolaTheme.typography.tituloPeque.copy(
+                    fontSize = 15.sp
+                ),
                 color = IberdrolaTheme.colors.primary,
                 textDecoration = TextDecoration.Underline
             )

@@ -3,7 +3,6 @@ package com.iberdrola.practicas2026.alejandroLO.ui.features.home.screens
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -67,7 +66,7 @@ fun IberdrolaHomeScreen(
     setCont: (Int) -> Unit,
     mostrarSheet: Boolean = false,
     homeViewModel: HomeViewModel,
-    clearFilters: (Boolean) -> Unit
+    changeMode: (Boolean) -> Unit
 ) {
     val TAG = "IberdrolaHomeScreen"
     val sheetState = rememberModalBottomSheetState()
@@ -88,7 +87,7 @@ fun IberdrolaHomeScreen(
         IberdrolaConfirmDialog(
             onConfirm = {
                 showConfirmDialog.value = false
-                homeViewModel.updateDirectionsOnline(pendingOnlineValue.value, clearFilters)
+                homeViewModel.updateDirectionsOnline(pendingOnlineValue.value, changeMode)
             },
             onDismiss = {
                 showConfirmDialog.value = false
@@ -111,6 +110,12 @@ fun IberdrolaHomeScreen(
                 modifier = Modifier.fillMaxSize()
             ) {
                 IberdrolaHomeHeader()
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+//                IberdrolaFacturaElectronica(
+//                    onClick = onElectronicBillClick
+//                )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -144,8 +149,8 @@ fun IberdrolaHomeScreen(
                             ) {
                                 items(directionList) { direccion ->
                                     SuministroItem(
-                                        direccion,
-                                        { onAddressClick(direccion.id, direccion.street) }
+                                        direction = direccion,
+                                        onClick = { onAddressClick(direccion.id, direccion.street) }
                                     )
                                 }
                             }
@@ -260,11 +265,11 @@ fun SuministroItem(direction: Direction, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
-            .clickable { onClick() }
             .testTag("home_address_item"),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = IberdrolaTheme.colors.surface),
-        border = BorderStroke(1.5.dp, IberdrolaTheme.colors.border)
+        border = BorderStroke(1.5.dp, IberdrolaTheme.colors.border),
+        onClick = onClick
     ) {
         Column {
             Row(
@@ -500,7 +505,7 @@ fun PreviewIberdrolaHomeScreen() {
             setCont = { },
             mostrarSheet = false,
             homeViewModel = viewModel(factory = HomeViewModelFactory.Factory),
-            clearFilters = {}
+            changeMode = {}
         )
     }
 }
@@ -514,7 +519,7 @@ fun PreviewIberdrolaHomeScreenWithAlert() {
             setCont = { },
             mostrarSheet = true,
             homeViewModel = viewModel(factory = HomeViewModelFactory.Factory),
-            clearFilters = {}
+            changeMode = {}
         )
     }
 }

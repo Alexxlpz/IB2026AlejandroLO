@@ -7,6 +7,7 @@ import com.google.gson.reflect.TypeToken
 import com.iberdrola.practicas2026.alejandroLO.data.BillDatabase
 import com.iberdrola.practicas2026.alejandroLO.data.model.Direction
 import com.iberdrola.practicas2026.alejandroLO.data.network.direction.DirectionApiService
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
@@ -37,7 +38,7 @@ class OfflineDirectionRepository(
         val database = BillDatabase.getDatabase(context)
         try {
             val remoteDir = apiService.getDirections()
-            withContext(kotlinx.coroutines.Dispatchers.IO) {
+            withContext(Dispatchers.IO) {
                 database.clearDatabase()
                 Log.d(
                     TAG,
@@ -63,7 +64,7 @@ class OfflineDirectionRepository(
         val directions: List<Direction> = gson.fromJson(jsonString, listType)
 
         // Limpiamos e insertamos
-        withContext(kotlinx.coroutines.Dispatchers.IO) {
+        withContext(Dispatchers.IO) {
             val database = BillDatabase.getDatabase(context)
 
             Log.d(TAG, "Iniciando clearDatabase desde Assets...")
