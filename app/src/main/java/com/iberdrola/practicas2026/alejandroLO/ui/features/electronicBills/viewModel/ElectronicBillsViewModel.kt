@@ -25,6 +25,8 @@ class ElectronicBillsViewModel(
     private val _uiState = MutableStateFlow(ElectronicBillsUiState())
     val uiState: StateFlow<ElectronicBillsUiState> = _uiState.asStateFlow()
 
+    val  DAY_IN_MILLIS = 60 * 60 * 24 * 1000
+
     private var billsJob: Job? = null
 
     init {
@@ -113,13 +115,30 @@ class ElectronicBillsViewModel(
         }
     }
 
-    fun resetCounter() {
+    fun resetTimerUpdate() {
         viewModelScope.launch {
             _uiState.update { currentState ->
                 currentState.copy(
-                    counter = 3
+                    resetTimer = System.currentTimeMillis() + DAY_IN_MILLIS
                 )
+            }
+//            val format = SimpleDateFormat("yyyy.MM.dd HH:mm")
+//            Log.d(TAG, "ahora: "+format.format(System.currentTimeMillis())+"resetTimerUpdate: ${format.format(uiState.value.resetTimer)}")
+        }
+    }
+
+    fun reviewCooldown(){
+        if(uiState.value.resetTimer != null &&
+            System.currentTimeMillis() >= uiState.value.resetTimer!!){
+            viewModelScope.launch {
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        resetTimer = null,
+                        counter = 3
+                    )
+                }
             }
         }
     }
+
 }

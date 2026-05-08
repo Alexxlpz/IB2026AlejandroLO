@@ -1,6 +1,8 @@
 package com.iberdrola.practicas2026.alejandroLO.ui.features.bills.screens
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -47,12 +49,17 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshState
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInWindow
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -61,15 +68,16 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.iberdrola.practicas2026.alejandroLO.R
 import com.iberdrola.practicas2026.alejandroLO.data.model.Bill
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillStatusEnum
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeEnum
+import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.FilterUiState
 import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.enums.FilterType
 import com.iberdrola.practicas2026.alejandroLO.ui.features.main.viewModel.ActiveFilterItem
-import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.FilterUiState
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IB2026AlejandroLOTheme
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
 import com.valentinilk.shimmer.ShimmerBounds
@@ -99,12 +107,31 @@ fun IberdrolaBillsScreen(
     onElectronicBillClick: () -> Unit
 ) {
     val scrollState = rememberScrollState()
+    val density = LocalDensity.current
     val numberFormat = NumberFormat.getCurrencyInstance(locale)
 
     val refreshingState: PullToRefreshState = rememberPullToRefreshState()
-
+    val scrollToHistoricoY = remember { mutableIntStateOf(0) }
 //    Log.d("FilterChipList", "FilterChipList: $filterIsApplied")
 //    Log.d("FilterChipList", "FilterChipList: $filterUiState")
+
+    val updateScrollToHistoricoY = { y: Int -> scrollToHistoricoY.intValue = y }
+
+    LaunchedEffect(isLoading) {
+        if (!isLoading && filterIsApplied && scrollToHistoricoY.intValue > 0 && scrollState.value != 990) {
+            scrollState.animateScrollTo(
+                990,
+                animationSpec = tween(
+                    durationMillis = 1500,
+                    easing = CubicBezierEasing(0.25f, 0.8f, 0.25f, 1f)
+                )
+            )
+
+        }else if(!isLoading && scrollState.value != 990){
+            scrollState.scrollTo(0)
+        }
+    }
+
 
     PullToRefreshBox( // para refrescar las facturas
         modifier = Modifier.fillMaxSize(),
@@ -154,6 +181,8 @@ fun IberdrolaBillsScreen(
                         clearFilterField = clearFilterField,
                         filterIsApplied = filterIsApplied,
                         enableFilterButton = enableFilterButton,
+                        updateScrollToHistoricoY = updateScrollToHistoricoY,
+                        density = density,
                         locale = locale
                     )
                 }
@@ -322,6 +351,8 @@ fun IberdrolaBillList(
     clearFilterField: (ActiveFilterItem) -> Unit,
     filterIsApplied: Boolean,
     enableFilterButton: Boolean,
+    updateScrollToHistoricoY: (Int) -> Unit,
+    density: Density,
     locale: Locale
 ) {
     val yearFormat = SimpleDateFormat("yyyy", Locale.forLanguageTag("es-ES"))
@@ -339,7 +370,12 @@ fun IberdrolaBillList(
             Text(
                 text = stringResource(R.string.historico_de_facturas),
                 style = IberdrolaTheme.typography.tituloGrande,
-                color = IberdrolaTheme.colors.onSurface
+                color = IberdrolaTheme.colors.onSurface,
+                modifier = Modifier.onGloballyPositioned {
+                    updateScrollToHistoricoY(it.positionInWindow().y.toInt() -
+                            with(density) { 250.dp.toPx().toInt() })
+                }
+
             )
 
             OutlinedButton(
@@ -617,12 +653,10 @@ fun FacturaElectronicaPromoCard(
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
-    val shape = RoundedCornerShape(20.dp)
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .clip(shape),
+            .padding(horizontal = 16.dp, vertical = 8.dp),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
             containerColor = IberdrolaTheme.colors.primary.copy(alpha = 0.12f)

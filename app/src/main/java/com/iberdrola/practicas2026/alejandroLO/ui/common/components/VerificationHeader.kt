@@ -86,12 +86,11 @@ fun VerificationHeader(title: String, progressStart: Float, progressEnd: Float, 
                 .padding(top = 0.dp, bottom = 16.dp)
         )
 
-        // Barra de progreso
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(4.dp)
-                .background(IberdrolaTheme.colors.border.copy(alpha = 0.5f))
+                .height(5.2.dp)
+                .background(IberdrolaTheme.colors.primary.copy(alpha = 0.35f))
         ) {
             Box(
                 modifier = Modifier

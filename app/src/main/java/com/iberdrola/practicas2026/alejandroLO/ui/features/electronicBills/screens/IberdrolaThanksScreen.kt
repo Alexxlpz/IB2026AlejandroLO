@@ -3,12 +3,12 @@ package com.iberdrola.practicas2026.alejandroLO.ui.features.electronicBills.scre
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -33,6 +34,7 @@ fun IberdrolaThanksScreen(
     onCloseClick: () -> Unit
 ) {
     var visible by remember { mutableStateOf(false) }
+    val modified_email = modifyEmail(email)
 
     LaunchedEffect(Unit) {
         visible = true
@@ -51,7 +53,7 @@ fun IberdrolaThanksScreen(
         ThanksMainContent(
             visible = visible,
             isModificacion = isModificacion,
-            email = email
+            email = modified_email
         )
 
         ThanksAcceptButton(
@@ -106,11 +108,9 @@ private fun ThanksMainContent(
                     scaleIn(initialScale = 0.8f, animationSpec = tween(800))
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(
-                    imageVector = Icons.Default.ThumbUp,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(120.dp)
+                Image(
+                    painter = painterResource(id = R.drawable.thumbup),
+                    contentDescription = "ThumbsUp",
                 )
 
                 Spacer(modifier = Modifier.height(40.dp))
@@ -165,5 +165,24 @@ private fun ThanksAcceptButton(
             style = IberdrolaTheme.typography.tituloPeque,
             fontWeight = FontWeight.Bold
         )
+    }
+}
+
+fun modifyEmail(email:String):String {
+    val parts = email.split("@")
+    return if (parts.size == 2) {
+        val localPart = parts[0]
+        val domainPart = parts[1]
+
+        if (localPart.length > 2) {
+            val firstChar = localPart.first()
+            val lastChar = localPart.last()
+            val maskedMiddle = "*".repeat(localPart.length - 2)
+            "$firstChar$maskedMiddle$lastChar@$domainPart"
+        } else {
+            email
+        }
+    } else {
+        email
     }
 }

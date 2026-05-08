@@ -1,10 +1,14 @@
 package com.iberdrola.practicas2026.alejandroLO.ui.features.electronicBills.screens
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -27,10 +32,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -40,6 +46,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -52,8 +59,11 @@ import com.iberdrola.practicas2026.alejandroLO.ui.common.components.IberdrolaNex
 import com.iberdrola.practicas2026.alejandroLO.ui.common.components.VerificationHeader
 import com.iberdrola.practicas2026.alejandroLO.ui.features.electronicBills.viewModel.ElectronicBillsUiState
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,7 +72,9 @@ fun IberdrolaVerificationEmailElectronicBillsScreen(
     onBackClick: () -> Unit,
     onNextClick: () -> Unit,
     electronicBillsUiState: ElectronicBillsUiState,
-    updateCounter: () -> Unit
+    updateCounter: () -> Unit,
+    reviewCoolDown: () -> Unit,
+    resetTimerUpdate: () -> Unit
 ) {
     var verificationCode by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
@@ -70,7 +82,7 @@ fun IberdrolaVerificationEmailElectronicBillsScreen(
     val scope = rememberCoroutineScope()
     val counter = electronicBillsUiState.counter
 
-    var finalProgress by remember { mutableStateOf(0.75f) }
+    var finalProgress by remember { mutableFloatStateOf(0.75f) }
 
     val supressBackStack: (Boolean) -> Unit = {
         if(!isLoading) {
@@ -78,11 +90,41 @@ fun IberdrolaVerificationEmailElectronicBillsScreen(
         }
     }
 
+    val bannerJob = remember { mutableStateOf<Job?>(null) }
+
+    val focusManager = LocalFocusManager.current
+
+    LaunchedEffect(Unit) {
+        reviewCoolDown()
+        if(electronicBillsUiState.resetTimer != null){
+            val date = Date(electronicBillsUiState.resetTimer)
+            val format = SimpleDateFormat("yyyy.MM.dd HH:mm")
+            val fecha = format.format(date)
+            Log.d("IberdrolaVerificationEmailElectronicBillsScreen", "hay que esperar hasta: "+ fecha)
+        }else {
+            Log.d("IberdrolaVerificationEmailElectronicBillsScreen", "reset no seteado aún")
+        }
+    }
+
+    LaunchedEffect(counter) {
+        if(counter == 0 && electronicBillsUiState.resetTimer == null){
+            resetTimerUpdate()
+        }
+    }
+
+
+
     BackHandler(onBack = { supressBackStack(isLoading) })
 
     Box(modifier = Modifier
         .fillMaxSize()
-        .background(IberdrolaTheme.colors.background)) {
+        .background(IberdrolaTheme.colors.background)
+        .pointerInput(Unit) {
+            detectTapGestures(onTap = {
+                focusManager.clearFocus()
+            })
+        }
+    ) {
         Scaffold(
             topBar = {},
             containerColor = IberdrolaTheme.colors.background
@@ -126,16 +168,20 @@ fun IberdrolaVerificationEmailElectronicBillsScreen(
 
                     HelpSection(
                         onResendClick = {
-                            scope.launch {
+                            bannerJob.value?.cancel()
+                            bannerJob.value = scope.launch {
                                 isLoading = true
                                 showSuccessMessage = false
                                 delay(1500)
                                 isLoading = false
                                 showSuccessMessage = true
+                                delay(5000)
+                                showSuccessMessage = false
                             }
                         },
                         counter = counter,
-                        updateCounter = { updateCounter() }
+                        updateCounter = { updateCounter() },
+                        isLoading = isLoading
                     )
                 }
 
@@ -158,6 +204,7 @@ fun IberdrolaVerificationEmailElectronicBillsScreen(
                                 delay(1500)
 
                                 isLoading = false
+                                delay(300)
                                 onNextClick()
                             }
                         }
@@ -186,7 +233,7 @@ fun VerificationInstructions(instructionTitle: String, instructionBody: String) 
         Text(
             text = instructionBody,
             style = IberdrolaTheme.typography.cuerpoPeque,
-            color = IberdrolaTheme.colors.onSurfaceVariant,
+            color = IberdrolaTheme.colors.onSurface,
             lineHeight = 18.sp
         )
     }
@@ -194,23 +241,68 @@ fun VerificationInstructions(instructionTitle: String, instructionBody: String) 
 
 @Composable
 fun VerificationCodeField(value: String, onValueChange: (String) -> Unit) {
-    TextField(
+    val interactionSource = remember { MutableInteractionSource() }
+
+    BasicTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(stringResource(R.string.codigo_verificacion_label)) },
         modifier = Modifier.fillMaxWidth(),
+        textStyle = IberdrolaTheme.typography.cuerpoGrande.copy(
+            letterSpacing = 1.sp
+        ),
+        interactionSource = interactionSource,
+        enabled = true,
+        singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = Color.Transparent,
-            unfocusedContainerColor = Color.Transparent,
-            focusedIndicatorColor = IberdrolaTheme.colors.primary,
-            unfocusedIndicatorColor = IberdrolaTheme.colors.onSurfaceVariant
-        )
+        decorationBox = { innerTextField ->
+            TextFieldDefaults.DecorationBox(
+                value = value,
+                innerTextField = innerTextField,
+                enabled = true,
+                singleLine = true,
+                visualTransformation = androidx.compose.ui.text.input.VisualTransformation.None,
+                interactionSource = interactionSource,
+                placeholder = {
+                    Text(
+                        text = stringResource(R.string.codigo_verificacion_label),
+                        style = IberdrolaTheme.typography.etiquetaGrande
+                    )
+                },
+                contentPadding = PaddingValues(start = 0.dp, end = 0.dp, top = 10.dp, bottom = 10.dp),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
+                    focusedIndicatorColor = IberdrolaTheme.colors.primary,
+                    unfocusedIndicatorColor = IberdrolaTheme.colors.onSurfaceVariant,
+                    cursorColor = IberdrolaTheme.colors.primary,
+                    focusedLabelColor = IberdrolaTheme.colors.primary,
+                    unfocusedLabelColor = Color.Gray
+                ),
+                container = {
+                    TextFieldDefaults.Container(
+                        enabled = true,
+                        isError = false,
+                        interactionSource = interactionSource,
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent
+                        ),
+                        shape = RectangleShape
+                    )
+                }
+            )
+        }
     )
 }
 
 @Composable
-fun HelpSection(onResendClick: () -> Unit, counter: Int, updateCounter: () -> Unit) {
+fun HelpSection(
+    onResendClick: () -> Unit,
+    counter: Int,
+    updateCounter: () -> Unit,
+    isLoading: Boolean
+) {
     Surface(
         color = if(counter > 0) {
             IberdrolaTheme.colors.blueLight
@@ -243,53 +335,52 @@ fun HelpSection(onResendClick: () -> Unit, counter: Int, updateCounter: () -> Un
                     color = IberdrolaTheme.colors.onSurface
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                if(counter == 3) {
-                    Text(
-                        text = stringResource(R.string.counter3_helpSelection),
-                        style = IberdrolaTheme.typography.cuerpoPeque,
-                        color = IberdrolaTheme.colors.onSurface,
-                        lineHeight = 16.sp
-                    )
-                }else if(counter == 0) {
-                    Text(
-                        text = stringResource(R.string.sin_intentos),
-                        style = IberdrolaTheme.typography.cuerpoPeque,
-                        color = IberdrolaTheme.colors.onSurface,
-                        lineHeight = 16.sp
-                    )
-                } else {
-                    Text(
-                        text = stringResource(R.string.texto_helpSelection, counter),
-                        style = IberdrolaTheme.typography.cuerpoPeque,
-                        color = IberdrolaTheme.colors.onSurface,
-                        lineHeight = 16.sp
-                    )
+                when (counter) {
+                    3 -> {
+                        Text(
+                            text = stringResource(R.string.counter3_helpSelection),
+                            style = IberdrolaTheme.typography.cuerpoPeque,
+                            color = IberdrolaTheme.colors.onSurface,
+                            lineHeight = 16.sp
+                        )
+                    }
+                    0 -> {
+                        Text(
+                            text = stringResource(R.string.sin_intentos),
+                            style = IberdrolaTheme.typography.cuerpoPeque,
+                            color = IberdrolaTheme.colors.onSurface,
+                            lineHeight = 16.sp
+                        )
+                    }
+                    else -> {
+                        Text(
+                            text = stringResource(R.string.texto_helpSelection, counter),
+                            style = IberdrolaTheme.typography.cuerpoPeque,
+                            color = IberdrolaTheme.colors.onSurface,
+                            lineHeight = 16.sp
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
-                if(counter == 0) {
-                    Text(
-                        text = stringResource(R.string.volver_a_enviar),
-                        style = IberdrolaTheme.typography.cuerpoPeque.copy(
-                            fontWeight = FontWeight.ExtraBold,
-                            textDecoration = TextDecoration.Underline
-                        ),
-                        color = IberdrolaTheme.colors.disableFontColor.copy(alpha = 0.7f)
-                    )
-                }else {
-                    Text(
-                        text = stringResource(R.string.volver_a_enviar),
-                        style = IberdrolaTheme.typography.cuerpoPeque.copy(
-                            fontWeight = FontWeight.ExtraBold,
-                            textDecoration = TextDecoration.Underline
-                        ),
-                        color = IberdrolaTheme.colors.onSurface,
-                        modifier = Modifier.clickable {
-                            onResendClick()
-                            updateCounter()
-                        }
-                    )
-                }
+                Text(
+                    text = stringResource(R.string.volver_a_enviar),
+                    style = IberdrolaTheme.typography.cuerpoPeque.copy(
+                        fontWeight = FontWeight.ExtraBold,
+                        textDecoration = TextDecoration.Underline
+                    ),
+                    color = if (isLoading || counter<=0) IberdrolaTheme.colors.onSurface.copy(alpha = 0.5f)
+                    else IberdrolaTheme.colors.onSurface,
+                    modifier = Modifier
+                        .padding(7.dp)
+                        .clickable(
+                            enabled = !isLoading && counter>0,
+                            onClick = {
+                                onResendClick()
+                                updateCounter()
+                            }
+                        )
+                )
             }
         }
     }
@@ -360,6 +451,8 @@ fun PreviewIberdrolaVerificationScreen() {
         onBackClick = {},
         onNextClick = {},
         electronicBillsUiState = ElectronicBillsUiState(),
-        updateCounter = {}
+        updateCounter = {},
+        reviewCoolDown = {},
+        resetTimerUpdate = {}
     )
 }

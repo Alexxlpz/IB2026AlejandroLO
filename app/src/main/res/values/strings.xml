@@ -79,8 +79,10 @@
     <string name="mas_info">Más info</string>
     <string name="texto_helpSelection">Si no lo encuentras, podemos volver a enviar el SMS. Recuerda que hoy te quedan %1$d intentos.</string>
     <string name="counter3_helpSelection">Si no lo encuentras, podemos volver a enviar el SMS.</string>
-    <string name="sin_intentos">Se ha quedado sin intentos, llame a la línea de atención al cliente</string>
+    <string name="sin_intentos">Se ha quedado sin intentos. Espere un día para que esté disponible o llame a la línea de atención al cliente</string>
     <string name="factura_no_disponible">La factura aún no está disponible. Intentelo mas adelante</string>
     <string name="contrato_title">Contrato de</string>
     <string name="error_al_cargar_los_contratos">Error al cargar los contratos</string>
+    <string name="email_dueño">a*****a@a.com</string>
+    <string name="email_mal_estructurado">Introduce un formato de email válido (ejemplo@dominio.com)</string>
 </resources>

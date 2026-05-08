@@ -6,5 +6,6 @@ data class ElectronicBillsUiState (
     val electronicBills: List<ElectronicBill> = emptyList(),
     val isOnline: Boolean = false,
     val counter: Int = 3,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val resetTimer: Long? = null
 )
