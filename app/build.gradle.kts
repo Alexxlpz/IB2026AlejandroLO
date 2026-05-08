@@ -21,7 +21,7 @@ android {
 
     defaultConfig {
         applicationId = "com.iberdrola.practicas2026.alejandroLO"
-        minSdk = 33
+        minSdk = 29 // para que compule sdk 29 como pide el enunciado de la practica
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -82,6 +82,7 @@ dependencies {
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.uiautomator)
+    implementation(libs.androidx.foundation)
     androidTestImplementation(libs.androidx.navigation.testing)
 
     // DEPENDENCIAS PARA LOS TEST

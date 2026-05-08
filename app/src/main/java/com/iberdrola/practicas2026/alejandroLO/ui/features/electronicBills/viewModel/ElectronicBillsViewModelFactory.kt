@@ -1,18 +1,20 @@
-package com.iberdrola.practicas2026.alejandroLO.ui.features.filter.viewModel
+package com.iberdrola.practicas2026.alejandroLO.ui.features.electronicBills.viewModel
 
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.iberdrola.practicas2026.alejandroLO.IberdrolaApplication
 
-object FilterViewModelFactory {
+object ElectronicBillsViewModelFactory {
     val Factory: ViewModelProvider.Factory = viewModelFactory {
         initializer {
             val application = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as IberdrolaApplication)
-            val filterRepository = application.container.filterRepository
+            val repository = application.container.electronicBillsRepository
+            val connectivityRepository = application.container.connectivityRepository
 
-            FilterViewModel(
-                filterRepository = filterRepository
+            ElectronicBillsViewModel(
+                electronicBillsRepository = repository,
+                connectivityRepository = connectivityRepository
             )
         }
     }

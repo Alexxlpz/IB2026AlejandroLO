@@ -15,6 +15,7 @@ import com.iberdrola.practicas2026.alejandroLO.ui.navigation.IberdrolaNavGraph
 import com.iberdrola.practicas2026.alejandroLO.ui.navigation.IberdrolaScreens
 import org.junit.Rule
 import org.junit.Test
+import java.util.Locale
 
 class IberdrolaNavGraphTest {
 
@@ -36,7 +37,8 @@ class IberdrolaNavGraphTest {
         composeTestRule.setContent {
             IberdrolaNavGraph(
                 navController = navController,
-                innerPadding = PaddingValues()
+                innerPadding = PaddingValues(),
+                locale = Locale.forLanguageTag("es-ES")
             )
         }
 
@@ -58,7 +60,8 @@ class IberdrolaNavGraphTest {
         composeTestRule.setContent {
             IberdrolaNavGraph(
                 navController = navController,
-                innerPadding = PaddingValues()
+                innerPadding = PaddingValues(),
+                locale = Locale.forLanguageTag("es-ES")
             )
         }
 
@@ -81,7 +84,8 @@ class IberdrolaNavGraphTest {
         composeTestRule.setContent {
             IberdrolaNavGraph(
                 navController = navController,
-                innerPadding = PaddingValues()
+                innerPadding = PaddingValues(),
+                locale = Locale.forLanguageTag("es-ES")
             )
         }
 
@@ -99,7 +103,8 @@ class IberdrolaNavGraphTest {
         composeTestRule.setContent {
             IberdrolaNavGraph(
                 navController = navController,
-                innerPadding = PaddingValues()
+                innerPadding = PaddingValues(),
+                locale = Locale.forLanguageTag("es-ES")
             )
         }
 

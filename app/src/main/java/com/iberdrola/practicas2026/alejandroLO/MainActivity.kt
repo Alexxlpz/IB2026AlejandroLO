@@ -26,7 +26,8 @@ import java.util.Locale
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val locale = Locale.getDefault() // para que coja la region del dispositivo y asi poder
+        //val locale = Locale.getDefault() // para que coja la region del dispositivo y asi poder
+        val locale = Locale.forLanguageTag("es-ES") // locale siempre España
         // adecuarnos a su cultura (forma de representar numeros, idioma(por ahora no), etc)
         Log.i("MainActivity", "Locale: $locale")
         enableEdgeToEdge()
@@ -61,7 +62,8 @@ class MainActivity : ComponentActivity() {
 
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     IberdrolaNavGraph(
-                        innerPadding = innerPadding
+                        innerPadding = innerPadding,
+                        locale = locale
                     )
                 }
             }
