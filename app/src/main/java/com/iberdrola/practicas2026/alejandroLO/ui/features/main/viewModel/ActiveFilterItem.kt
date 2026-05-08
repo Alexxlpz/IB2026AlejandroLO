@@ -1,4 +1,4 @@
-package com.iberdrola.practicas2026.alejandroLO.ui.features.filter.viewModel
+package com.iberdrola.practicas2026.alejandroLO.ui.features.main.viewModel
 
 import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.enums.FilterType
 

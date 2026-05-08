@@ -10,9 +10,8 @@ import androidx.compose.ui.test.performClick
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsViewModel
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsViewModelFactory
-import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.viewModel.FilterViewModel
-import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.viewModel.FilterViewModelFactory
 import com.iberdrola.practicas2026.alejandroLO.ui.features.main.screens.IberdrolaMainScreen
+import com.iberdrola.practicas2026.alejandroLO.ui.theme.IB2026AlejandroLOTheme
 import org.junit.Rule
 import org.junit.Test
 
@@ -20,17 +19,12 @@ class IberdrolaMainScreenTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-
     // -------------------------
-    // Función de ayuda para crear los ViewModels necesarios en los tests
+    // Función de ayuda para crear el ViewModel necesario en los tests
     // -------------------------
     @Composable
-    private fun createViewModels(): Pair<BillsViewModel, FilterViewModel> {
-        // Asumiendo que tienes acceso a las fábricas en el entorno de test
-        // Si no, puedes usar hiltViewModel() o pasar mocks si usas una librería de mocking
-        val billsViewModel: BillsViewModel = viewModel(factory = BillsViewModelFactory.Factory)
-        val filterViewModel: FilterViewModel = viewModel(factory = FilterViewModelFactory.Factory)
-        return Pair(billsViewModel, filterViewModel)
+    private fun createBillsViewModel(): BillsViewModel {
+        return viewModel(factory = BillsViewModelFactory.Factory)
     }
 
     // -------------------------
@@ -39,13 +33,15 @@ class IberdrolaMainScreenTest {
     @Test
     fun givenMainScreen_whenLoaded_thenIsDisplayed() {
         composeTestRule.setContent {
-            val (billsVm, filterVm) = createViewModels()
-            IberdrolaMainScreen(
-                onBackButtonClick = {},
-                onFilterClick = {},
-                filterViewModel = filterVm,
-                billsViewModel = billsVm
-            )
+            IB2026AlejandroLOTheme {
+                val billsVm = createBillsViewModel()
+                IberdrolaMainScreen(
+                    onBackButtonClick = {},
+                    onFilterClick = {},
+                    onElectronicBillClick = { _, _ -> },
+                    billsViewModel = billsVm
+                )
+            }
         }
 
         composeTestRule.onNodeWithTag("main_screen").assertIsDisplayed()
@@ -56,13 +52,15 @@ class IberdrolaMainScreenTest {
         var backClicked = false
 
         composeTestRule.setContent {
-            val (billsVm, filterVm) = createViewModels()
-            IberdrolaMainScreen(
-                onBackButtonClick = { backClicked = true },
-                onFilterClick = {},
-                filterViewModel = filterVm,
-                billsViewModel = billsVm
-            )
+            IB2026AlejandroLOTheme {
+                val billsVm = createBillsViewModel()
+                IberdrolaMainScreen(
+                    onBackButtonClick = { backClicked = true },
+                    onFilterClick = {},
+                    onElectronicBillClick = { _, _ -> },
+                    billsViewModel = billsVm
+                )
+            }
         }
 
         composeTestRule.onNodeWithTag("main_back_button").performClick()
@@ -73,13 +71,15 @@ class IberdrolaMainScreenTest {
     @Test
     fun givenMainScreen_whenOptionSelected_thenPagerChanges() {
         composeTestRule.setContent {
-            val (billsVm, filterVm) = createViewModels()
-            IberdrolaMainScreen(
-                onBackButtonClick = {},
-                onFilterClick = {},
-                filterViewModel = filterVm,
-                billsViewModel = billsVm
-            )
+            IB2026AlejandroLOTheme {
+                val billsVm = createBillsViewModel()
+                IberdrolaMainScreen(
+                    onBackButtonClick = {},
+                    onFilterClick = {},
+                    onElectronicBillClick = { _, _ -> },
+                    billsViewModel = billsVm
+                )
+            }
         }
 
         composeTestRule.waitUntilAtLeastOneExists(hasTestTag("bills_screen"), 5000)
@@ -88,19 +88,20 @@ class IberdrolaMainScreenTest {
     }
 
     @Test
-    fun givenMainScreen_thenFilterButtonParametersArePassed() {
+    fun givenMainScreen_thenRenderedCorrectly() {
         composeTestRule.setContent {
-            val (billsVm, filterVm) = createViewModels()
-
-            IberdrolaMainScreen(
-                onBackButtonClick = {},
-                onFilterClick = {},
-                filterViewModel = filterVm,
-                billsViewModel = billsVm
-            )
+            IB2026AlejandroLOTheme {
+                val billsVm = createBillsViewModel()
+                IberdrolaMainScreen(
+                    onBackButtonClick = {},
+                    onFilterClick = {},
+                    onElectronicBillClick = { _, _ -> },
+                    billsViewModel = billsVm
+                )
+            }
         }
 
-        // Verificamos que la pantalla principal se renderiza correctamente con los nuevos parámetros
+        // Verificamos que la pantalla principal se renderiza correctamente
         composeTestRule.onNodeWithTag("main_screen").assertIsDisplayed()
     }
 }

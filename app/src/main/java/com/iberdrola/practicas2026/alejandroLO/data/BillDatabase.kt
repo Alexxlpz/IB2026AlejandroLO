@@ -12,10 +12,12 @@ import com.iberdrola.practicas2026.alejandroLO.data.model.Bill
 import com.iberdrola.practicas2026.alejandroLO.data.model.BillStatus
 import com.iberdrola.practicas2026.alejandroLO.data.model.BillType
 import com.iberdrola.practicas2026.alejandroLO.data.model.Direction
+import com.iberdrola.practicas2026.alejandroLO.data.model.ElectronicBill
 import com.iberdrola.practicas2026.alejandroLO.data.repository.bill.BillsDao
 import com.iberdrola.practicas2026.alejandroLO.data.repository.billStatus.BillStatusDao
 import com.iberdrola.practicas2026.alejandroLO.data.repository.billType.BillTypeDao
 import com.iberdrola.practicas2026.alejandroLO.data.repository.direction.DirectionDao
+import com.iberdrola.practicas2026.alejandroLO.data.repository.electronicBill.ElectronicBillsDao
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillStatusEnum
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeEnum
 
@@ -25,9 +27,10 @@ import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeE
         Bill::class,
         BillType::class,
         BillStatus::class,
-        Direction::class
+        Direction::class,
+        ElectronicBill::class
     ],
-    version = 18,
+    version = 19,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -37,6 +40,8 @@ abstract class BillDatabase : RoomDatabase() {
     abstract fun billStatusDao(): BillStatusDao
 
     abstract fun directionDao(): DirectionDao
+
+    abstract fun electronicBillDao(): ElectronicBillsDao
 
     val TAG: String = "BillDatabase"
 

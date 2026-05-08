@@ -7,14 +7,15 @@ import com.iberdrola.practicas2026.alejandroLO.BuildConfig
 import com.iberdrola.practicas2026.alejandroLO.R
 import com.iberdrola.practicas2026.alejandroLO.data.network.bill.BillsApiService
 import com.iberdrola.practicas2026.alejandroLO.data.network.direction.DirectionApiService
+import com.iberdrola.practicas2026.alejandroLO.data.network.electronicBill.ElectronicBillApiService
 import com.iberdrola.practicas2026.alejandroLO.data.repository.bill.BillsRepository
 import com.iberdrola.practicas2026.alejandroLO.data.repository.bill.OfflineBillsRepository
 import com.iberdrola.practicas2026.alejandroLO.data.repository.conectivity.ConnectivityRepository
 import com.iberdrola.practicas2026.alejandroLO.data.repository.conectivity.OfflineConnectivityRepository
 import com.iberdrola.practicas2026.alejandroLO.data.repository.direction.DirectionRepository
 import com.iberdrola.practicas2026.alejandroLO.data.repository.direction.OfflineDirectionRepository
-import com.iberdrola.practicas2026.alejandroLO.data.repository.filter.FilterRepository
-import com.iberdrola.practicas2026.alejandroLO.data.repository.filter.OfflineFilterRepository
+import com.iberdrola.practicas2026.alejandroLO.data.repository.electronicBill.ElectronicBillsRepository
+import com.iberdrola.practicas2026.alejandroLO.data.repository.electronicBill.OfflineElectronicBillsRepository
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -30,8 +31,7 @@ interface AppContainer {
     val billsRepository: BillsRepository
     val directionsRepository: DirectionRepository
     val connectivityRepository: ConnectivityRepository
-
-    val filterRepository: FilterRepository
+    val electronicBillsRepository: ElectronicBillsRepository
 }
 
 class AppDataContainer(private val context: Context) : AppContainer {
@@ -61,13 +61,17 @@ class AppDataContainer(private val context: Context) : AppContainer {
         retrofit.create(DirectionApiService::class.java)
     }
 
+    private val electronicBillRetrofitService: ElectronicBillApiService by lazy {
+        retrofit.create(ElectronicBillApiService::class.java)
+    }
+
     override val billsRepository: BillsRepository by lazy {
         OfflineBillsRepository(
             billDao = BillDatabase.getDatabase(context).billDao(),
             apiService = billsRetrofitService,
             context = context,
             gson = gson, // se lo pasamos para que no lo tenga que crear otra vez si carga los datos
-                        // localmente
+            // localmente
             directionsRepository = directionsRepository
         )
     }
@@ -80,19 +84,27 @@ class AppDataContainer(private val context: Context) : AppContainer {
         )
     }
 
-    // patron de diseño "Shared Repository State"
-    // patron usado para centralizar la variable isOnline
-    override val connectivityRepository: ConnectivityRepository by lazy {
-        OfflineConnectivityRepository()
+    override val electronicBillsRepository: ElectronicBillsRepository by lazy {
+        OfflineElectronicBillsRepository(
+            electronicBillDao = BillDatabase.getDatabase(context).electronicBillDao(),
+            apiService = electronicBillRetrofitService,
+            context = context,
+            gson = gson,
+            directionsRepository = directionsRepository
+        )
     }
 
-    override val filterRepository: FilterRepository by lazy {
-        OfflineFilterRepository()
+    // patron de diseño "Shared Repository State"
+    // patron usado para centralizar la variable isOnline
+    override
+    val connectivityRepository: ConnectivityRepository by lazy {
+        OfflineConnectivityRepository()
     }
 
     private fun getUnsafeOkHttpClient(context: Context): OkHttpClient {
         val cf = CertificateFactory.getInstance("X.509")
-        val certInput = context.resources.openRawResource(R.raw.alejandro_cert)
+        val certInput =
+            context.resources.openRawResource(R.raw.alejandro_cert)
         val certificate = cf.generateCertificate(certInput)
         certInput.close()
 
@@ -109,9 +121,11 @@ class AppDataContainer(private val context: Context) : AppContainer {
         sslContext.init(null, tmf.trustManagers, null)
 
         return OkHttpClient.Builder()
-            .sslSocketFactory(sslContext.socketFactory, tmf.trustManagers[0] as X509TrustManager)
+            .sslSocketFactory(
+                sslContext.socketFactory,
+                tmf.trustManagers[0] as X509TrustManager
+            )
             .hostnameVerifier { _, _ -> true }
             .build()
     }
-
 }

@@ -14,6 +14,7 @@ object HomeViewModelFactory {
 
             HomeViewModel(
                 directionRepository = repository,
+                electronicBillsRepository = application.container.electronicBillsRepository,
                 connectivityRepository = connectivityRepository
             )
         }

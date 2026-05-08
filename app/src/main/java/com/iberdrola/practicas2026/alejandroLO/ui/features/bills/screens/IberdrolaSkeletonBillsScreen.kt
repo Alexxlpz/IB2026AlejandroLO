@@ -43,7 +43,9 @@ fun SkeletonScreen(modifier: Modifier = Modifier) {
             .testTag("bills_skeleton")
     ) {
         LastBillSkeleton()
-        Spacer(modifier = Modifier.height(25.dp))
+        Spacer(modifier = Modifier.height(8.5.dp))
+        ElectronicBillsSkeleton()
+        Spacer(modifier = Modifier.height(34.dp))
         TitleAndFilterSkeleton()
         Spacer(modifier = Modifier.height(24.dp))
         BillSkeletonYear()
@@ -146,14 +148,27 @@ fun BillSkeletonList(){
 }
 
 @Composable
+fun ElectronicBillsSkeleton(){
+    Box(
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .fillMaxWidth()
+    ) {
+        SkeletonBox(
+            width = 1000.dp,
+            height = 65.dp,
+            shape = RoundedCornerShape(20.dp)
+        )
+    }
+}
+
+@Composable
 fun TitleAndFilterSkeleton(){
     Row(
         modifier = Modifier
             .padding(horizontal = 16.dp)
-            .fillMaxWidth()
-        ,
-        horizontalArrangement = Arrangement.SpaceBetween,
-
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         SkeletonBox(width = 190.dp, height = 30.dp)
         SkeletonBox(

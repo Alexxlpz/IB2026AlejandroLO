@@ -40,12 +40,17 @@ data class IberdrolaColors(
     val onErrorContainer: Color = IberdrolaRedText,
     val iconLuzGas: Color = Color(0xFF004D3F),
     val importeHistorico: Color = Color(0xFF868686),
-    val disableFontColor: Color = Color(0xFF514F4F)
+    val disableFontColor: Color = Color(0xFF514F4F),
+    val disabledContainer: Color = Color(0xFFEEEEEE),
+    val blueLight: Color = IberdrolaBlueLight,
+    val blueDark: Color = IberdrolaBlueDark,
+    val warningContainer: Color = IberdrolaYellow
 )
 
 // Estructura de Tipografía Propia
 data class IberdrolaTypography(
     val tituloPrincipal: TextStyle = Typography.headlineMedium,
+    val tituloSecundario: TextStyle = Typography.headlineSmall,
     val tituloGrande: TextStyle = Typography.titleLarge,
     val tituloMedio: TextStyle = Typography.titleMedium,
     val tituloPeque: TextStyle = Typography.titleSmall,
