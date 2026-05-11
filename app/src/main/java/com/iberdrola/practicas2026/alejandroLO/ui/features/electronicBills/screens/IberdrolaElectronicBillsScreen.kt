@@ -122,24 +122,25 @@ fun FacturaElectronicaContent(
                         thickness = 1.5.dp
                     )
                 }
-
-                item {
-                    ContratoItem(
-                        titulo = "Contrato de Gas",
-                        icon = Icons.Outlined.LocalFireDepartment,
-                        isActivo = isGasEnabled,
-                        onClick = {
-                            onContratoClick(isGasEnabled, "contrato_gas")
-                            updateSelectedTypeBill(BillTypeEnum.GAS)
-                        }
-                    )
-                }
-
-                item {
-                    HorizontalDivider(
-                        color = IberdrolaTheme.colors.border.copy(alpha = 0.95f),
-                        thickness = 1.5.dp
-                    )
+                
+                if (isGasEnabled) {
+                    item {
+                        ContratoItem(
+                            titulo = "Contrato de Gas",
+                            icon = Icons.Outlined.LocalFireDepartment,
+                            isActivo = false,
+                            onClick = {
+                                onContratoClick(false, "contrato_gas")
+                                updateSelectedTypeBill(BillTypeEnum.GAS)
+                            }
+                        )
+                    }
+                    item {
+                        HorizontalDivider(
+                            color = IberdrolaTheme.colors.border.copy(alpha = 0.95f),
+                            thickness = 1.5.dp
+                        )
+                    }
                 }
             }
         }
