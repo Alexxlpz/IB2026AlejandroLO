@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -161,8 +162,6 @@ fun IberdrolaHomeScreen(
                         }
                     }
                 }
-
-
 
                 IberdrolaHomeFoot(
                     isOnline = localIsOnline.value,
@@ -345,8 +344,7 @@ fun IberdrolaHomeFoot(
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -366,6 +364,12 @@ fun IberdrolaHomeFoot(
                 ),
                 modifier = Modifier.testTag("home_switch")
             )
+        }
+
+        Box(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp, top = 2.dp)) {
+            Button(onClick = { throw RuntimeException("BUM BUM BUTTON CLICKED") }) {
+                Text(text = "BUM BUM (BUTTON)")
+            }
         }
 
         Row(

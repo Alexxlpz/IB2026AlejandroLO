@@ -214,7 +214,10 @@ fun IberdrolaNavGraph(
                     homeViewModel.logButtonClick("filtrar", IberdrolaScreens.MAIN.title)
                     navController.navigate(IberdrolaScreens.FILTER.title)
                 },
-                onElectronicBillClick = onElectronicBillClick,
+                onElectronicBillClick = { street, streetId ->
+                    electronicBillsViewModel.reviewIsGasEnabled()
+                    onElectronicBillClick(street, streetId)
+                },
                 onChangeBillType = { homeViewModel.logChangeBillType(it) },
                 onButtonClick = {
                     homeViewModel.logButtonClick(it, IberdrolaScreens.MAIN.title)
