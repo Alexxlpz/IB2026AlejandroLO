@@ -16,6 +16,8 @@ import com.iberdrola.practicas2026.alejandroLO.data.repository.direction.Directi
 import com.iberdrola.practicas2026.alejandroLO.data.repository.direction.OfflineDirectionRepository
 import com.iberdrola.practicas2026.alejandroLO.data.repository.electronicBill.ElectronicBillsRepository
 import com.iberdrola.practicas2026.alejandroLO.data.repository.electronicBill.OfflineElectronicBillsRepository
+import com.iberdrola.practicas2026.alejandroLO.data.repository.remoteConfig.OfflineRemoteConfigRepository
+import com.iberdrola.practicas2026.alejandroLO.data.repository.remoteConfig.RemoteConfigRepository
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -32,6 +34,7 @@ interface AppContainer {
     val directionsRepository: DirectionRepository
     val connectivityRepository: ConnectivityRepository
     val electronicBillsRepository: ElectronicBillsRepository
+    val remoteConfigRepository: RemoteConfigRepository
 }
 
 class AppDataContainer(private val context: Context) : AppContainer {
@@ -96,9 +99,12 @@ class AppDataContainer(private val context: Context) : AppContainer {
 
     // patron de diseño "Shared Repository State"
     // patron usado para centralizar la variable isOnline
-    override
-    val connectivityRepository: ConnectivityRepository by lazy {
+    override val connectivityRepository: ConnectivityRepository by lazy {
         OfflineConnectivityRepository()
+    }
+
+    override val remoteConfigRepository: RemoteConfigRepository by lazy {
+        OfflineRemoteConfigRepository()
     }
 
     private fun getUnsafeOkHttpClient(context: Context): OkHttpClient {

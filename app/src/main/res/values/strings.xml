@@ -85,4 +85,6 @@
     <string name="error_al_cargar_los_contratos">Error al cargar los contratos</string>
     <string name="email_dueño">a*****a@a.com</string>
     <string name="email_mal_estructurado">Introduce un formato de email válido (ejemplo@dominio.com)</string>
+    <string name="sin_activar">Sin Activar</string>
+    <string name="activa">Activa</string>
 </resources>

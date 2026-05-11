@@ -48,7 +48,8 @@ fun IberdrolaElectronicBillsScreen(
     onBackClick: () -> Unit,
     onContratoClick: (Boolean) -> Unit,
     updateSelectedTypeBill: (BillTypeEnum) -> Unit,
-    electronicBillError: Boolean
+    electronicBillError: Boolean,
+    isGasEnabled: Boolean = true
 ) {
     Scaffold(
         topBar = {
@@ -68,7 +69,8 @@ fun IberdrolaElectronicBillsScreen(
             modifier = Modifier.padding(paddingValues),
             onContratoClick = onContratoClick,
             updateSelectedTypeBill = updateSelectedTypeBill,
-            electronicBillError = electronicBillError
+            electronicBillError = electronicBillError,
+            isGasEnabled = isGasEnabled
         )
     }
 }
@@ -78,7 +80,8 @@ fun FacturaElectronicaContent(
     modifier: Modifier = Modifier,
     onContratoClick: (Boolean) -> Unit,
     updateSelectedTypeBill: (BillTypeEnum) -> Unit,
-    electronicBillError: Boolean
+    electronicBillError: Boolean,
+    isGasEnabled: Boolean
 ) {
     Column(
         modifier = modifier
@@ -104,7 +107,6 @@ fun FacturaElectronicaContent(
                 item {
                     ContratoItem(
                         titulo = "Contrato de Luz",
-                        estado = "Activa",
                         icon = Icons.Outlined.Lightbulb,
                         isActivo = true,
                         onClick = {
@@ -124,11 +126,10 @@ fun FacturaElectronicaContent(
                 item {
                     ContratoItem(
                         titulo = "Contrato de Gas",
-                        estado = "Sin Activar",
                         icon = Icons.Outlined.LocalFireDepartment,
-                        isActivo = false,
+                        isActivo = isGasEnabled,
                         onClick = {
-                            onContratoClick(false)
+                            onContratoClick(isGasEnabled)
                             updateSelectedTypeBill(BillTypeEnum.GAS)
                         }
                     )
@@ -149,11 +150,12 @@ fun FacturaElectronicaContent(
 @Composable
 fun ContratoItem(
     titulo: String,
-    estado: String,
     icon: ImageVector,
     isActivo: Boolean,
     onClick: () -> Unit
 ) {
+    val estado = if (isActivo) stringResource(R.string.activa) else stringResource(R.string.sin_activar)
+
     Row(
         modifier = Modifier
             .fillMaxWidth()

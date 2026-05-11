@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.google.services)
 }
 
 android {
@@ -17,11 +18,11 @@ android {
     val mockoonIp = localProperties.getProperty("MOCKOON_IP") ?: "ERROR"
 
     namespace = "com.iberdrola.practicas2026.alejandroLO"
-    compileSdk = 36 // <--- ACTUALIZADO A 36 PARA COMPATIBILIDAD CON LIBRERÍAS 2026
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.iberdrola.practicas2026.alejandroLO"
-        minSdk = 29 // para que compule sdk 29 como pide el enunciado de la practica
+        minSdk = 29
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -104,4 +105,9 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.config)
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.11.0")
 }

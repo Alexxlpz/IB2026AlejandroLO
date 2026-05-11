@@ -138,6 +138,7 @@ fun IberdrolaNavGraph(
                 pantallaAct,
                 IberdrolaScreens.ELECTRONIC_BILLS
             )
+            electronicBillsViewModel.reviewIsGasEnabled()
             delay(300)
             updateNewEmail(null)
             //electronicBillsViewModel.resetCounter()
@@ -149,6 +150,8 @@ fun IberdrolaNavGraph(
         Log.d(TAG, "updateIsModificacion: $it")
         isModificacion = it
     }
+
+    val isGasEnabled by electronicBillsViewModel.isGasEnabled.collectAsState()
 
     NavHost(
         navController = navController,
@@ -222,19 +225,21 @@ fun IberdrolaNavGraph(
                     }
                 },
                 updateSelectedTypeBill = updateSelectedTypeBill,
-                electronicBillError = electronicBills == null
+                electronicBillError = electronicBills == null,
+                isGasEnabled = isGasEnabled
             )
         }
         composable(IberdrolaScreens.ELECTRONIC_BILLS_MODIFY.title) {
             val emailToDisplay = if (typeSelected == BillTypeEnum.LUZ) {
-                electronicBills?.electricityBillEmail ?: ""
+                electronicBills?.electricityBillEmail ?: "esteEmailNoExiste@noExiste.com"
             } else {
-                electronicBills?.gasBillEmail ?: ""
+                electronicBills?.gasBillEmail ?: "esteEmailNoExiste@noExiste.com"
             }
             IberdrolaModifyElectronicBillsScreen(
                 onBackClick = { onCloseClick(IberdrolaScreens.ELECTRONIC_BILLS_MODIFY) },
                 onEditEmailClick = {
                     navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS_MODIFING_EMAIL.title)
+                    updateNewEmail(emailToDisplay)
                 },
                 selectedStreet = selectedStreet,
                 email = emailToDisplay,
@@ -260,10 +265,8 @@ fun IberdrolaNavGraph(
                 },
                 email = if (newEmail != null) {
                     newEmail!!
-                } else if (typeSelected == BillTypeEnum.LUZ) {
-                    electronicBills?.electricityBillEmail!!
                 } else {
-                    electronicBills?.gasBillEmail!!
+                    "esteEmailNoExiste@noExiste.com"
                 },
                 fromVerification = fromVerification
             )
