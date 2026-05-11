@@ -8,6 +8,8 @@ import com.iberdrola.practicas2026.alejandroLO.R
 import com.iberdrola.practicas2026.alejandroLO.data.network.bill.BillsApiService
 import com.iberdrola.practicas2026.alejandroLO.data.network.direction.DirectionApiService
 import com.iberdrola.practicas2026.alejandroLO.data.network.electronicBill.ElectronicBillApiService
+import com.iberdrola.practicas2026.alejandroLO.data.repository.analyticsRepository.AnalyticsRepository
+import com.iberdrola.practicas2026.alejandroLO.data.repository.analyticsRepository.OfflineAnalyticsRepository
 import com.iberdrola.practicas2026.alejandroLO.data.repository.bill.BillsRepository
 import com.iberdrola.practicas2026.alejandroLO.data.repository.bill.OfflineBillsRepository
 import com.iberdrola.practicas2026.alejandroLO.data.repository.conectivity.ConnectivityRepository
@@ -35,6 +37,7 @@ interface AppContainer {
     val connectivityRepository: ConnectivityRepository
     val electronicBillsRepository: ElectronicBillsRepository
     val remoteConfigRepository: RemoteConfigRepository
+    val analyticsRepository: AnalyticsRepository
 }
 
 class AppDataContainer(private val context: Context) : AppContainer {
@@ -105,6 +108,10 @@ class AppDataContainer(private val context: Context) : AppContainer {
 
     override val remoteConfigRepository: RemoteConfigRepository by lazy {
         OfflineRemoteConfigRepository()
+    }
+
+    override val analyticsRepository: AnalyticsRepository by lazy {
+        OfflineAnalyticsRepository(context)
     }
 
     private fun getUnsafeOkHttpClient(context: Context): OkHttpClient {

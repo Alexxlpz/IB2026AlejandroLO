@@ -89,6 +89,8 @@ fun IberdrolaFilterScreen(
     onBack: () -> Unit = {},
     locale: Locale = Locale.forLanguageTag("es-ES"),
     billsViewModel: BillsViewModel = viewModel(factory = BillsViewModelFactory.Factory),
+    onFilter: () -> Unit,
+    onClearFilter: () -> Unit
 ) {
     // Refactored to separate state collection from UI content to avoid ViewModel issues in Previews
     val filterUiState by billsViewModel.filterUiState.collectAsState()
@@ -99,6 +101,7 @@ fun IberdrolaFilterScreen(
         locale = locale,
         onApplyFilters = { dateFrom, dateTo, priceRange, selectedStates ->
             // Use the ViewModel's submit method (keeping typo sumbmitButtom for consistency)
+            onFilter()
             billsViewModel.sumbmitButtom(
                 dateFrom = dateFrom,
                 dateTo = dateTo,
@@ -108,6 +111,7 @@ fun IberdrolaFilterScreen(
             onBack()
         },
         onClearFilters = {
+            onClearFilter()
             billsViewModel.clearFilters()
         }
     )
