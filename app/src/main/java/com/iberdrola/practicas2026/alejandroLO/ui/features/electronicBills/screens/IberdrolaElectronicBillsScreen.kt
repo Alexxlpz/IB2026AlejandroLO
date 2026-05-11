@@ -46,7 +46,7 @@ import com.iberdrola.practicas2026.alejandroLO.R
 @Composable
 fun IberdrolaElectronicBillsScreen(
     onBackClick: () -> Unit,
-    onContratoClick: (Boolean) -> Unit,
+    onContratoClick: (Boolean, String) -> Unit,
     updateSelectedTypeBill: (BillTypeEnum) -> Unit,
     electronicBillError: Boolean,
     isGasEnabled: Boolean = true
@@ -78,7 +78,7 @@ fun IberdrolaElectronicBillsScreen(
 @Composable
 fun FacturaElectronicaContent(
     modifier: Modifier = Modifier,
-    onContratoClick: (Boolean) -> Unit,
+    onContratoClick: (Boolean, String) -> Unit,
     updateSelectedTypeBill: (BillTypeEnum) -> Unit,
     electronicBillError: Boolean,
     isGasEnabled: Boolean
@@ -110,7 +110,7 @@ fun FacturaElectronicaContent(
                         icon = Icons.Outlined.Lightbulb,
                         isActivo = true,
                         onClick = {
-                            onContratoClick(true)
+                            onContratoClick(true, "contrato_luz")
                             updateSelectedTypeBill(BillTypeEnum.LUZ)
                         }
                     )
@@ -129,7 +129,7 @@ fun FacturaElectronicaContent(
                         icon = Icons.Outlined.LocalFireDepartment,
                         isActivo = isGasEnabled,
                         onClick = {
-                            onContratoClick(isGasEnabled)
+                            onContratoClick(isGasEnabled, "contrato_gas")
                             updateSelectedTypeBill(BillTypeEnum.GAS)
                         }
                     )
@@ -256,7 +256,7 @@ fun ErrorMessageShowing(error: String?) {
 fun PreviewIberdrolaElectronicBillsScreen() {
     IberdrolaElectronicBillsScreen(
         onBackClick = {},
-        onContratoClick = {},
+        onContratoClick = {_, _ ->},
         updateSelectedTypeBill = {},
         electronicBillError = false
     )
@@ -267,7 +267,7 @@ fun PreviewIberdrolaElectronicBillsScreen() {
 fun PreviewIberdrolaElectronicBillsScreenError() {
     IberdrolaElectronicBillsScreen(
         onBackClick = {},
-        onContratoClick = {},
+        onContratoClick = {_, _ ->},
         updateSelectedTypeBill = {},
         electronicBillError = true
     )

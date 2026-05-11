@@ -54,6 +54,8 @@ fun IberdrolaMainScreen(
     modifier: Modifier = Modifier,
     locale: Locale = Locale.forLanguageTag("es-ES"),
     billsViewModel: BillsViewModel = viewModel(factory = BillsViewModelFactory.Factory),
+    onChangeBillType: (String) -> Unit,
+    onButtonClick: (String) -> Unit
 ) {
 
     LaunchedEffect(Unit) {
@@ -75,6 +77,8 @@ fun IberdrolaMainScreen(
             billsViewModel.refreshBills()
         },
         onElectronicBillClick = onElectronicBillClick,
+        onChangeBillType = onChangeBillType,
+        onButtonClick = onButtonClick,
         modifier = modifier,
         locale = locale
     )
@@ -91,6 +95,8 @@ fun IberdrolaMainScreenContent(
     onRefresh: () -> Unit,
     onClearFilterField: (ActiveFilterItem) -> Unit,
     onElectronicBillClick: (String, Int) -> Unit,
+    onChangeBillType: (String) -> Unit,
+    onButtonClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     locale: Locale = Locale.forLanguageTag("es-ES")
 ) {
@@ -151,6 +157,7 @@ fun IberdrolaMainScreenContent(
                 streetName = billsUiState.directionStreet,
                 options = billsUiState.options,
                 onOptionSelected = { option ->
+                    onChangeBillType(option.title)
                     val page = if (option == BillTypeEnum.LUZ) 0 else 1
                     scope.launch { pagerState.animateScrollToPage(page) }
                 },
@@ -175,7 +182,10 @@ fun IberdrolaMainScreenContent(
                     bills = filteredBills,
                     lastBill = lastBill,
                     isLoading = billsUiState.isLoading,
-                    onclick = { selectingBill(it) },
+                    onclick = {
+                        onButtonClick("factura ${it.id} clickada")
+                        selectingBill(it)
+                    },
                     refresh = onRefresh,
                     modifier = Modifier.fillMaxSize(),
                     error = billsUiState.errorMessage,
@@ -185,7 +195,10 @@ fun IberdrolaMainScreenContent(
                     clearFilterField = onClearFilterField,
                     filterIsApplied = filterIsApplied,
                     enableFilterButton = enableFilterButton,
-                    onElectronicBillClick = { onElectronicBillClick(billsUiState.directionStreet, billsUiState.directionId) },
+                    onElectronicBillClick = {
+                        onButtonClick("boton_electronicBills")
+                        onElectronicBillClick(billsUiState.directionStreet, billsUiState.directionId)
+                    },
                 )
             }
         }
@@ -215,12 +228,14 @@ fun PreviewIberdrolaMainScreen() {
                 options = BillTypeEnum.entries.toList()
             ),
             filterUiState = FilterUiState(),
-            onBackButtonClick = { },
+            onBackButtonClick = {},
             onFilterClick = {},
             onOptionSelected = {},
             onRefresh = {},
             onClearFilterField = {},
             onElectronicBillClick = { _, _ -> },
+            onChangeBillType = {},
+            onButtonClick = {},
             modifier = Modifier,
             locale = Locale.forLanguageTag("es-ES")
         )

@@ -11,11 +11,13 @@ object HomeViewModelFactory {
             val application = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as IberdrolaApplication)
             val repository = application.container.directionsRepository
             val connectivityRepository = application.container.connectivityRepository
+            val analyticsRepository = application.container.analyticsRepository
 
             HomeViewModel(
                 directionRepository = repository,
                 electronicBillsRepository = application.container.electronicBillsRepository,
-                connectivityRepository = connectivityRepository
+                connectivityRepository = connectivityRepository,
+                analyticsRepository = analyticsRepository
             )
         }
     }

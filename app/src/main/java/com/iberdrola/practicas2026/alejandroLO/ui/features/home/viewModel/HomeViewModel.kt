@@ -3,6 +3,7 @@ package com.iberdrola.practicas2026.alejandroLO.ui.features.home.viewModel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.iberdrola.practicas2026.alejandroLO.data.repository.analyticsRepository.AnalyticsRepository
 import com.iberdrola.practicas2026.alejandroLO.data.repository.conectivity.ConnectivityRepository
 import com.iberdrola.practicas2026.alejandroLO.data.repository.direction.DirectionRepository
 import com.iberdrola.practicas2026.alejandroLO.data.repository.electronicBill.ElectronicBillsRepository
@@ -21,7 +22,8 @@ import java.lang.Math.random
 class HomeViewModel(
     private val directionRepository: DirectionRepository,
     private val electronicBillsRepository: ElectronicBillsRepository,
-    private val connectivityRepository: ConnectivityRepository
+    private val connectivityRepository: ConnectivityRepository,
+    private val analyticsRepository: AnalyticsRepository
 ) : ViewModel() {
 
     val TAG = "HomeViewModel"
@@ -111,5 +113,42 @@ class HomeViewModel(
         clearFilters(isOnline) // espera a que el valor de isOnline cambie y limpia los filtros
         connectivityRepository.setOnlineMode(isOnline) // el collect se encarga de cambiar el valor del uiState
         refreshDirections()
+    }
+
+    // ------------- analytics -------------
+    // -- funcionalidades reservadas para --
+    // -- indicar el flujo al analytics   --
+    // -------------------------------------
+
+    fun logScreenView(screen: String) {
+        analyticsRepository.logScreenView(screen)
+    }
+
+    fun logButtonClick(buttonName: String, screen: String) {
+        analyticsRepository.logButtonClick(buttonName, screen)
+    }
+
+    fun logElectronicBillEmailUpdated(contractType: String, isModification: Boolean) {
+        analyticsRepository.logElectronicBillEmailUpdated(contractType, isModification)
+    }
+
+    fun logVerificationAttempt(contractType: String, attemptNumber: Int) {
+        analyticsRepository.logVerificationAttempt(contractType, attemptNumber)
+    }
+
+    fun logChangeMode(isOnline: Boolean) {
+        analyticsRepository.logChangeMode(isOnline)
+    }
+
+    fun logSelectDirection(street: String) {
+        analyticsRepository.logSelectDirection(street)
+    }
+
+    fun logOpenFeedbackSheet(mostrarFeedback: Boolean) {
+        analyticsRepository.logOpenFeedbackSheet(mostrarFeedback)
+    }
+
+    fun logChangeBillType(type: String) {
+        analyticsRepository.logChangeBillType(type)
     }
 }

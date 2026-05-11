@@ -133,6 +133,17 @@ class ElectronicBillsViewModel(
         }
     }
 
+    fun updateCounterWithAnalyticsPost(post2Analytics: (Int) -> Unit) {
+        viewModelScope.launch {
+            _uiState.update { currentState ->
+                currentState.copy(
+                    counter = currentState.counter - 1
+                )
+            }
+            post2Analytics(_uiState.value.counter)
+        }
+    }
+
     fun resetTimerUpdate() {
         viewModelScope.launch {
             _uiState.update { currentState ->
