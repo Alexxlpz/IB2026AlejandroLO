@@ -100,7 +100,7 @@ fun IberdrolaBar(onBackButtonClick: () -> Unit) {
                 .clip(RoundedCornerShape(50))
                 .background(backgroundColor)
                 .clickable { onBackButtonClick() }
-                .padding(start = 8.dp, top = 8.dp, bottom = 8.dp, end = 10.dp)
+                .padding(start = 0.dp, top = 8.dp, bottom = 8.dp, end = 10.dp)
                 .testTag("main_back_button")
         ) {
             Icon(
