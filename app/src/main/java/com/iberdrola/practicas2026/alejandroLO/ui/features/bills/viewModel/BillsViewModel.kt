@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.iberdrola.practicas2026.alejandroLO.data.model.Bill
 import com.iberdrola.practicas2026.alejandroLO.data.repository.bill.BillsRepository
 import com.iberdrola.practicas2026.alejandroLO.data.repository.conectivity.ConnectivityRepository
+import com.iberdrola.practicas2026.alejandroLO.data.repository.remoteConfig.RemoteConfigRepository
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillStatusEnum
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeEnum
 import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.enums.FilterType
@@ -17,6 +18,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -25,11 +27,11 @@ import java.lang.Math.random
 import java.util.Date
 import kotlin.math.ceil
 import kotlin.math.floor
-import kotlinx.coroutines.flow.debounce
 
 class BillsViewModel(
     private val billsRepository: BillsRepository,
-    private val connectivityRepository: ConnectivityRepository
+    private val connectivityRepository: ConnectivityRepository,
+    private val remoteConfigRepository: RemoteConfigRepository
 ) : ViewModel() {
 
     private val _billsUiState = MutableStateFlow(BillsUiState())
@@ -37,15 +39,28 @@ class BillsViewModel(
 
     private val _filterUiState = MutableStateFlow(FilterUiState())
     val filterUiState: StateFlow<FilterUiState> = _filterUiState.asStateFlow()
+
+    private val _isGasEnabled = MutableStateFlow(
+        remoteConfigRepository.isGasContractsEnabled()
+    )
+    val isGasEnabled: StateFlow<Boolean> = _isGasEnabled.asStateFlow()
+
     private var billsJob: Job? = null
     val TAG: String = "BillsViewModel"
 
     init {
         load_conectivity()
+        loadRemoteConfig()
         load_options()
         refreshBills()
     }
 
+    fun loadRemoteConfig() {
+        viewModelScope.launch {
+            remoteConfigRepository.fetchAndActivate()
+            _isGasEnabled.value = remoteConfigRepository.isGasContractsEnabled()
+        }
+    }
 
     fun load_conectivity() {
         viewModelScope.launch {
@@ -89,6 +104,16 @@ class BillsViewModel(
 
                             val maxDate = bills.maxOf { it.emissionDate }
                             val minDate = bills.minOf { it.emissionDate }
+
+                            reviewIsGasEnabled()
+
+                            if(!_isGasEnabled.value){
+                                _billsUiState.update {
+                                    it.copy(
+                                        billsList = bills.filter { bill -> bill.typeId != BillTypeEnum.GAS.ordinal }
+                                    )
+                                }
+                            }
 
                             setDateLimits(minDate, maxDate)
                             setPriceLimits(minPrice, maxPrice)
@@ -305,4 +330,10 @@ class BillsViewModel(
         }
     }
 
+    fun reviewIsGasEnabled(){
+        viewModelScope.launch {
+            remoteConfigRepository.fetchAndActivate()
+            _isGasEnabled.value = remoteConfigRepository.isGasContractsEnabled()
+        }
+    }
 }

@@ -4,6 +4,7 @@ import android.content.Context
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.logEvent
 
+// %LOCALAPPDATA%\Android\Sdk\platform-tools\adb shell setprop debug.firebase.analytics.app com.iberdrola.practicas2026.alejandroLO
 class OfflineAnalyticsRepository(context: Context) : AnalyticsRepository {
 
     private val analytics = FirebaseAnalytics.getInstance(context)

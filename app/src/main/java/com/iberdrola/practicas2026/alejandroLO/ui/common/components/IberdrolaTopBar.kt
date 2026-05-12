@@ -48,6 +48,7 @@ fun IberdrolaTopBar(selectedOption: BillTypeEnum,
                     options: List<BillTypeEnum>,
                     onOptionSelected: (BillTypeEnum) -> Unit,
                     onBackButtonClick: () -> Unit,
+                    isGasEnabled: Boolean,
                     modifier: Modifier = Modifier){
     Column(modifier = modifier
         .fillMaxWidth()
@@ -69,7 +70,8 @@ fun IberdrolaTopBar(selectedOption: BillTypeEnum,
             onOptionSelected = { selectedOptionTitle ->
                 val selectedOption = BillTypeEnum.entries.find { it.title == selectedOptionTitle } ?: BillTypeEnum.LUZ
                 onOptionSelected(selectedOption)
-            }
+            },
+            isGasEnabled = isGasEnabled
         )
     }
 }
@@ -144,19 +146,22 @@ fun IberdrolaTitleAndDescription(
 fun ServiceSelector(
     selectedOption: String,
     options: List<String>,
-    onOptionSelected: (String) -> Unit
+    onOptionSelected: (String) -> Unit,
+    isGasEnabled: Boolean
 ) {
     Row(modifier = Modifier
         .fillMaxWidth()
         .padding(horizontal = 10.dp)
     ) {
         for (option in options) {
-            ServiceOption(
-                text = option,
-                isSelected = selectedOption == option,
-                onClick = { onOptionSelected(option) }
-            )
-            Spacer(modifier = Modifier.width(10.dp))
+            if(isGasEnabled || option != "Gas") {
+                ServiceOption(
+                    text = option,
+                    isSelected = selectedOption == option,
+                    onClick = { onOptionSelected(option) }
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+            }
         }
     }
     Box(
@@ -227,6 +232,7 @@ fun PreviewIberdrolaTopBar() {
             options = BillTypeEnum.entries,
             onOptionSelected = { },
             onBackButtonClick = { },
+            isGasEnabled = true,
             modifier = Modifier
         )
     }

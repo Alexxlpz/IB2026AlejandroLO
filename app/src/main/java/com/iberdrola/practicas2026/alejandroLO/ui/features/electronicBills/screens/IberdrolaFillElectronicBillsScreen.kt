@@ -69,7 +69,7 @@ fun IberdrolaFillElectronicBillsScreen(
     fromVerification: Boolean
 ) {
     var email by remember { mutableStateOf(email?:"") }
-    var acceptedTerms by remember { mutableStateOf(false) }
+    var acceptedTerms by remember { mutableStateOf(fromVerification) }
 
     var showDialog by remember { mutableStateOf(false) }
     var dialogTitle by remember { mutableStateOf("") }
