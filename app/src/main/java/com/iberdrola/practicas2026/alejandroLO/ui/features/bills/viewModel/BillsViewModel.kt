@@ -97,23 +97,25 @@ class BillsViewModel(
                     if (bills.isNotEmpty()) {
                         withContext(Dispatchers.Default) {
 
-                            // para redondear hacia arriba
-                            val maxPrice = ceil(bills.maxOf { it.price }).toFloat()
-                            // para redondear hacia abajo
-                            val minPrice = floor(bills.minOf { it.price }).toFloat()
+                            var billAux = bills
 
-                            val maxDate = bills.maxOf { it.emissionDate }
-                            val minDate = bills.minOf { it.emissionDate }
-
-                            reviewIsGasEnabled()
-
+                            suspendReviewIsGasEnabled()
                             if(!_isGasEnabled.value){
+                                billAux = billAux.filter { it.typeId != BillTypeEnum.GAS.ordinal }
                                 _billsUiState.update {
                                     it.copy(
-                                        billsList = bills.filter { bill -> bill.typeId != BillTypeEnum.GAS.ordinal }
+                                        billsList = billAux
                                     )
                                 }
                             }
+
+                            // para redondear hacia arriba
+                            val maxPrice = ceil(billAux.maxOf { it.price }).toFloat()
+                            // para redondear hacia abajo
+                            val minPrice = floor(billAux.minOf { it.price }).toFloat()
+
+                            val maxDate = billAux.maxOf { it.emissionDate }
+                            val minDate = billAux.minOf { it.emissionDate }
 
                             setDateLimits(minDate, maxDate)
                             setPriceLimits(minPrice, maxPrice)
@@ -330,10 +332,14 @@ class BillsViewModel(
         }
     }
 
+    suspend fun suspendReviewIsGasEnabled() {
+        remoteConfigRepository.fetchAndActivate()
+        _isGasEnabled.value = remoteConfigRepository.isGasContractsEnabled()
+    }
+
     fun reviewIsGasEnabled(){
         viewModelScope.launch {
-            remoteConfigRepository.fetchAndActivate()
-            _isGasEnabled.value = remoteConfigRepository.isGasContractsEnabled()
+            suspendReviewIsGasEnabled()
         }
     }
 }
