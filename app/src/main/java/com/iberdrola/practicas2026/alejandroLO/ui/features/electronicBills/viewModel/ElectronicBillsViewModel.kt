@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.iberdrola.practicas2026.alejandroLO.data.model.ElectronicBill
 import com.iberdrola.practicas2026.alejandroLO.data.repository.conectivity.ConnectivityRepository
 import com.iberdrola.practicas2026.alejandroLO.data.repository.electronicBill.ElectronicBillsRepository
-import com.iberdrola.practicas2026.alejandroLO.data.repository.remoteConfig.RemoteConfigRepository
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeEnum
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -18,20 +17,13 @@ import kotlinx.coroutines.launch
 
 class ElectronicBillsViewModel(
     private val electronicBillsRepository: ElectronicBillsRepository,
-    private val connectivityRepository: ConnectivityRepository,
-    private val remoteConfigRepository: RemoteConfigRepository
+    private val connectivityRepository: ConnectivityRepository
 ) : ViewModel() {
 
     val TAG = "ElectronicBillsViewModel"
 
     private val _uiState = MutableStateFlow(ElectronicBillsUiState())
     val uiState: StateFlow<ElectronicBillsUiState> = _uiState.asStateFlow()
-
-
-    private val _isGasEnabled = MutableStateFlow(
-        remoteConfigRepository.isGasContractsEnabled()
-    )
-    val isGasEnabled: StateFlow<Boolean> = _isGasEnabled.asStateFlow()
 
 
     val  DAY_IN_MILLIS = 60 * 60 * 24 * 1000
@@ -41,16 +33,8 @@ class ElectronicBillsViewModel(
     init {
         viewModelScope.launch {
             load_conectivity()
-            loadRemoteConfig()
             delay(1000)
             refreshElectronicBills()
-        }
-    }
-
-    fun loadRemoteConfig() {
-        viewModelScope.launch {
-            remoteConfigRepository.fetchAndActivate()
-            _isGasEnabled.value = remoteConfigRepository.isGasContractsEnabled()
         }
     }
 
@@ -169,12 +153,4 @@ class ElectronicBillsViewModel(
             }
         }
     }
-
-    fun reviewIsGasEnabled(){
-        viewModelScope.launch {
-            remoteConfigRepository.fetchAndActivate()
-            _isGasEnabled.value = remoteConfigRepository.isGasContractsEnabled()
-        }
-    }
-
 }

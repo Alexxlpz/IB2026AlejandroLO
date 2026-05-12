@@ -102,8 +102,6 @@ fun IberdrolaNavGraph(
                     inclusive = true
                 }
             }
-
-
         }
     }
 
@@ -143,7 +141,7 @@ fun IberdrolaNavGraph(
         updateElectronicBills(directionId)
     }
 
-    var newEmail: String? = null
+    var newEmail by remember { mutableStateOf<String?>(null) }
     val updateNewEmail: (String?) -> Unit = {
         Log.d(TAG, "changeNewEmail: $it")
         newEmail = it
@@ -155,7 +153,7 @@ fun IberdrolaNavGraph(
                 pantallaAct,
                 IberdrolaScreens.ELECTRONIC_BILLS
             )
-            electronicBillsViewModel.reviewIsGasEnabled()
+            billsViewModel.reviewIsGasEnabled()
             delay(300)
             updateNewEmail(null)
             //electronicBillsViewModel.resetCounter()
@@ -168,7 +166,7 @@ fun IberdrolaNavGraph(
         isModificacion = it
     }
 
-    val isGasEnabled by electronicBillsViewModel.isGasEnabled.collectAsState()
+    val isGasEnabled by billsViewModel.isGasEnabled.collectAsState()
 
     NavHost(
         navController = navController,
@@ -215,7 +213,7 @@ fun IberdrolaNavGraph(
                     navController.navigate(IberdrolaScreens.FILTER.title)
                 },
                 onElectronicBillClick = { street, streetId ->
-                    electronicBillsViewModel.reviewIsGasEnabled()
+                    billsViewModel.reviewIsGasEnabled()
                     onElectronicBillClick(street, streetId)
                 },
                 onChangeBillType = { homeViewModel.logChangeBillType(it) },

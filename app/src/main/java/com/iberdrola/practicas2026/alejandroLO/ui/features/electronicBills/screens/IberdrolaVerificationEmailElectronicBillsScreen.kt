@@ -84,12 +84,6 @@ fun IberdrolaVerificationEmailElectronicBillsScreen(
 
     var finalProgress by remember { mutableFloatStateOf(0.75f) }
 
-    val supressBackStack: (Boolean) -> Unit = {
-        if(!isLoading) {
-            onBackClick()
-        }
-    }
-
     val bannerJob = remember { mutableStateOf<Job?>(null) }
 
     val focusManager = LocalFocusManager.current
@@ -114,7 +108,11 @@ fun IberdrolaVerificationEmailElectronicBillsScreen(
 
 
 
-    BackHandler(onBack = { supressBackStack(isLoading) })
+    BackHandler(enabled = true) {
+        if (!isLoading) {
+            onBackClick()
+        }
+    }
 
     Box(modifier = Modifier
         .fillMaxSize()
@@ -339,6 +337,14 @@ fun HelpSection(
                     3 -> {
                         Text(
                             text = stringResource(R.string.counter3_helpSelection),
+                            style = IberdrolaTheme.typography.cuerpoPeque,
+                            color = IberdrolaTheme.colors.onSurface,
+                            lineHeight = 16.sp
+                        )
+                    }
+                    1 -> {
+                        Text(
+                            text = stringResource(R.string.texto_helpSelection_counter1),
                             style = IberdrolaTheme.typography.cuerpoPeque,
                             color = IberdrolaTheme.colors.onSurface,
                             lineHeight = 16.sp

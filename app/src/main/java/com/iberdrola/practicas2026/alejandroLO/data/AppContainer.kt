@@ -41,6 +41,8 @@ interface AppContainer {
 }
 
 class AppDataContainer(private val context: Context) : AppContainer {
+    // para redireccionamiento de puertos
+    // %LOCALAPPDATA%\Android\Sdk\platform-tools\adb reverse tcp:3001 tcp:3001
     private val baseUrl = BuildConfig.MOCKOON_URL // url para conectarnos con mockoon
 //    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 

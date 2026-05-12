@@ -1,5 +1,6 @@
 package com.iberdrola.practicas2026.alejandroLO.ui.features.electronicBills.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -51,6 +52,11 @@ fun IberdrolaElectronicBillsScreen(
     electronicBillError: Boolean,
     isGasEnabled: Boolean = true
 ) {
+
+    BackHandler {
+        onBackClick()
+    }
+
     Scaffold(
         topBar = {
             Box(

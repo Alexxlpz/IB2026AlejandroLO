@@ -53,7 +53,7 @@ fun IberdrolaModifyEmailElectronicBillScreen(
     val progressStart = if (fromVerification) 0.75f else 0f
 
     BackHandler(
-        onBack = onCloseClick
+        onBack = onBackClick
     )
 
     val focusManager = LocalFocusManager.current

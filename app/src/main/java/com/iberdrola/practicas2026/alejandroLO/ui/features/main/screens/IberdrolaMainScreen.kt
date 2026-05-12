@@ -64,6 +64,7 @@ fun IberdrolaMainScreen(
 
     val billsUiState by billsViewModel.billsUiState.collectAsState()
     val filterUiState by billsViewModel.filterUiState.collectAsState()
+    val isGasEnabled by billsViewModel.isGasEnabled.collectAsState()
 
     IberdrolaMainScreenContent(
         billsUiState = billsUiState,
@@ -79,6 +80,7 @@ fun IberdrolaMainScreen(
         onElectronicBillClick = onElectronicBillClick,
         onChangeBillType = onChangeBillType,
         onButtonClick = onButtonClick,
+        isGasEnabled = isGasEnabled,
         modifier = modifier,
         locale = locale
     )
@@ -97,6 +99,7 @@ fun IberdrolaMainScreenContent(
     onElectronicBillClick: (String, Int) -> Unit,
     onChangeBillType: (String) -> Unit,
     onButtonClick: (String) -> Unit,
+    isGasEnabled: Boolean,
     modifier: Modifier = Modifier,
     locale: Locale = Locale.forLanguageTag("es-ES")
 ) {
@@ -129,10 +132,20 @@ fun IberdrolaMainScreenContent(
         }
     }
 
-    val pagerState = rememberPagerState(
-        initialPage = if (billsUiState.selectedOption == BillTypeEnum.LUZ) 0 else 1,
-        pageCount = { 2 }
-    )
+
+
+    val pagerState = if(isGasEnabled) {
+        rememberPagerState(
+            initialPage = if (billsUiState.selectedOption == BillTypeEnum.LUZ) 0 else 1,
+            pageCount = { 2 }
+        )
+    }else {
+        rememberPagerState(
+            initialPage = BillTypeEnum.LUZ.ordinal,
+            pageCount = { 1 }
+        )
+    }
+
 
     LaunchedEffect(pagerState.currentPage) {
         val option = if (pagerState.currentPage == 0) BillTypeEnum.LUZ else BillTypeEnum.GAS
@@ -161,7 +174,8 @@ fun IberdrolaMainScreenContent(
                     val page = if (option == BillTypeEnum.LUZ) 0 else 1
                     scope.launch { pagerState.animateScrollToPage(page) }
                 },
-                onBackButtonClick = onBackButtonClick
+                onBackButtonClick = onBackButtonClick,
+                isGasEnabled = isGasEnabled
             )
 
             HorizontalPager(
@@ -236,6 +250,7 @@ fun PreviewIberdrolaMainScreen() {
             onElectronicBillClick = { _, _ -> },
             onChangeBillType = {},
             onButtonClick = {},
+            isGasEnabled = true,
             modifier = Modifier,
             locale = Locale.forLanguageTag("es-ES")
         )
