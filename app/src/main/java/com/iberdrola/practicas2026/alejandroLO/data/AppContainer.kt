@@ -1,9 +1,10 @@
 package com.iberdrola.practicas2026.alejandroLO.data
 
 import android.content.Context
+import android.os.Build
+import android.util.Log
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializer
-import com.iberdrola.practicas2026.alejandroLO.BuildConfig
 import com.iberdrola.practicas2026.alejandroLO.R
 import com.iberdrola.practicas2026.alejandroLO.data.network.bill.BillsApiService
 import com.iberdrola.practicas2026.alejandroLO.data.network.direction.DirectionApiService
@@ -42,8 +43,9 @@ interface AppContainer {
 
 class AppDataContainer(private val context: Context) : AppContainer {
     // para redireccionamiento de puertos
-    // %LOCALAPPDATA%\Android\Sdk\platform-tools\adb reverse tcp:3001 tcp:3001
-    private val baseUrl = BuildConfig.MOCKOON_URL // url para conectarnos con mockoon
+    // %LOCALAPPDATA%\Android\Sdk\platform-tools\adb reverse tcp:3000 tcp:3000
+    private val deviceUrl = "https://localhost:3000/" // en dispositivo fisico
+    private val emulatorUrl = "https://10.0.2.2:3000/" // url para conectarnos con mockoon en emulador
 //    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 
 
@@ -54,8 +56,16 @@ class AppDataContainer(private val context: Context) : AppContainer {
         })
         .setLenient() // para que Gson sea mas tolerable con el json
         .create()
+
+    val usedUrl = if(isEmulator()) {
+        Log.d("AppDataContainer", "Usando URL de emulador: $emulatorUrl")
+        emulatorUrl
+    } else {
+        Log.d("AppDataContainer", "Usando URL de dispositivo: $deviceUrl")
+        deviceUrl
+    }
     private val retrofit: Retrofit = Retrofit.Builder()
-        .baseUrl(baseUrl)
+        .baseUrl(usedUrl)
         .client(getUnsafeOkHttpClient(context))
         .addConverterFactory(GsonConverterFactory.create(gson)) // se lo pasamos para que lo use
         // para crear los objetos bill
@@ -142,5 +152,34 @@ class AppDataContainer(private val context: Context) : AppContainer {
             )
             .hostnameVerifier { _, _ -> true }
             .build()
+    }
+
+    fun isEmulator(): Boolean {
+        val result = (Build.FINGERPRINT.startsWith("generic")
+                || Build.FINGERPRINT.startsWith("unknown")
+                || Build.MODEL.contains("google_sdk")
+                || Build.MODEL.contains("Emulator")
+                || Build.MODEL.contains("Android SDK built for x86")
+                || Build.MANUFACTURER.contains("Genymotion")
+                || Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic")
+                || Build.PRODUCT == "google_sdk"
+                || Build.HARDWARE.contains("goldfish")
+                || Build.HARDWARE.contains("ranchu")
+                || Build.PRODUCT.contains("sdk")
+                || Build.PRODUCT.contains("emulator"))
+
+        // log para depurar
+        Log.d("isEmulator", """
+        FINGERPRINT: ${Build.FINGERPRINT}
+        MODEL: ${Build.MODEL}
+        MANUFACTURER: ${Build.MANUFACTURER}
+        BRAND: ${Build.BRAND}
+        DEVICE: ${Build.DEVICE}
+        PRODUCT: ${Build.PRODUCT}
+        HARDWARE: ${Build.HARDWARE}
+        resultado: $result
+    """.trimIndent())
+
+        return result
     }
 }
