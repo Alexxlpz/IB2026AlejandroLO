@@ -129,7 +129,6 @@ class BillsViewModel(
                 try {
                     Log.d(TAG, "BILLS -> refreshBills form street: "+_billsUiState.value.directionStreet)
                     billsRepository.refreshBillsOnline()
-                    // ahora el delay lo simulamos desde mockoon
                     delay(500) // debido a que se carga demasiado rapido y ves aparecer las bills mientras se cargan
                 } catch (e: Exception) {
                     Log.e(TAG, "Error al conectar con Mockoon: ${e.message}")

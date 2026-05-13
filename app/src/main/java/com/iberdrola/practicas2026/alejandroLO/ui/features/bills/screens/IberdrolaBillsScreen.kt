@@ -166,7 +166,8 @@ fun IberdrolaBillsScreen(
                     if (lastBill != null) {
                         IberdrolaLastBill(
                             lastBill = lastBill ,
-                            numberFormat = numberFormat
+                            numberFormat = numberFormat,
+                            onclick = { onclick(lastBill) }
                         )
 
                         FacturaElectronicaPromoCard(onClick = onElectronicBillClick)
@@ -226,7 +227,8 @@ fun IberdrolaBillsScreen(
 @Composable
 fun IberdrolaLastBill(
     lastBill: Bill,
-    numberFormat: NumberFormat
+    numberFormat: NumberFormat,
+    onclick: () -> Unit
 ) {
     val billColor = BillStatusEnum.entries[lastBill.statusId].color
     val billStatus = BillStatusEnum.entries[lastBill.statusId].status
@@ -238,7 +240,8 @@ fun IberdrolaLastBill(
             .testTag("last_bill_item"),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = IberdrolaTheme.colors.surface),
-        border = BorderStroke(2.dp, IberdrolaTheme.colors.primary.copy(alpha = 0.6f))
+        border = BorderStroke(2.dp, IberdrolaTheme.colors.primary.copy(alpha = 0.6f)),
+        onClick = onclick
     ) {
         Column(
             modifier = Modifier
@@ -656,6 +659,7 @@ fun FacturaElectronicaPromoCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
+            .clip(RoundedCornerShape(20.dp))
             .padding(horizontal = 16.dp, vertical = 8.dp),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(

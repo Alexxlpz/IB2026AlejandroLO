@@ -308,6 +308,11 @@ fun IberdrolaNavGraph(
                 } else {
                     "esteEmailNoExiste@noExiste.com"
                 },
+                emailFromModificacion = if (typeSelected == BillTypeEnum.LUZ) {
+                    electronicBills?.electricityBillEmail!!
+                } else {
+                    electronicBills?.gasBillEmail!!
+                },
                 fromVerification = fromVerification
             )
         }
@@ -386,7 +391,8 @@ fun IberdrolaNavGraph(
                     )
                 },
                 reviewCoolDown = { electronicBillsViewModel.reviewCooldown() },
-                resetTimerUpdate = { electronicBillsViewModel.resetTimerUpdate() }
+                resetTimerUpdate = { electronicBillsViewModel.resetTimerUpdate() },
+                isModificacion = isModificacion
             )
         }
         composable(IberdrolaScreens.ELECTRONIC_BILLS_THANKS.title) {

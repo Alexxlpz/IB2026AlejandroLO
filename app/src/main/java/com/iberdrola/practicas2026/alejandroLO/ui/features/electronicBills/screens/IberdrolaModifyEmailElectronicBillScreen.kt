@@ -1,5 +1,6 @@
 package com.iberdrola.practicas2026.alejandroLO.ui.features.electronicBills.screens
 
+import android.util.Patterns.EMAIL_ADDRESS
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -43,12 +44,20 @@ fun IberdrolaModifyEmailElectronicBillScreen(
     onBackClick: () -> Unit,
     onNextClick: (String) -> Unit,
     email: String,
+    emailFromModificacion: String,
     fromVerification: Boolean
 ) {
     var newEmail by remember { mutableStateOf(email) }
-
-    val isEmailValid = android.util.Patterns.EMAIL_ADDRESS.matcher(newEmail).matches()
+    val isEqualEmail = newEmail == emailFromModificacion
+    val isEmailValid = EMAIL_ADDRESS.matcher(newEmail).matches()
+            && newEmail.substringAfterLast(".").length > 1
     val isError = (newEmail.isNotEmpty() && !isEmailValid) || newEmail.isEmpty()
+    var showEqualEmailError by remember { mutableStateOf(false) }
+    val errorText = if (isError) {
+        "Introduce un formato de email válido (ejemplo@dominio.com)"
+    } else if(showEqualEmailError && isEqualEmail) {
+        "El email para modificación no puede ser el mismo que el email ya asociado"
+    } else ""
 
     val progressStart = if (fromVerification) 0.75f else 0f
 
@@ -100,7 +109,10 @@ fun IberdrolaModifyEmailElectronicBillScreen(
 
                     BasicTextField(
                         value = newEmail,
-                        onValueChange = { newEmail = it },
+                        onValueChange = {
+                            newEmail = it
+                            showEqualEmailError = false
+                        },
                         modifier = Modifier.fillMaxWidth(),
                         textStyle = IberdrolaTheme.typography.cuerpoMedio.copy(
                             fontSize = 18.sp,
@@ -118,17 +130,17 @@ fun IberdrolaModifyEmailElectronicBillScreen(
                                 singleLine = true,
                                 visualTransformation = androidx.compose.ui.text.input.VisualTransformation.None,
                                 interactionSource = interactionSource,
-                                isError = isError,
-                                placeholder = {
+                                isError = isError || (showEqualEmailError && isEqualEmail),
+                                label = {
                                     Text(
                                         text = stringResource(id = R.string.new_email_label),
                                         style = IberdrolaTheme.typography.tituloPeque
                                     )
                                 },
                                 supportingText = {
-                                    if (isError) {
+                                    if (isError || (showEqualEmailError && isEqualEmail)) {
                                         Text(
-                                            text = "Introduce un formato de email válido (ejemplo@dominio.com)",
+                                            text = errorText,
                                             style = IberdrolaTheme.typography.etiquetaPeque,
                                             color = Color.Red
                                         )
@@ -143,19 +155,22 @@ fun IberdrolaModifyEmailElectronicBillScreen(
                                     focusedIndicatorColor = IberdrolaTheme.colors.primary,
                                     unfocusedIndicatorColor = IberdrolaTheme.colors.onSurface,
                                     errorIndicatorColor = Color.Red,
-                                    focusedLabelColor = Color.Gray,
+                                    focusedLabelColor = IberdrolaTheme.colors.primary,
                                     unfocusedLabelColor = Color.Gray,
-                                    errorLabelColor = Color.Red
+                                    errorLabelColor = Color.Red,
+                                    cursorColor = IberdrolaTheme.colors.primary
                                 ),
                                 container = {
                                     TextFieldDefaults.Container(
                                         enabled = true,
-                                        isError = isError,
+                                        isError = isError || (showEqualEmailError && isEqualEmail),
                                         interactionSource = interactionSource,
                                         colors = TextFieldDefaults.colors(
                                             focusedContainerColor = Color.Transparent,
                                             unfocusedContainerColor = Color.Transparent,
-                                            errorContainerColor = Color.Transparent
+                                            errorContainerColor = Color.Transparent,
+                                            focusedIndicatorColor = IberdrolaTheme.colors.primary,
+                                            errorIndicatorColor = Color.Red
                                         ),
                                         shape = androidx.compose.ui.graphics.RectangleShape,
                                     )
@@ -173,7 +188,14 @@ fun IberdrolaModifyEmailElectronicBillScreen(
                 IberdrolaNextBackButtons(
                     isNextEnabled = isNextEnabled,
                     onBackClick = onBackClick,
-                    onNextClick = { onNextClick(newEmail) }
+                    onNextClick = {
+                        if (isEqualEmail) {
+                            showEqualEmailError = true
+                        } else {
+                            onNextClick(newEmail)
+                        }
+                    },
+                    falseDisable = isEqualEmail
                 )
             }
         }
@@ -188,6 +210,7 @@ fun PreviewIberdrolaModifyEmailElectronicBillScreen() {
         onBackClick = {},
         onNextClick = {},
         email = "emailPrueba@hotmail.com",
+        emailFromModificacion = "",
         fromVerification = false
     )
 }
