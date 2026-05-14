@@ -665,17 +665,22 @@ fun FacturaElectronicaPromoCard(
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
-    Card(
+    val interactionSource = remember { MutableInteractionSource() }
+
+    Surface(
         modifier = modifier
             .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
             .clip(RoundedCornerShape(20.dp))
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .clickable(
+                interactionSource = interactionSource,
+                indication = ripple(),
+                onClick = onClick
+            ),
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = IberdrolaTheme.colors.primary.copy(alpha = 0.12f)
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        onClick = onClick
+        color = IberdrolaTheme.colors.primary.copy(alpha = 0.12f),
+        tonalElevation = 0.dp,
+        shadowElevation = 0.dp
     ) {
         Row(
             modifier = Modifier
