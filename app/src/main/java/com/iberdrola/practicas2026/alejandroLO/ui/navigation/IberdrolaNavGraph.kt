@@ -210,6 +210,7 @@ fun IberdrolaNavGraph(
                 billsViewModel = billsViewModel,
                 onFilterClick = {
                     homeViewModel.logButtonClick("filtrar", IberdrolaScreens.MAIN.title)
+                    billsViewModel.onReturnFromFilter()
                     navController.navigate(IberdrolaScreens.FILTER.title)
                 },
                 onElectronicBillClick = { street, streetId ->
@@ -308,6 +309,11 @@ fun IberdrolaNavGraph(
                 } else {
                     "esteEmailNoExiste@noExiste.com"
                 },
+                emailFromModificacion = if (typeSelected == BillTypeEnum.LUZ) {
+                    electronicBills?.electricityBillEmail!!
+                } else {
+                    electronicBills?.gasBillEmail!!
+                },
                 fromVerification = fromVerification
             )
         }
@@ -386,7 +392,8 @@ fun IberdrolaNavGraph(
                     )
                 },
                 reviewCoolDown = { electronicBillsViewModel.reviewCooldown() },
-                resetTimerUpdate = { electronicBillsViewModel.resetTimerUpdate() }
+                resetTimerUpdate = { electronicBillsViewModel.resetTimerUpdate() },
+                isModificacion = isModificacion
             )
         }
         composable(IberdrolaScreens.ELECTRONIC_BILLS_THANKS.title) {

@@ -104,7 +104,10 @@ fun IberdrolaBillsScreen(
     clearFilterField: (ActiveFilterItem) -> Unit,
     enableFilterButton: Boolean,
     filterIsApplied: Boolean,
-    onElectronicBillClick: () -> Unit
+    onElectronicBillClick: () -> Unit,
+    isActivePage: Boolean,
+    initialScrollDone: Boolean,
+    onScrollInitialized: () -> Unit
 ) {
     val scrollState = rememberScrollState()
     val density = LocalDensity.current
@@ -118,17 +121,23 @@ fun IberdrolaBillsScreen(
     val updateScrollToHistoricoY = { y: Int -> scrollToHistoricoY.intValue = y }
 
     LaunchedEffect(isLoading) {
-        if (!isLoading && filterIsApplied && scrollToHistoricoY.intValue > 0 && scrollState.value != 990) {
-            scrollState.animateScrollTo(
-                990,
-                animationSpec = tween(
-                    durationMillis = 1500,
-                    easing = CubicBezierEasing(0.25f, 0.8f, 0.25f, 1f)
-                )
-            )
-
-        }else if(!isLoading && scrollState.value != 990){
-            scrollState.scrollTo(0)
+        if (!isLoading && !initialScrollDone) {
+            if (filterIsApplied) {
+                if (isActivePage) {
+                    scrollState.animateScrollTo(
+                        990,
+                        animationSpec = tween(
+                            durationMillis = 1500,
+                            easing = CubicBezierEasing(0.25f, 0.8f, 0.25f, 1f)
+                        )
+                    )
+                } else {
+                    scrollState.scrollTo(990)
+                }
+            } else {
+                scrollState.scrollTo(0)
+            }
+            onScrollInitialized()
         }
     }
 
@@ -166,7 +175,8 @@ fun IberdrolaBillsScreen(
                     if (lastBill != null) {
                         IberdrolaLastBill(
                             lastBill = lastBill ,
-                            numberFormat = numberFormat
+                            numberFormat = numberFormat,
+                            onclick = { onclick(lastBill) }
                         )
 
                         FacturaElectronicaPromoCard(onClick = onElectronicBillClick)
@@ -226,7 +236,8 @@ fun IberdrolaBillsScreen(
 @Composable
 fun IberdrolaLastBill(
     lastBill: Bill,
-    numberFormat: NumberFormat
+    numberFormat: NumberFormat,
+    onclick: () -> Unit
 ) {
     val billColor = BillStatusEnum.entries[lastBill.statusId].color
     val billStatus = BillStatusEnum.entries[lastBill.statusId].status
@@ -238,7 +249,8 @@ fun IberdrolaLastBill(
             .testTag("last_bill_item"),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = IberdrolaTheme.colors.surface),
-        border = BorderStroke(2.dp, IberdrolaTheme.colors.primary.copy(alpha = 0.6f))
+        border = BorderStroke(2.dp, IberdrolaTheme.colors.primary.copy(alpha = 0.6f)),
+        onClick = onclick
     ) {
         Column(
             modifier = Modifier
@@ -653,21 +665,27 @@ fun FacturaElectronicaPromoCard(
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
-    Card(
+    val interactionSource = remember { MutableInteractionSource() }
+
+    Surface(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .clip(RoundedCornerShape(20.dp))
+            .clickable(
+                interactionSource = interactionSource,
+                indication = ripple(),
+                onClick = onClick
+            ),
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = IberdrolaTheme.colors.primary.copy(alpha = 0.12f)
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        onClick = onClick
+        color = IberdrolaTheme.colors.primary.copy(alpha = 0.12f),
+        tonalElevation = 0.dp,
+        shadowElevation = 0.dp
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+                .padding(16.dp)
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
@@ -730,7 +748,10 @@ fun PreviewIberdrolaBillsScreen() {
             clearFilterField = {},
             enableFilterButton = true,
             filterIsApplied = false,
-            onElectronicBillClick = {}
+            onElectronicBillClick = {},
+            isActivePage = false,
+            initialScrollDone = false,
+            onScrollInitialized = {}
         )
     }
 }
@@ -751,7 +772,10 @@ fun PreviewIberdrolaBillsScreenWithNoBills() {
             clearFilterField = {},
             enableFilterButton = true,
             filterIsApplied = false,
-            onElectronicBillClick = {}
+            onElectronicBillClick = {},
+            isActivePage = false,
+            initialScrollDone = false,
+            onScrollInitialized = {}
         )
     }
 }

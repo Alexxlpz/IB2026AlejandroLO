@@ -24,7 +24,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.ThumbDownOffAlt
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -63,6 +62,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -74,14 +74,23 @@ fun IberdrolaVerificationEmailElectronicBillsScreen(
     electronicBillsUiState: ElectronicBillsUiState,
     updateCounter: () -> Unit,
     reviewCoolDown: () -> Unit,
-    resetTimerUpdate: () -> Unit
+    resetTimerUpdate: () -> Unit,
+    isModificacion: Boolean
 ) {
     var verificationCode by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
     var showSuccessMessage by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val counter = electronicBillsUiState.counter
-
+    var fecha by remember {
+        mutableStateOf(
+            if(electronicBillsUiState.resetTimer != null){
+                Date(electronicBillsUiState.resetTimer)
+            }else {
+                Date()
+            }
+        )
+    }
     var finalProgress by remember { mutableFloatStateOf(0.75f) }
 
     val bannerJob = remember { mutableStateOf<Job?>(null) }
@@ -93,8 +102,8 @@ fun IberdrolaVerificationEmailElectronicBillsScreen(
         if(electronicBillsUiState.resetTimer != null){
             val date = Date(electronicBillsUiState.resetTimer)
             val format = SimpleDateFormat("yyyy.MM.dd HH:mm")
-            val fecha = format.format(date)
-            Log.d("IberdrolaVerificationEmailElectronicBillsScreen", "hay que esperar hasta: "+ fecha)
+            fecha = date
+            Log.d("IberdrolaVerificationEmailElectronicBillsScreen", "hay que esperar hasta: "+ format.format(date))
         }else {
             Log.d("IberdrolaVerificationEmailElectronicBillsScreen", "reset no seteado aún")
         }
@@ -133,7 +142,7 @@ fun IberdrolaVerificationEmailElectronicBillsScreen(
                     .padding(paddingValues)
             ) {
                 VerificationHeader(
-                    title = stringResource(R.string.activa_tu_factura_electronica),
+                    title = if(isModificacion) stringResource(R.string.modificar_email) else stringResource(R.string.activa_tu_factura_electronica),
                     progressStart = 0.5f,
                     progressEnd = finalProgress,
                     onCloseClick = onCloseClick
@@ -179,7 +188,8 @@ fun IberdrolaVerificationEmailElectronicBillsScreen(
                         },
                         counter = counter,
                         updateCounter = { updateCounter() },
-                        isLoading = isLoading
+                        isLoading = isLoading,
+                        fechaReset = fecha
                     )
                 }
 
@@ -260,7 +270,7 @@ fun VerificationCodeField(value: String, onValueChange: (String) -> Unit) {
                 singleLine = true,
                 visualTransformation = androidx.compose.ui.text.input.VisualTransformation.None,
                 interactionSource = interactionSource,
-                placeholder = {
+                label = {
                     Text(
                         text = stringResource(R.string.codigo_verificacion_label),
                         style = IberdrolaTheme.typography.etiquetaGrande
@@ -299,8 +309,32 @@ fun HelpSection(
     onResendClick: () -> Unit,
     counter: Int,
     updateCounter: () -> Unit,
-    isLoading: Boolean
+    isLoading: Boolean,
+    fechaReset: Date
 ) {
+    val format = SimpleDateFormat("HH:mm")
+    var fechaFinal by remember { mutableStateOf("") }
+
+    val fechaCal = Calendar.getInstance().apply {
+        time = if (fechaReset.time > System.currentTimeMillis()) {
+            fechaReset
+        } else {
+            time = Date(System.currentTimeMillis() + 60 * 60 * 24 * 1000L)
+            time
+        }
+    }
+
+    val ahora = Calendar.getInstance()
+
+    fechaFinal = if (
+        fechaCal.get(Calendar.DAY_OF_YEAR) > ahora.get(Calendar.DAY_OF_YEAR) ||
+        fechaCal.get(Calendar.YEAR) > ahora.get(Calendar.YEAR)
+    ) {
+        "mañana a las " + format.format(fechaCal.time)
+    } else {
+        "hoy a las " + format.format(fechaCal.time)
+    }
+
     Surface(
         color = if(counter > 0) {
             IberdrolaTheme.colors.blueLight
@@ -320,7 +354,7 @@ fun HelpSection(
             verticalAlignment = Alignment.Top
         ) {
             Icon(
-                imageVector = if(counter > 0) Icons.Outlined.Info else Icons.Outlined.ThumbDownOffAlt,
+                imageVector = Icons.Outlined.Info,
                 contentDescription = null,
                 tint = IberdrolaTheme.colors.onSurface,
                 modifier = Modifier.size(25.dp)
@@ -352,7 +386,7 @@ fun HelpSection(
                     }
                     0 -> {
                         Text(
-                            text = stringResource(R.string.sin_intentos),
+                            text = stringResource(R.string.sin_intentos, fechaFinal),
                             style = IberdrolaTheme.typography.cuerpoPeque,
                             color = IberdrolaTheme.colors.onSurface,
                             lineHeight = 16.sp
@@ -380,10 +414,12 @@ fun HelpSection(
                     modifier = Modifier
                         .padding(7.dp)
                         .clickable(
-                            enabled = !isLoading && counter>0,
+                            enabled = !isLoading && counter > 0,
                             onClick = {
-                                onResendClick()
-                                updateCounter()
+                                if(!isLoading && counter > 0){
+                                    onResendClick()
+                                    updateCounter()
+                                }
                             }
                         )
                 )
@@ -459,6 +495,7 @@ fun PreviewIberdrolaVerificationScreen() {
         electronicBillsUiState = ElectronicBillsUiState(),
         updateCounter = {},
         reviewCoolDown = {},
-        resetTimerUpdate = {}
+        resetTimerUpdate = {},
+        isModificacion = false
     )
 }

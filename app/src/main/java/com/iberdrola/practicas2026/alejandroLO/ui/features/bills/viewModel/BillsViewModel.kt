@@ -25,6 +25,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.Math.random
 import java.util.Date
+import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.floor
 
@@ -129,7 +130,6 @@ class BillsViewModel(
                 try {
                     Log.d(TAG, "BILLS -> refreshBills form street: "+_billsUiState.value.directionStreet)
                     billsRepository.refreshBillsOnline()
-                    // ahora el delay lo simulamos desde mockoon
                     delay(500) // debido a que se carga demasiado rapido y ves aparecer las bills mientras se cargan
                 } catch (e: Exception) {
                     Log.e(TAG, "Error al conectar con Mockoon: ${e.message}")
@@ -146,9 +146,40 @@ class BillsViewModel(
 
     fun setDateLimits(minDate: Date, maxDate: Date){
         _filterUiState.update { currentState ->
+
+            var newDateFrom: Date? = if(minDate == maxDate) {
+                null
+            } else if(currentState.selectedDateFrom != null) {
+                if(currentState.selectedDateFrom !in minDate..maxDate) {
+                    minDate
+                }else {
+                    currentState.selectedDateFrom
+                }
+            }else {
+                null
+            }
+            var newDateTo: Date? = if(minDate == maxDate) {
+                null
+            } else if(currentState.selectedDateTo != null) {
+                if(currentState.selectedDateTo !in minDate..maxDate) {
+                    maxDate
+                }else {
+                    currentState.selectedDateTo
+                }
+            }else {
+                null
+            }
+
+            if(newDateTo == newDateFrom) {
+                newDateTo = null
+                newDateFrom = null
+            }
+
             currentState.copy(
                 minDate = minDate,
-                maxDate = maxDate
+                maxDate = maxDate,
+                selectedDateFrom = newDateFrom,
+                selectedDateTo = newDateTo
             )
         }
     }
@@ -164,12 +195,12 @@ class BillsViewModel(
 
             val safeMax = if (minPrice == maxPrice) maxPrice + 1f else maxPrice
 
-            val newRange = if (wasAtLimits || isFirstLoad) {
+            val newRange = if (wasAtLimits || isFirstLoad || abs(minPrice - maxPrice) < 1f) {
                 minPrice..safeMax
-            } else currentState.priceRange //else {
-//                currentState.priceRange.start.coerceIn(minPrice, safeMax)..
-//                        currentState.priceRange.endInclusive.coerceIn(minPrice, safeMax)
-//            }
+            } else {
+                currentState.priceRange.start.coerceIn(minPrice, safeMax)..
+                        currentState.priceRange.endInclusive.coerceIn(minPrice, safeMax)
+            }
 
             currentState.copy(
                 minPrice = minPrice,
@@ -271,6 +302,7 @@ class BillsViewModel(
         priceRange: ClosedFloatingPointRange<Float>,
         selectedStates: List<BillStatusEnum>
     ){
+        _billsUiState.update { it.copy(scrollInitializedPages = emptySet()) }
         var selectedStatesAux = selectedStates
         if(selectedStates.isEmpty()){ // si esta vacio estamos filtrando por todos
             selectedStatesAux = BillStatusEnum.entries
@@ -324,6 +356,7 @@ class BillsViewModel(
     }
 
     fun clearFilterField(activeFilterItem: ActiveFilterItem){
+        _billsUiState.update { it.copy(scrollInitializedPages = emptySet()) }
         when(activeFilterItem.type){
             FilterType.DATE_FROM -> onClearDate(0)
             FilterType.DATE_TO -> onClearDate(1)
@@ -341,5 +374,13 @@ class BillsViewModel(
         viewModelScope.launch {
             suspendReviewIsGasEnabled()
         }
+    }
+
+    fun onReturnFromFilter() {
+        _billsUiState.update { it.copy(isReturnFromFilter = true) }
+    }
+
+    fun onPageScrollInitialized(page: Int) {
+        _billsUiState.update { it.copy(scrollInitializedPages = it.scrollInitializedPages + page) }
     }
 }

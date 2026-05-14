@@ -26,6 +26,9 @@ tracing = "1.2.0"
 material3Version = "1.4.0"
 uiautomator = "2.3.0"
 foundation = "1.11.0"
+runtime = "1.11.1"
+ui = "1.11.1"
+foundationVersion = "1.11.1"
 
 [libraries]
 androidx-compose-foundation = { module = "androidx.compose.foundation:foundation" }
@@ -64,6 +67,9 @@ androidx-tracing = { group = "androidx.tracing", name = "tracing", version.ref =
 androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3Version" }
 androidx-uiautomator = { group = "androidx.test.uiautomator", name = "uiautomator", version.ref = "uiautomator" }
 androidx-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
+androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtime" }
+androidx-ui = { group = "androidx.compose.ui", name = "ui", version.ref = "ui" }
+foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundationVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

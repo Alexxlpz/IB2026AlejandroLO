@@ -81,6 +81,7 @@ fun IberdrolaMainScreen(
         onChangeBillType = onChangeBillType,
         onButtonClick = onButtonClick,
         isGasEnabled = isGasEnabled,
+        onPageScrollInitialized = { billsViewModel.onPageScrollInitialized(it) },
         modifier = modifier,
         locale = locale
     )
@@ -100,6 +101,7 @@ fun IberdrolaMainScreenContent(
     onChangeBillType: (String) -> Unit,
     onButtonClick: (String) -> Unit,
     isGasEnabled: Boolean,
+    onPageScrollInitialized: (Int) -> Unit,
     modifier: Modifier = Modifier,
     locale: Locale = Locale.forLanguageTag("es-ES")
 ) {
@@ -213,6 +215,9 @@ fun IberdrolaMainScreenContent(
                         onButtonClick("boton_electronicBills")
                         onElectronicBillClick(billsUiState.directionStreet, billsUiState.directionId)
                     },
+                    isActivePage = page == pagerState.currentPage,
+                    initialScrollDone = billsUiState.scrollInitializedPages.contains(page),
+                    onScrollInitialized = { onPageScrollInitialized(page) }
                 )
             }
         }
@@ -224,7 +229,7 @@ fun IberdrolaMainScreenContent(
                         Text(stringResource(R.string.cerrar))
                     }
                 },
-                title = { Text(stringResource(R.string.factura_no_disponible)) },
+                text = { Text(stringResource(R.string.factura_no_disponible)) },
                 containerColor = IberdrolaTheme.colors.surface
             )
         }
@@ -251,6 +256,7 @@ fun PreviewIberdrolaMainScreen() {
             onChangeBillType = {},
             onButtonClick = {},
             isGasEnabled = true,
+            onPageScrollInitialized = {},
             modifier = Modifier,
             locale = Locale.forLanguageTag("es-ES")
         )

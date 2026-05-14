@@ -88,10 +88,11 @@ fun IberdrolaModifyElectronicBillsScreen(
             Text(
                 text = selectedStreet,
                 style = IberdrolaTheme.typography.tituloPeque.copy(
-                    fontSize = 18.sp,
-                    lineHeight = 24.sp
+                    fontSize = 19.sp,
+                    lineHeight = 24.sp,
+                    fontWeight = FontWeight.ExtraBold
                 ),
-                color = IberdrolaTheme.colors.onSurface.copy(alpha = 0.8f),
+                color = IberdrolaTheme.colors.onSurface,
                 modifier = Modifier.padding(vertical = 8.dp)
             )
 

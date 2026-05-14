@@ -42,7 +42,6 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -77,7 +76,12 @@ fun IberdrolaFillElectronicBillsScreen(
 
 
     val isEmailValid = EMAIL_ADDRESS.matcher(email.trim()).matches()
+            && email.substringAfterLast(".").length > 1
+
     val isError = (email.isNotEmpty() && !isEmailValid)
+    val errorText = if (email.isNotEmpty() && !isEmailValid) {
+        "Introduce un formato de email válido (ejemplo@dominio.com)"
+    } else ""
 
     val progressStart = if (fromVerification) 0.75f else 0f
 
@@ -161,7 +165,7 @@ fun IberdrolaFillElectronicBillsScreen(
                             visualTransformation = VisualTransformation.None,
                             interactionSource = interactionSource,
                             isError = isError,
-                            placeholder = {
+                            label = {
                                 Text(
                                     text = stringResource(id = R.string.new_email_label),
                                     style = IberdrolaTheme.typography.tituloPeque
@@ -170,7 +174,7 @@ fun IberdrolaFillElectronicBillsScreen(
                             supportingText = {
                                 if (isError) {
                                     Text(
-                                        text = stringResource(R.string.email_mal_estructurado),
+                                        text = errorText,
                                         style = IberdrolaTheme.typography.etiquetaPeque,
                                         color = Color.Red
                                     )
@@ -190,9 +194,10 @@ fun IberdrolaFillElectronicBillsScreen(
                                 focusedIndicatorColor = IberdrolaTheme.colors.primary,
                                 unfocusedIndicatorColor = IberdrolaTheme.colors.onSurface,
                                 errorIndicatorColor = Color.Red,
-                                focusedLabelColor = Color.Gray,
+                                focusedLabelColor = IberdrolaTheme.colors.primary,
                                 unfocusedLabelColor = Color.Gray,
-                                errorLabelColor = Color.Red
+                                errorLabelColor = Color.Red,
+                                cursorColor = IberdrolaTheme.colors.primary
                             ),
                             container = {
                                 TextFieldDefaults.Container(
@@ -202,7 +207,9 @@ fun IberdrolaFillElectronicBillsScreen(
                                     colors = TextFieldDefaults.colors(
                                         focusedContainerColor = Color.Transparent,
                                         unfocusedContainerColor = Color.Transparent,
-                                        errorContainerColor = Color.Transparent
+                                        errorContainerColor = Color.Transparent,
+                                        focusedIndicatorColor = IberdrolaTheme.colors.primary,
+                                        errorIndicatorColor = Color.Red
                                     ),
                                     shape = RectangleShape,
                                 )
@@ -224,20 +231,20 @@ fun IberdrolaFillElectronicBillsScreen(
                 Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
                     InfoLegalLine(
                         label = "Responsable:",
-                        content = " Iberdrola Clientes S.A.U. ",
-                        description = "Iberdrola Clientes S.A.U. con domicilio social en Bilbao, Plaza Euskadi número 5. Para más detalles puede contactar con nuestro Delegado de Protección de Datos."
+                        content = "Iberdrola Clientes S.A.U.",
+                        description = "Con domicilio social en Almeria. Para mas información ponte en contacto con el equipo de facturación."
                     )
 
                     InfoLegalLine(
                         label = "Finalidad:",
-                        content = " Gestión de la factura electrónica. ",
-                        description = "Tratamos sus datos para gestionar el alta en la factura electrónica, así como el envío de comunicaciones comerciales si así lo ha consentido."
+                        content = "Gestión de la factura electrónica.",
+                        description = "Se recopilarán los datos con el objetivos de realizar un proceso mas eficiente de facturación electrónica."
                     )
 
                     InfoLegalLine(
                         label = "Derechos:",
-                        content = " Acceso, rectificación, supresión, limitación del tratamiento, portabilidad de datos y oposición, incluida la oposición a decisiones individuales automatizadas.",
-                        description = "Se podrá ejercitar sus derechos en cualquier momento a través de nuestros canales oficiales."
+                        content = "Acceso, rectificación, supresión, limitación del tratamiento, portabilidad de datos y oposición, incluida la oposición a decisiones individuales automatizadas.",
+                        description = "Para mas información consulte las Condiciones Generales de la aplicación"
                     )
                 }
 
@@ -363,26 +370,22 @@ fun InfoLegalLine(
 
     val annotatedString = buildAnnotatedString {
         withStyle(
-            style = ParagraphStyle(
-                lineHeight = textStyle.lineHeight
+            style = SpanStyle(
+                fontFamily = textStyle.fontFamily,
+                fontSize = textStyle.fontSize,
+                fontWeight = textStyle.fontWeight,
+                color = Color(0xFF1A1A1A)
             )
         ) {
-            withStyle(
-                style = SpanStyle(
-                    fontFamily = textStyle.fontFamily,
-                    fontSize = textStyle.fontSize,
-                    fontWeight = textStyle.fontWeight,
-                    color = Color(0xFF1A1A1A)
-                )
-            ) {
-                append(label)
-                append(" $content")
+            append(label)
+            append(" $content")
 
-                if (isExpanded) {
-                    append(" $description")
-                }
+            if (isExpanded) {
+                append(" $description")
             }
         }
+
+        append(" ")
 
         pushStringAnnotation(tag = "expand", annotation = "expand")
         withStyle(
@@ -394,7 +397,7 @@ fun InfoLegalLine(
                 textDecoration = TextDecoration.Underline
             )
         ) {
-            append(if (isExpanded) " Leer menos" else " Más info")
+            append(if (isExpanded) "Menos info" else "Más info")
         }
         pop()
     }
