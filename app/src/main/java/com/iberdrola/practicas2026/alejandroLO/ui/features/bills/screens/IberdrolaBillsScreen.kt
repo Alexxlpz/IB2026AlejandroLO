@@ -104,7 +104,10 @@ fun IberdrolaBillsScreen(
     clearFilterField: (ActiveFilterItem) -> Unit,
     enableFilterButton: Boolean,
     filterIsApplied: Boolean,
-    onElectronicBillClick: () -> Unit
+    onElectronicBillClick: () -> Unit,
+    isActivePage: Boolean,
+    initialScrollDone: Boolean,
+    onScrollInitialized: () -> Unit
 ) {
     val scrollState = rememberScrollState()
     val density = LocalDensity.current
@@ -118,17 +121,23 @@ fun IberdrolaBillsScreen(
     val updateScrollToHistoricoY = { y: Int -> scrollToHistoricoY.intValue = y }
 
     LaunchedEffect(isLoading) {
-        if (!isLoading && filterIsApplied && scrollToHistoricoY.intValue > 0 && scrollState.value != 990) {
-            scrollState.animateScrollTo(
-                990,
-                animationSpec = tween(
-                    durationMillis = 1500,
-                    easing = CubicBezierEasing(0.25f, 0.8f, 0.25f, 1f)
-                )
-            )
-
-        }else if(!isLoading && scrollState.value != 990){
-            scrollState.scrollTo(0)
+        if (!isLoading && !initialScrollDone) {
+            if (filterIsApplied) {
+                if (isActivePage) {
+                    scrollState.animateScrollTo(
+                        990,
+                        animationSpec = tween(
+                            durationMillis = 1500,
+                            easing = CubicBezierEasing(0.25f, 0.8f, 0.25f, 1f)
+                        )
+                    )
+                } else {
+                    scrollState.scrollTo(990)
+                }
+            } else {
+                scrollState.scrollTo(0)
+            }
+            onScrollInitialized()
         }
     }
 
@@ -734,7 +743,10 @@ fun PreviewIberdrolaBillsScreen() {
             clearFilterField = {},
             enableFilterButton = true,
             filterIsApplied = false,
-            onElectronicBillClick = {}
+            onElectronicBillClick = {},
+            isActivePage = false,
+            initialScrollDone = false,
+            onScrollInitialized = {}
         )
     }
 }
@@ -755,7 +767,10 @@ fun PreviewIberdrolaBillsScreenWithNoBills() {
             clearFilterField = {},
             enableFilterButton = true,
             filterIsApplied = false,
-            onElectronicBillClick = {}
+            onElectronicBillClick = {},
+            isActivePage = false,
+            initialScrollDone = false,
+            onScrollInitialized = {}
         )
     }
 }

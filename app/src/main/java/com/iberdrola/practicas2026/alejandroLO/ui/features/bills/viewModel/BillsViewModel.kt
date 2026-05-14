@@ -302,6 +302,7 @@ class BillsViewModel(
         priceRange: ClosedFloatingPointRange<Float>,
         selectedStates: List<BillStatusEnum>
     ){
+        _billsUiState.update { it.copy(scrollInitializedPages = emptySet()) }
         var selectedStatesAux = selectedStates
         if(selectedStates.isEmpty()){ // si esta vacio estamos filtrando por todos
             selectedStatesAux = BillStatusEnum.entries
@@ -355,6 +356,7 @@ class BillsViewModel(
     }
 
     fun clearFilterField(activeFilterItem: ActiveFilterItem){
+        _billsUiState.update { it.copy(scrollInitializedPages = emptySet()) }
         when(activeFilterItem.type){
             FilterType.DATE_FROM -> onClearDate(0)
             FilterType.DATE_TO -> onClearDate(1)
@@ -372,5 +374,13 @@ class BillsViewModel(
         viewModelScope.launch {
             suspendReviewIsGasEnabled()
         }
+    }
+
+    fun onReturnFromFilter() {
+        _billsUiState.update { it.copy(isReturnFromFilter = true) }
+    }
+
+    fun onPageScrollInitialized(page: Int) {
+        _billsUiState.update { it.copy(scrollInitializedPages = it.scrollInitializedPages + page) }
     }
 }

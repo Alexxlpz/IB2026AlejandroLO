@@ -210,6 +210,7 @@ fun IberdrolaNavGraph(
                 billsViewModel = billsViewModel,
                 onFilterClick = {
                     homeViewModel.logButtonClick("filtrar", IberdrolaScreens.MAIN.title)
+                    billsViewModel.onReturnFromFilter()
                     navController.navigate(IberdrolaScreens.FILTER.title)
                 },
                 onElectronicBillClick = { street, streetId ->
