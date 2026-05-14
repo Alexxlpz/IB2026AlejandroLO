@@ -25,6 +25,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.Math.random
 import java.util.Date
+import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.floor
 
@@ -145,9 +146,40 @@ class BillsViewModel(
 
     fun setDateLimits(minDate: Date, maxDate: Date){
         _filterUiState.update { currentState ->
+
+            var newDateFrom: Date? = if(minDate == maxDate) {
+                null
+            } else if(currentState.selectedDateFrom != null) {
+                if(currentState.selectedDateFrom !in minDate..maxDate) {
+                    minDate
+                }else {
+                    currentState.selectedDateFrom
+                }
+            }else {
+                null
+            }
+            var newDateTo: Date? = if(minDate == maxDate) {
+                null
+            } else if(currentState.selectedDateTo != null) {
+                if(currentState.selectedDateTo !in minDate..maxDate) {
+                    maxDate
+                }else {
+                    currentState.selectedDateTo
+                }
+            }else {
+                null
+            }
+
+            if(newDateTo == newDateFrom) {
+                newDateTo = null
+                newDateFrom = null
+            }
+
             currentState.copy(
                 minDate = minDate,
-                maxDate = maxDate
+                maxDate = maxDate,
+                selectedDateFrom = newDateFrom,
+                selectedDateTo = newDateTo
             )
         }
     }
@@ -163,12 +195,12 @@ class BillsViewModel(
 
             val safeMax = if (minPrice == maxPrice) maxPrice + 1f else maxPrice
 
-            val newRange = if (wasAtLimits || isFirstLoad) {
+            val newRange = if (wasAtLimits || isFirstLoad || abs(minPrice - maxPrice) < 1f) {
                 minPrice..safeMax
-            } else currentState.priceRange //else {
-//                currentState.priceRange.start.coerceIn(minPrice, safeMax)..
-//                        currentState.priceRange.endInclusive.coerceIn(minPrice, safeMax)
-//            }
+            } else {
+                currentState.priceRange.start.coerceIn(minPrice, safeMax)..
+                        currentState.priceRange.endInclusive.coerceIn(minPrice, safeMax)
+            }
 
             currentState.copy(
                 minPrice = minPrice,
