@@ -1,5 +1,6 @@
 package com.iberdrola.practicas2026.alejandroLO.ui.features.electronicBills.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -48,6 +49,11 @@ fun IberdrolaModifyElectronicBillsScreen(
     email: String,
     type: BillTypeEnum
 ) {
+
+    BackHandler {
+        onBackClick()
+    }
+
     Scaffold(
         topBar = {
             Box(
@@ -82,10 +88,11 @@ fun IberdrolaModifyElectronicBillsScreen(
             Text(
                 text = selectedStreet,
                 style = IberdrolaTheme.typography.tituloPeque.copy(
-                    fontSize = 18.sp,
-                    lineHeight = 24.sp
+                    fontSize = 19.sp,
+                    lineHeight = 24.sp,
+                    fontWeight = FontWeight.ExtraBold
                 ),
-                color = IberdrolaTheme.colors.onSurface.copy(alpha = 0.8f),
+                color = IberdrolaTheme.colors.onSurface,
                 modifier = Modifier.padding(vertical = 8.dp)
             )
 

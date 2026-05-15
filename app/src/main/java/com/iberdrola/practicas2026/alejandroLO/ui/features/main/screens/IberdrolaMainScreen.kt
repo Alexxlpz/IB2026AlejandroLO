@@ -1,6 +1,5 @@
 package com.iberdrola.practicas2026.alejandroLO.ui.features.main.screens
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -34,16 +33,14 @@ import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.screens.Iberdro
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsUiState
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsViewModel
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsViewModelFactory
-import com.iberdrola.practicas2026.alejandroLO.ui.features.main.viewModel.ActiveFilterItem
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.FilterUiState
+import com.iberdrola.practicas2026.alejandroLO.ui.features.main.viewModel.ActiveFilterItem
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IB2026AlejandroLOTheme
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.util.Locale
-import kotlin.math.abs
 
-// hay que hacer una UI que almacene selectedOption
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -54,6 +51,8 @@ fun IberdrolaMainScreen(
     modifier: Modifier = Modifier,
     locale: Locale = Locale.forLanguageTag("es-ES"),
     billsViewModel: BillsViewModel = viewModel(factory = BillsViewModelFactory.Factory),
+    onChangeBillType: (String) -> Unit,
+    onButtonClick: (String) -> Unit
 ) {
 
     LaunchedEffect(Unit) {
@@ -62,6 +61,7 @@ fun IberdrolaMainScreen(
 
     val billsUiState by billsViewModel.billsUiState.collectAsState()
     val filterUiState by billsViewModel.filterUiState.collectAsState()
+    val isGasEnabled by billsViewModel.isGasEnabled.collectAsState()
 
     IberdrolaMainScreenContent(
         billsUiState = billsUiState,
@@ -75,6 +75,10 @@ fun IberdrolaMainScreen(
             billsViewModel.refreshBills()
         },
         onElectronicBillClick = onElectronicBillClick,
+        onChangeBillType = onChangeBillType,
+        onButtonClick = onButtonClick,
+        isGasEnabled = isGasEnabled,
+        onPageScrollInitialized = { billsViewModel.onPageScrollInitialized(it) },
         modifier = modifier,
         locale = locale
     )
@@ -91,29 +95,22 @@ fun IberdrolaMainScreenContent(
     onRefresh: () -> Unit,
     onClearFilterField: (ActiveFilterItem) -> Unit,
     onElectronicBillClick: (String, Int) -> Unit,
+    onChangeBillType: (String) -> Unit,
+    onButtonClick: (String) -> Unit,
+    isGasEnabled: Boolean,
+    onPageScrollInitialized: (Int) -> Unit,
     modifier: Modifier = Modifier,
     locale: Locale = Locale.forLanguageTag("es-ES")
 ) {
-    // usamos state para forzar a la pantalla a calcular el valor de filterUiState, asi detecta el cambio al borrar el chip
     val filterIsApplied = remember(filterUiState) {
         filterUiState.selectedDateFrom != null ||
                 filterUiState.selectedDateTo != null ||
                 filterUiState.priceRange != filterUiState.minPrice..filterUiState.maxPrice ||
                 filterUiState.selectedStates.size != BillStatusEnum.entries.size
-                // con comparar el tamaño basta, nos da igual porque este filtrando, solo si lo
-                // está haciendo o no
     }
 
     val billsToShow = if (filterIsApplied) billsUiState.filteredBillList else billsUiState.billsList
 
-
-    if (filterIsApplied) {
-        Log.d("FilterDebug", "Applied because -> Date: ${filterUiState.selectedDateFrom != null}, " +
-                "Status: ${filterUiState.selectedStates.size != BillStatusEnum.entries.size}, " +
-                "Price: ${abs(filterUiState.priceRange.start - filterUiState.minPrice) > 0.01f}")
-    }
-
-    // está deshabilitado si no hay filtros y no hay facturas
     val enableFilterButton = filterIsApplied || billsUiState.billsList.isNotEmpty()
 
     var showAlert by remember { mutableStateOf(false) }
@@ -123,17 +120,27 @@ fun IberdrolaMainScreenContent(
         }
     }
 
-    val pagerState = rememberPagerState(
-        initialPage = if (billsUiState.selectedOption == BillTypeEnum.LUZ) 0 else 1,
-        pageCount = { 2 }
-    )
+
+
+    val pagerState = if(isGasEnabled) {
+        rememberPagerState(
+            initialPage = if (billsUiState.selectedOption == BillTypeEnum.LUZ) 0 else 1,
+            pageCount = { 2 }
+        )
+    }else {
+        rememberPagerState(
+            initialPage = BillTypeEnum.LUZ.ordinal,
+            pageCount = { 1 }
+        )
+    }
+
 
     LaunchedEffect(pagerState.currentPage) {
         val option = if (pagerState.currentPage == 0) BillTypeEnum.LUZ else BillTypeEnum.GAS
         onOptionSelected(option)
     }
 
-    BackHandler { // quiero que también cuente el contador si le das al botón back
+    BackHandler {
         onBackButtonClick()
     }
 
@@ -145,16 +152,17 @@ fun IberdrolaMainScreenContent(
             .fillMaxSize()
             .testTag("main_screen")
         ) {
-//            Log.d("MainScreen", "is sync enabled: ${billsUiState.value.isOnline}")
             IberdrolaTopBar(
                 selectedOption = billsUiState.selectedOption,
                 streetName = billsUiState.directionStreet,
                 options = billsUiState.options,
                 onOptionSelected = { option ->
+                    onChangeBillType(option.title)
                     val page = if (option == BillTypeEnum.LUZ) 0 else 1
                     scope.launch { pagerState.animateScrollToPage(page) }
                 },
-                onBackButtonClick = onBackButtonClick
+                onBackButtonClick = onBackButtonClick,
+                isGasEnabled = isGasEnabled
             )
 
             HorizontalPager(
@@ -164,7 +172,7 @@ fun IberdrolaMainScreenContent(
 
 
                 val filteredBills = billsToShow.filter {
-                    it.typeId == page // 0 = Luz, 1 = Gas
+                    it.typeId == page
                 }
 
                 val lastBill = billsUiState.billsList.filter {
@@ -175,7 +183,10 @@ fun IberdrolaMainScreenContent(
                     bills = filteredBills,
                     lastBill = lastBill,
                     isLoading = billsUiState.isLoading,
-                    onclick = { selectingBill(it) },
+                    onclick = {
+                        onButtonClick("factura ${it.id} clickada")
+                        selectingBill(it)
+                    },
                     refresh = onRefresh,
                     modifier = Modifier.fillMaxSize(),
                     error = billsUiState.errorMessage,
@@ -185,7 +196,13 @@ fun IberdrolaMainScreenContent(
                     clearFilterField = onClearFilterField,
                     filterIsApplied = filterIsApplied,
                     enableFilterButton = enableFilterButton,
-                    onElectronicBillClick = { onElectronicBillClick(billsUiState.directionStreet, billsUiState.directionId) },
+                    onElectronicBillClick = {
+                        onButtonClick("boton_electronicBills")
+                        onElectronicBillClick(billsUiState.directionStreet, billsUiState.directionId)
+                    },
+                    isActivePage = page == pagerState.currentPage,
+                    initialScrollDone = billsUiState.scrollInitializedPages.contains(page),
+                    onScrollInitialized = { onPageScrollInitialized(page) }
                 )
             }
         }
@@ -197,7 +214,7 @@ fun IberdrolaMainScreenContent(
                         Text(stringResource(R.string.cerrar))
                     }
                 },
-                title = { Text(stringResource(R.string.factura_no_disponible)) },
+                text = { Text(stringResource(R.string.factura_no_disponible)) },
                 containerColor = IberdrolaTheme.colors.surface
             )
         }
@@ -215,12 +232,16 @@ fun PreviewIberdrolaMainScreen() {
                 options = BillTypeEnum.entries.toList()
             ),
             filterUiState = FilterUiState(),
-            onBackButtonClick = { },
+            onBackButtonClick = {},
             onFilterClick = {},
             onOptionSelected = {},
             onRefresh = {},
             onClearFilterField = {},
             onElectronicBillClick = { _, _ -> },
+            onChangeBillType = {},
+            onButtonClick = {},
+            isGasEnabled = true,
+            onPageScrollInitialized = {},
             modifier = Modifier,
             locale = Locale.forLanguageTag("es-ES")
         )

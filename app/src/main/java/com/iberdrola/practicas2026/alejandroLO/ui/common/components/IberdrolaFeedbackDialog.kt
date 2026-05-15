@@ -1,16 +1,24 @@
 package com.iberdrola.practicas2026.alejandroLO.ui.common.components
 
+import androidx.compose.animation.core.EaseOutCubic
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -22,38 +30,46 @@ import androidx.compose.material.icons.outlined.SentimentSatisfied
 import androidx.compose.material.icons.outlined.SentimentVeryDissatisfied
 import androidx.compose.material.icons.outlined.SentimentVerySatisfied
 import androidx.compose.material.icons.outlined.ThumbUp
-import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.iberdrola.practicas2026.alejandroLO.R
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.Typography
+import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -67,7 +83,7 @@ fun FeedbackDialogContent(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 24.dp, end = 24.dp, bottom = 48.dp),
+            .padding(start = 24.dp, end = 24.dp, bottom = 25.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.height(8.dp))
@@ -148,16 +164,9 @@ fun IberdrolaFeedbackDialog(
         onRatingSelected()
     }
 
-    ModalBottomSheet(
-        onDismissRequest = {
-            onDismiss()
-        },
+    IberdrolaCustomBottomSheet(
         sheetState = sheetState,
-        containerColor = IberdrolaTheme.colors.surfaceVariant,
-        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
-        scrimColor = Color.Black.copy(alpha = 0.4f),
-        dragHandle = { BottomSheetDefaults.DragHandle() },
-        modifier = Modifier.testTag("bottom_sheet")
+        onDismiss = onDismiss
     ) {
         if(showThanks.value){
             IberdrolaThanksFeedback()
@@ -214,7 +223,7 @@ fun IberdrolaThanksFeedback() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 24.dp, end = 24.dp, bottom = 48.dp),
+            .padding(start = 24.dp, end = 24.dp, bottom = 25.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.height(21.7.dp))
@@ -250,6 +259,139 @@ fun IberdrolaThanksFeedback() {
         )
 
         Spacer(modifier = Modifier.height(24.dp))
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun IberdrolaCustomBottomSheet(
+    sheetState: SheetState,
+    onDismiss: () -> Unit,
+    content: @Composable () -> Unit
+) {
+    var offsetY by remember { mutableFloatStateOf(0f) }
+    val scope = rememberCoroutineScope()
+    var hasBeenVisible by remember { mutableStateOf(false) }
+
+    LaunchedEffect(sheetState.currentValue) {
+        when (sheetState.currentValue) {
+            SheetValue.Expanded, SheetValue.PartiallyExpanded -> hasBeenVisible = true
+            SheetValue.Hidden -> if (hasBeenVisible) onDismiss()
+        }
+    }
+
+    val animatedOffset by animateFloatAsState(
+        targetValue = offsetY,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioNoBouncy,
+            stiffness = Spring.StiffnessHigh
+        ),
+        label = "sheetOffset"
+    )
+
+    var visible by remember { mutableStateOf(false) }
+    val enterOffset by animateFloatAsState(
+        targetValue = if (visible) 0f else 1000f,
+        animationSpec = tween(durationMillis = 350, easing = EaseOutCubic),
+        label = "enterOffset"
+    )
+
+    LaunchedEffect(Unit) { visible = true }
+
+    Dialog(
+        onDismissRequest = {
+            scope.launch { sheetState.hide() }
+            onDismiss()
+        },
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false,
+            decorFitsSystemWindows = false
+        )
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.03f))
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = {
+                        scope.launch { sheetState.hide() }
+                        onDismiss()
+                    }
+                )
+                .testTag("bottom_sheet"),
+            contentAlignment = Alignment.BottomCenter
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .offset { IntOffset(0, (animatedOffset + enterOffset).roundToInt()) }
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = {}
+                    )
+                    .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
+                    .background(IberdrolaTheme.colors.surfaceVariant)
+            ) {
+                Column(
+                    modifier = Modifier.navigationBarsPadding()
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .pointerInput(Unit)
+                            {
+                                detectVerticalDragGestures(
+                                    onDragEnd = {
+                                        if (offsetY > 200f) {
+                                            scope.launch { sheetState.hide() }
+                                            onDismiss()
+                                        } else {
+                                            offsetY = 0f
+                                        }
+                                    },
+                                    onVerticalDrag = { _, dragAmount ->
+                                        offsetY = (offsetY + dragAmount).coerceAtLeast(0f)
+                                    }
+                                )
+                            }
+                            .padding(top = 12.dp, bottom = 8.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .clickable(
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    indication = ripple(
+                                        bounded = true,
+                                        color = IberdrolaTheme.colors.onSurfaceVariant.copy(alpha = 0.3f)
+                                    ),
+                                    onClick = {
+                                        scope.launch { sheetState.hide() }
+                                        onDismiss()
+                                    }
+                                )
+                                .padding(horizontal = 16.dp, vertical = 10.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(width = 44.dp, height = 5.dp)
+                                    .background(
+                                        color = IberdrolaTheme.colors.onSurfaceVariant.copy(alpha = 0.4f),
+                                        shape = RoundedCornerShape(30)
+                                    )
+                            )
+                        }
+                    }
+
+                    content()
+                }
+            }
+        }
     }
 }
 

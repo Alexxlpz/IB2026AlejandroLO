@@ -1,7 +1,6 @@
 package com.iberdrola.practicas2026.alejandroLO
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
@@ -26,10 +25,8 @@ import java.util.Locale
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //val locale = Locale.getDefault() // para que coja la region del dispositivo y asi poder
-        val locale = Locale.forLanguageTag("es-ES") // locale siempre España
-        // adecuarnos a su cultura (forma de representar numeros, idioma(por ahora no), etc)
-        Log.i("MainActivity", "Locale: $locale")
+        val locale = Locale.forLanguageTag("es-ES")
+        
         enableEdgeToEdge()
         setContent {
             IB2026AlejandroLOTheme {
@@ -46,7 +43,7 @@ class MainActivity : ComponentActivity() {
                         text = { Text(stringResource(R.string.seguro_que_quieres_salir_de_la_aplicacion)) },
                         confirmButton = {
                             Button(
-                                onClick = { finish() } // cerramos la Activity
+                                onClick = { finish() }
                             ) {
                                 Text(stringResource(R.string.aceptar))
                             }

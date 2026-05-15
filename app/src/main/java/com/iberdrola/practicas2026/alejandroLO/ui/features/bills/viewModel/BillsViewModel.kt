@@ -1,11 +1,11 @@
 package com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.iberdrola.practicas2026.alejandroLO.data.model.Bill
 import com.iberdrola.practicas2026.alejandroLO.data.repository.bill.BillsRepository
 import com.iberdrola.practicas2026.alejandroLO.data.repository.conectivity.ConnectivityRepository
+import com.iberdrola.practicas2026.alejandroLO.data.repository.remoteConfig.RemoteConfigRepository
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillStatusEnum
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeEnum
 import com.iberdrola.practicas2026.alejandroLO.ui.features.filter.enums.FilterType
@@ -17,19 +17,21 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.Math.random
 import java.util.Date
+import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.floor
-import kotlinx.coroutines.flow.debounce
 
 class BillsViewModel(
     private val billsRepository: BillsRepository,
-    private val connectivityRepository: ConnectivityRepository
+    private val connectivityRepository: ConnectivityRepository,
+    private val remoteConfigRepository: RemoteConfigRepository
 ) : ViewModel() {
 
     private val _billsUiState = MutableStateFlow(BillsUiState())
@@ -37,15 +39,27 @@ class BillsViewModel(
 
     private val _filterUiState = MutableStateFlow(FilterUiState())
     val filterUiState: StateFlow<FilterUiState> = _filterUiState.asStateFlow()
+
+    private val _isGasEnabled = MutableStateFlow(
+        remoteConfigRepository.isGasContractsEnabled()
+    )
+    val isGasEnabled: StateFlow<Boolean> = _isGasEnabled.asStateFlow()
+
     private var billsJob: Job? = null
-    val TAG: String = "BillsViewModel"
 
     init {
         load_conectivity()
+        loadRemoteConfig()
         load_options()
         refreshBills()
     }
 
+    fun loadRemoteConfig() {
+        viewModelScope.launch {
+            remoteConfigRepository.fetchAndActivate()
+            _isGasEnabled.value = remoteConfigRepository.isGasContractsEnabled()
+        }
+    }
 
     fun load_conectivity() {
         viewModelScope.launch {
@@ -70,7 +84,7 @@ class BillsViewModel(
             )
         }
 
-            billsJob = launch {// solo coger aquellas que coincidan con la calle
+            billsJob = launch {
                 billsRepository.getAllBillsByDirectionId(directionId)
                     .debounce(600)
                     .collect { bills ->
@@ -82,13 +96,23 @@ class BillsViewModel(
                     if (bills.isNotEmpty()) {
                         withContext(Dispatchers.Default) {
 
-                            // para redondear hacia arriba
-                            val maxPrice = ceil(bills.maxOf { it.price }).toFloat()
-                            // para redondear hacia abajo
-                            val minPrice = floor(bills.minOf { it.price }).toFloat()
+                            var billAux = bills
 
-                            val maxDate = bills.maxOf { it.emissionDate }
-                            val minDate = bills.minOf { it.emissionDate }
+                            suspendReviewIsGasEnabled()
+                            if(!_isGasEnabled.value){
+                                billAux = billAux.filter { it.typeId != BillTypeEnum.GAS.ordinal }
+                                _billsUiState.update {
+                                    it.copy(
+                                        billsList = billAux
+                                    )
+                                }
+                            }
+
+                            val maxPrice = ceil(billAux.maxOf { it.price }).toFloat()
+                            val minPrice = floor(billAux.minOf { it.price }).toFloat()
+
+                            val maxDate = billAux.maxOf { it.emissionDate }
+                            val minDate = billAux.minOf { it.emissionDate }
 
                             setDateLimits(minDate, maxDate)
                             setPriceLimits(minPrice, maxPrice)
@@ -100,17 +124,14 @@ class BillsViewModel(
 
             if (isOnline) {
                 try {
-                    Log.d(TAG, "BILLS -> refreshBills form street: "+_billsUiState.value.directionStreet)
                     billsRepository.refreshBillsOnline()
-                    // ahora el delay lo simulamos desde mockoon
-                    delay(500) // debido a que se carga demasiado rapido y ves aparecer las bills mientras se cargan
+                    delay(500)
                 } catch (e: Exception) {
-                    Log.e(TAG, "Error al conectar con Mockoon: ${e.message}")
                     _billsUiState.update { it.copy(errorMessage = "Error al conectar con Mockoon: ${e.message}") }
                 }
             }else {
                 billsRepository.insertMockBillsFromAssets()
-                delay((1000 + (random() * 2000)).toLong()) // delay entre 1 y 3 seg
+                delay((1000 + (random() * 2000)).toLong())
             }
             delay(700)
             _billsUiState.update { it.copy(isLoading = false) }
@@ -119,9 +140,40 @@ class BillsViewModel(
 
     fun setDateLimits(minDate: Date, maxDate: Date){
         _filterUiState.update { currentState ->
+
+            var newDateFrom: Date? = if(minDate == maxDate) {
+                null
+            } else if(currentState.selectedDateFrom != null) {
+                if(currentState.selectedDateFrom !in minDate..maxDate) {
+                    minDate
+                }else {
+                    currentState.selectedDateFrom
+                }
+            }else {
+                null
+            }
+            var newDateTo: Date? = if(minDate == maxDate) {
+                null
+            } else if(currentState.selectedDateTo != null) {
+                if(currentState.selectedDateTo !in minDate..maxDate) {
+                    maxDate
+                }else {
+                    currentState.selectedDateTo
+                }
+            }else {
+                null
+            }
+
+            if(newDateTo == newDateFrom) {
+                newDateTo = null
+                newDateFrom = null
+            }
+
             currentState.copy(
                 minDate = minDate,
-                maxDate = maxDate
+                maxDate = maxDate,
+                selectedDateFrom = newDateFrom,
+                selectedDateTo = newDateTo
             )
         }
     }
@@ -137,12 +189,12 @@ class BillsViewModel(
 
             val safeMax = if (minPrice == maxPrice) maxPrice + 1f else maxPrice
 
-            val newRange = if (wasAtLimits || isFirstLoad) {
+            val newRange = if (wasAtLimits || isFirstLoad || abs(minPrice - maxPrice) < 1f) {
                 minPrice..safeMax
-            } else currentState.priceRange //else {
-//                currentState.priceRange.start.coerceIn(minPrice, safeMax)..
-//                        currentState.priceRange.endInclusive.coerceIn(minPrice, safeMax)
-//            }
+            } else {
+                currentState.priceRange.start.coerceIn(minPrice, safeMax)..
+                        currentState.priceRange.endInclusive.coerceIn(minPrice, safeMax)
+            }
 
             currentState.copy(
                 minPrice = minPrice,
@@ -153,7 +205,6 @@ class BillsViewModel(
     }
 
     fun updateSelectedOption(option: BillTypeEnum) {
-        Log.d(TAG, "BILLS -> updateSelectedOption: $option")
         _billsUiState.update {
             it.copy(
                 selectedOption = option
@@ -172,17 +223,7 @@ class BillsViewModel(
 
     fun filterCriteriaApply(){
         viewModelScope.launch(Dispatchers.Default) {
-
-            Log.d(TAG, "BILLS -> filterCriteria price: ${_filterUiState.value.priceRange}")
-            Log.d(TAG, "BILLS -> filterCriteria max-min: ${_filterUiState.value.maxPrice}-${_filterUiState.value.minPrice}")
-            Log.d(TAG, "BILLS -> filterCriteria dateFrom: ${_filterUiState.value.selectedDateFrom}")
-            Log.d(TAG, "BILLS -> filterCriteria dateTo: ${_filterUiState.value.selectedDateTo}")
-            Log.d(TAG, "BILLS -> filterCriteria states: ${_filterUiState.value.selectedStates}")
-
-
             val filteredBills = filterBillsLocally(_billsUiState.value.billsList, _filterUiState.value)
-
-            Log.d(TAG, "BILLS -> filterCriteriaApply: ${filteredBills.size}")
 
             _billsUiState.update {
                 it.copy(
@@ -221,7 +262,6 @@ class BillsViewModel(
     }
 
 
-    // Lo que antes habia en filter
     fun clearFilters() {
         val maxPrice = _filterUiState.value.maxPrice
         val minPrice = _filterUiState.value.minPrice
@@ -244,8 +284,9 @@ class BillsViewModel(
         priceRange: ClosedFloatingPointRange<Float>,
         selectedStates: List<BillStatusEnum>
     ){
+        _billsUiState.update { it.copy(scrollInitializedPages = emptySet()) }
         var selectedStatesAux = selectedStates
-        if(selectedStates.isEmpty()){ // si esta vacio estamos filtrando por todos
+        if(selectedStates.isEmpty()){
             selectedStatesAux = BillStatusEnum.entries
         }
 
@@ -264,11 +305,6 @@ class BillsViewModel(
             0 -> _filterUiState.update { it.copy(selectedDateFrom = null) }
             1 -> _filterUiState.update { it.copy(selectedDateTo = null) }
         }
-        if(dateField == 0){
-            Log.d(TAG, "onClearDate(0): ${_filterUiState.value.selectedDateFrom}")
-        }else {
-            Log.d(TAG, "onClearDate(1): ${_filterUiState.value.selectedDateTo}")
-        }
     }
 
     fun onClearState(state: BillStatusEnum) {
@@ -284,7 +320,6 @@ class BillsViewModel(
                 selectedStates = futureState
             )
         }
-        Log.d(TAG, "onClearState: ${_filterUiState.value.selectedStates}")
     }
 
     fun onClearPriceRange() {
@@ -293,10 +328,10 @@ class BillsViewModel(
                 priceRange = it.minPrice..it.maxPrice
             )
         }
-        Log.d(TAG, "onClearPriceRange: ${_filterUiState.value.priceRange}")
     }
 
     fun clearFilterField(activeFilterItem: ActiveFilterItem){
+        _billsUiState.update { it.copy(scrollInitializedPages = emptySet()) }
         when(activeFilterItem.type){
             FilterType.DATE_FROM -> onClearDate(0)
             FilterType.DATE_TO -> onClearDate(1)
@@ -305,4 +340,22 @@ class BillsViewModel(
         }
     }
 
+    suspend fun suspendReviewIsGasEnabled() {
+        remoteConfigRepository.fetchAndActivate()
+        _isGasEnabled.value = remoteConfigRepository.isGasContractsEnabled()
+    }
+
+    fun reviewIsGasEnabled(){
+        viewModelScope.launch {
+            suspendReviewIsGasEnabled()
+        }
+    }
+
+    fun onReturnFromFilter() {
+        _billsUiState.update { it.copy(isReturnFromFilter = true) }
+    }
+
+    fun onPageScrollInitialized(page: Int) {
+        _billsUiState.update { it.copy(scrollInitializedPages = it.scrollInitializedPages + page) }
+    }
 }
