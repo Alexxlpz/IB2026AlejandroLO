@@ -367,7 +367,7 @@ fun IberdrolaHomeFoot(
         }
 
         Box(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp, top = 2.dp)) {
-            Button(onClick = { throw RuntimeException("Debug crash button clicked") }) {
+            Button(onClick = { throw Exception("Debug crash button clicked") }) {
                 Text(text = "CRASH BUTTON")
             }
         }

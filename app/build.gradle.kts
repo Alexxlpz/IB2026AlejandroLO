@@ -116,3 +116,33 @@ dependencies {
     implementation(libs.kotlinx.coroutines.play.services)
     implementation(libs.firebase.crashlytics)
 }
+
+tasks.register("adbReverse") {
+    group = "custom"
+    description = "Configura el reverse para Mockoon"
+    doLast {
+        val localProperties = Properties()
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localProperties.load(localPropertiesFile.inputStream())
+        }
+        val sdkDir = localProperties.getProperty("sdk.dir")
+            ?: System.getenv("ANDROID_HOME")
+            ?: error("No se encontró el SDK de Android")
+
+        val isWindows = System.getProperty("os.name").lowercase().contains("windows")
+        val adb = if (isWindows) "$sdkDir/platform-tools/adb.exe"
+        else "$sdkDir/platform-tools/adb"
+
+        val process = ProcessBuilder(adb, "reverse", "tcp:3000", "tcp:3000")
+            .redirectErrorStream(true)
+            .start()
+        process.waitFor()
+
+        println("ADB Reverse ejecutado correctamente en el puerto 3000")
+    }
+}
+
+tasks.matching { it.name == "preBuild" }.configureEach {
+    dependsOn("adbReverse")
+}
