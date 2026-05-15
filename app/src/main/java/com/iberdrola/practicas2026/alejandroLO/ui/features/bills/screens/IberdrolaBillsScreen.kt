@@ -115,8 +115,6 @@ fun IberdrolaBillsScreen(
 
     val refreshingState: PullToRefreshState = rememberPullToRefreshState()
     val scrollToHistoricoY = remember { mutableIntStateOf(0) }
-//    Log.d("FilterChipList", "FilterChipList: $filterIsApplied")
-//    Log.d("FilterChipList", "FilterChipList: $filterUiState")
 
     val updateScrollToHistoricoY = { y: Int -> scrollToHistoricoY.intValue = y }
 
@@ -142,7 +140,7 @@ fun IberdrolaBillsScreen(
     }
 
 
-    PullToRefreshBox( // para refrescar las facturas
+    PullToRefreshBox(
         modifier = Modifier.fillMaxSize(),
         isRefreshing = isLoading,
         onRefresh = refresh,
@@ -297,7 +295,6 @@ fun IberdrolaLastBill(
 
             val annotatedPrice = buildAnnotatedString {
                 if (formattedPrice.contains(euroSymbol)) {
-                    // solo si es € lo ponemos mas chiquitito
                     val pricePart = formattedPrice.replace(euroSymbol, "").trim()
                     append(pricePart)
 
@@ -461,7 +458,7 @@ fun IberdrolaBillList(
                         "Cuando tengas alguna, aparecerá en este listado",
                 modifier = Modifier
                     .widthIn(max = 280.dp)
-                    .padding(top = 16.dp), // No se extiende más de 280dp
+                    .padding(top = 16.dp),
                 style = IberdrolaTheme.typography.cuerpoMedio,
                 color = IberdrolaTheme.colors.onSurfaceVariant,
                 textAlign = TextAlign.Center,
@@ -592,10 +589,10 @@ fun FilterChipList(
             if (filterUiState.selectedDateFrom != null) add(ActiveFilterItem(FilterType.DATE_FROM, "Desde: ${dateFormat.format(filterUiState.selectedDateFrom)}"))
             if (filterUiState.selectedDateTo != null) add(ActiveFilterItem(FilterType.DATE_TO, "Hasta: ${dateFormat.format(filterUiState.selectedDateTo)}"))
             if (filterUiState.priceRange != filterUiState.minPrice..filterUiState.maxPrice){
-                // para redondear hacia abajo
+
                 val maxPrice = numberFormat.format(floor(filterUiState.priceRange.endInclusive))
-                // para redondear hacia abajo
                 val minPrice = numberFormat.format(floor(filterUiState.priceRange.start))
+
                 add(ActiveFilterItem(FilterType.PRICE_RANGE, "Precio: $minPrice - $maxPrice"))
             }
             if (filterUiState.selectedStates != BillStatusEnum.entries && filterUiState.selectedStates.isNotEmpty()){
@@ -633,7 +630,7 @@ fun FilterChip(
 ) {
     Surface(
         modifier = Modifier.padding(end = 10.dp),
-        color = IberdrolaTheme.colors.successContainer, // Verde muy suave de Iberdrola
+        color = IberdrolaTheme.colors.successContainer,
         shape = RoundedCornerShape(20.dp),
         border = BorderStroke(1.dp, IberdrolaTheme.colors.primary.copy(alpha = 0.2f))
     ) {

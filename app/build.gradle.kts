@@ -90,7 +90,6 @@ dependencies {
     implementation(libs.foundation)
     androidTestImplementation(libs.androidx.navigation.testing)
 
-    // DEPENDENCIAS PARA LOS TEST
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.mockk)
     testImplementation(libs.junit)
@@ -115,4 +114,50 @@ dependencies {
     implementation(libs.firebase.config)
     implementation(libs.kotlinx.coroutines.play.services)
     implementation(libs.firebase.crashlytics)
+}
+
+tasks.register("adbReverse") {
+    group = "custom"
+    description = "Configura el reverse para Mockoon"
+    doLast {
+        val localProperties = Properties()
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localProperties.load(localPropertiesFile.inputStream())
+        }
+        val sdkDir = localProperties.getProperty("sdk.dir")
+            ?: System.getenv("ANDROID_HOME")
+            ?: error("No se encontró el SDK de Android")
+
+        val isWindows = System.getProperty("os.name").lowercase().contains("windows")
+        val adb = if (isWindows) "$sdkDir/platform-tools/adb.exe" else "$sdkDir/platform-tools/adb"
+
+        val devicesOutput = ProcessBuilder(adb, "devices")
+            .redirectErrorStream(true)
+            .start()
+            .inputStream.bufferedReader().readText()
+
+        val physicalDevices = devicesOutput.lines()
+            .drop(1)
+            .filter { it.isNotBlank() && it.contains("\tdevice") }
+            .map { it.substringBefore("\t").trim() }
+            .filter { !it.startsWith("emulator") }
+
+        if (physicalDevices.isEmpty()) {
+            println("no hay ningún dispositivo físico conectado")
+            return@doLast
+        }
+
+        physicalDevices.forEach { deviceId ->
+            val process = ProcessBuilder(adb, "-s", deviceId, "reverse", "tcp:3000", "tcp:3000")
+                .redirectErrorStream(true)
+                .start()
+            process.waitFor()
+            println("adb reverse ejecutado en $deviceId")
+        }
+    }
+}
+
+tasks.matching { it.name == "preBuild" }.configureEach {
+    dependsOn("adbReverse")
 }

@@ -1,6 +1,5 @@
 package com.iberdrola.practicas2026.alejandroLO.ui.features.home.screens
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -69,7 +68,6 @@ fun IberdrolaHomeScreen(
     homeViewModel: HomeViewModel,
     changeMode: (Boolean) -> Unit
 ) {
-    val TAG = "IberdrolaHomeScreen"
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
 
@@ -92,13 +90,12 @@ fun IberdrolaHomeScreen(
             },
             onDismiss = {
                 showConfirmDialog.value = false
-                localIsOnline.value = isOnline // Revertimos visualmente el switch
+                localIsOnline.value = isOnline
             }
         )
     }
 
     if (isLoading) {
-        Log.d(TAG, "IberdrolaHomeScreen: Loading...")
         IberdrolaHomeLoadingScreen()
     } else {
         Box(
@@ -113,10 +110,6 @@ fun IberdrolaHomeScreen(
                 IberdrolaHomeHeader()
 
                 Spacer(modifier = Modifier.height(8.dp))
-
-//                IberdrolaFacturaElectronica(
-//                    onClick = onElectronicBillClick
-//                )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -173,12 +166,10 @@ fun IberdrolaHomeScreen(
                 )
             }
 
-            Log.d(TAG, "IberdrolaHomeScreen: mostrarSheet: $mostrarSheet")
             if (mostrarSheet) {
                 IberdrolaFeedbackDialog(
                     sheetState = sheetState,
                     onDismiss = {
-                        Log.d(TAG, "IberdrolaHomeScreen: dismiss alert")
                         scope.launch {
                             sheetState.hide()
                         }.invokeOnCompletion {
@@ -244,7 +235,7 @@ fun IberdrolaHomeHeader() {
                 Column {
                     Text(
                         text = stringResource(R.string.hola) + stringResource(R.string.alejandro),
-                        style = IberdrolaTheme.typography.tituloGrande, // O un headline si prefieres
+                        style = IberdrolaTheme.typography.tituloGrande,
                         color = IberdrolaTheme.colors.background
                     )
                     Text(
@@ -367,7 +358,7 @@ fun IberdrolaHomeFoot(
         }
 
         Box(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp, top = 2.dp)) {
-            Button(onClick = { throw RuntimeException("Debug crash button clicked") }) {
+            Button(onClick = { throw Exception("Debug crash button clicked") }) {
                 Text(text = "CRASH BUTTON")
             }
         }
@@ -527,4 +518,3 @@ fun PreviewIberdrolaHomeScreenWithAlert() {
         )
     }
 }
-// mockoon_iberdrola.json

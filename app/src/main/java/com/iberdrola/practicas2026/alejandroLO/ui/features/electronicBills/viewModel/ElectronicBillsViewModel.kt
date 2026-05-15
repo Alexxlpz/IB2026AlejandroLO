@@ -1,6 +1,5 @@
 package com.iberdrola.practicas2026.alejandroLO.ui.features.electronicBills.viewModel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.iberdrola.practicas2026.alejandroLO.data.model.ElectronicBill
@@ -20,8 +19,6 @@ class ElectronicBillsViewModel(
     private val connectivityRepository: ConnectivityRepository
 ) : ViewModel() {
 
-    val TAG = "ElectronicBillsViewModel"
-
     private val _uiState = MutableStateFlow(ElectronicBillsUiState())
     val uiState: StateFlow<ElectronicBillsUiState> = _uiState.asStateFlow()
 
@@ -38,7 +35,6 @@ class ElectronicBillsViewModel(
         }
     }
 
-    // REFRESCAMOS LAS ELECTRONICBILLS CUANDO CARGAMOS LAS CALLES
     fun load_conectivity() {
         viewModelScope.launch {
             connectivityRepository.isOnline.collect { status ->
@@ -69,7 +65,6 @@ class ElectronicBillsViewModel(
                     }
                 )
             }
-            Log.d(TAG, "aux: $electronicBillAux, updateElectronicBillEmail: ${_uiState.value.electronicBills}")
             electronicBillsRepository.update(electronicBillAux)
         }
     }
@@ -97,22 +92,10 @@ class ElectronicBillsViewModel(
                 try {
                     electronicBillsRepository.refreshElectronicBillsOnline()
                 } catch (e: Exception) {
-                    Log.e(TAG, "Error al conectar con Mockoon: ${e.message}")
                     _uiState.update { it.copy(errorMessage = e.message) }
                 }
             }else {
                 electronicBillsRepository.insertMockElectronicBillsFromAssets()
-            }
-            Log.d(TAG, "ELECBILL tras refreshElectronicBills -> ${uiState.value.electronicBills}")
-        }
-    }
-
-    fun updateCounter() {
-        viewModelScope.launch {
-            _uiState.update { currentState ->
-                currentState.copy(
-                    counter = currentState.counter - 1
-                )
             }
         }
     }
@@ -135,8 +118,6 @@ class ElectronicBillsViewModel(
                     resetTimer = System.currentTimeMillis() + DAY_IN_MILLIS
                 )
             }
-//            val format = SimpleDateFormat("yyyy.MM.dd HH:mm")
-//            Log.d(TAG, "ahora: "+format.format(System.currentTimeMillis())+"resetTimerUpdate: ${format.format(uiState.value.resetTimer)}")
         }
     }
 

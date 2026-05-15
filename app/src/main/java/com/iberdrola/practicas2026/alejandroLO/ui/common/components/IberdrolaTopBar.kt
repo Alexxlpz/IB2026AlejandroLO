@@ -195,7 +195,7 @@ fun ServiceOption(
 
     Column(
         modifier = Modifier
-            .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)) // Ripple recortado
+            .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = ripple(color = IberdrolaTheme.colors.onSurface),

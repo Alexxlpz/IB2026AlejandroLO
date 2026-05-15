@@ -2,7 +2,6 @@ package com.iberdrola.practicas2026.alejandroLO.data
 
 import android.content.Context
 import android.os.Build
-import android.util.Log
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializer
 import com.iberdrola.practicas2026.alejandroLO.R
@@ -42,33 +41,27 @@ interface AppContainer {
 }
 
 class AppDataContainer(private val context: Context) : AppContainer {
-    // para redireccionamiento de puertos
     // %LOCALAPPDATA%\Android\Sdk\platform-tools\adb reverse tcp:3000 tcp:3000
-    private val deviceUrl = "https://localhost:3000/" // en dispositivo fisico
-    private val emulatorUrl = "https://10.0.2.2:3000/" // url para conectarnos con mockoon en emulador
-//    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
+    private val deviceUrl = "https://localhost:3000/"
+    private val emulatorUrl = "https://10.0.2.2:3000/"
 
 
-    // convierte el json a bill aplicando las operaciones necesarias sobre el timestamp para convertirlo en date
     private val gson = GsonBuilder()
         .registerTypeAdapter(Date::class.java, JsonDeserializer { json, _, _ ->
             Date(json.asJsonPrimitive.asLong)
         })
-        .setLenient() // para que Gson sea mas tolerable con el json
+        .setLenient()
         .create()
 
     val usedUrl = if(isEmulator()) {
-        Log.d("AppDataContainer", "Usando URL de emulador: $emulatorUrl")
         emulatorUrl
     } else {
-        Log.d("AppDataContainer", "Usando URL de dispositivo: $deviceUrl")
         deviceUrl
     }
     private val retrofit: Retrofit = Retrofit.Builder()
         .baseUrl(usedUrl)
         .client(getUnsafeOkHttpClient(context))
-        .addConverterFactory(GsonConverterFactory.create(gson)) // se lo pasamos para que lo use
-        // para crear los objetos bill
+        .addConverterFactory(GsonConverterFactory.create(gson))
         .build()
 
     private val billsRetrofitService: BillsApiService by lazy {
@@ -88,8 +81,7 @@ class AppDataContainer(private val context: Context) : AppContainer {
             billDao = BillDatabase.getDatabase(context).billDao(),
             apiService = billsRetrofitService,
             context = context,
-            gson = gson, // se lo pasamos para que no lo tenga que crear otra vez si carga los datos
-            // localmente
+            gson = gson,
             directionsRepository = directionsRepository
         )
     }
@@ -112,8 +104,6 @@ class AppDataContainer(private val context: Context) : AppContainer {
         )
     }
 
-    // patron de diseño "Shared Repository State"
-    // patron usado para centralizar la variable isOnline
     override val connectivityRepository: ConnectivityRepository by lazy {
         OfflineConnectivityRepository()
     }
@@ -167,18 +157,6 @@ class AppDataContainer(private val context: Context) : AppContainer {
                 || Build.HARDWARE.contains("ranchu")
                 || Build.PRODUCT.contains("sdk")
                 || Build.PRODUCT.contains("emulator"))
-
-        // log para depurar
-        Log.d("isEmulator", """
-        FINGERPRINT: ${Build.FINGERPRINT}
-        MODEL: ${Build.MODEL}
-        MANUFACTURER: ${Build.MANUFACTURER}
-        BRAND: ${Build.BRAND}
-        DEVICE: ${Build.DEVICE}
-        PRODUCT: ${Build.PRODUCT}
-        HARDWARE: ${Build.HARDWARE}
-        resultado: $result
-    """.trimIndent())
 
         return result
     }

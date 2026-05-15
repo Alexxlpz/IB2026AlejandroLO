@@ -1,6 +1,5 @@
 package com.iberdrola.practicas2026.alejandroLO.ui.features.electronicBills.screens
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -101,11 +100,8 @@ fun IberdrolaVerificationEmailElectronicBillsScreen(
         reviewCoolDown()
         if(electronicBillsUiState.resetTimer != null){
             val date = Date(electronicBillsUiState.resetTimer)
-            val format = SimpleDateFormat("yyyy.MM.dd HH:mm")
             fecha = date
-            Log.d("IberdrolaVerificationEmailElectronicBillsScreen", "hay que esperar hasta: "+ format.format(date))
         }else {
-            Log.d("IberdrolaVerificationEmailElectronicBillsScreen", "reset no seteado aún")
         }
     }
 
@@ -193,7 +189,6 @@ fun IberdrolaVerificationEmailElectronicBillsScreen(
                     )
                 }
 
-                // Botonera inferior
                 Column(modifier = Modifier.fillMaxWidth()) {
                     if (showSuccessMessage) {
                         SuccessBanner(
@@ -434,9 +429,7 @@ fun LoadingOverlay() {
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black.copy(alpha = 0.4f))
-            .pointerInput(Unit) {
-                // No se podra pulsar nada mientras carga
-            },
+            .pointerInput(Unit) {},
         contentAlignment = Alignment.Center
     ) {
         CircularProgressIndicator(

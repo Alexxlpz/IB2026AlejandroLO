@@ -2,7 +2,6 @@ package com.iberdrola.practicas2026.alejandroLO.data.repository.electronicBill
 
 import android.content.Context
 import android.database.sqlite.SQLiteConstraintException
-import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.iberdrola.practicas2026.alejandroLO.data.model.ElectronicBill
@@ -19,8 +18,6 @@ class OfflineElectronicBillsRepository(
     private val directionsRepository: DirectionRepository
 ) : ElectronicBillsRepository {
 
-    val TAG: String = "OfflineElectronicBillsRepository"
-
     override suspend fun insert(electronicBill: ElectronicBill) = electronicBillDao.insert(electronicBill)
     override suspend fun update(electronicBill: ElectronicBill) = electronicBillDao.update(electronicBill)
     override suspend fun delete(electronicBill: ElectronicBill) = electronicBillDao.delete(electronicBill)
@@ -36,21 +33,16 @@ class OfflineElectronicBillsRepository(
 
             try {
                 electronicBillDao.deleteAll()
-                Log.d(TAG, "Insertando facturas electronicas desde API...")
                 remoteBills.forEach { electronicBillDao.insert(it) }
-                Log.d(TAG, "Facturas electronicas insertadas: $remoteBills")
             } catch (_: SQLiteConstraintException) {
-                Log.w(TAG, "Fallo de ForeignKey online. Refrescando direcciones desde API...")
                 directionsRepository.refreshDirectionsOnline()
 
                 electronicBillDao.deleteAll()
                 remoteBills.forEach { electronicBillDao.insert(it) }
-                Log.d(TAG, "Reintento online exitoso")
             }
 
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             electronicBillDao.deleteAll()
-            Log.e(TAG, "Error en refreshBillsOnline: ${e.message}")
             throw Exception("Error en refreshBillsOnline")
         }
     }
@@ -61,23 +53,15 @@ class OfflineElectronicBillsRepository(
 
         try {
             electronicBillDao.deleteAll()
-            Log.d(TAG, "Insertando facturas electronicas mock...")
             bills?.forEach { electronicBillDao.insert(it) }
-            Log.d(TAG, "Facturas electronicas insertadas: $bills")
         } catch (_: SQLiteConstraintException) {
-            Log.w(TAG, "Fallo de ForeignKey en mock. Cargando direcciones locales...")
             directionsRepository.insertMockDirectionsFromAssets()
 
             electronicBillDao.deleteAll()
             bills?.forEach { electronicBillDao.insert(it) }
-            Log.d(TAG, "Base de datos reparada y facturas insertadas.")
         }
     }
 
-    /*
-    Convierte un string json a una lista de bills, convirtiendo mediante un TypeConverter los
-    timestamp en tipos date.
-     */
     private fun JsonToElectronicBill(jsonString: String): List<ElectronicBill>? {
 
         val listType = object : TypeToken<List<ElectronicBill>>() {}.type

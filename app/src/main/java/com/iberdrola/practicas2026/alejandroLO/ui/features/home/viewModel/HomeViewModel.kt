@@ -1,6 +1,5 @@
 package com.iberdrola.practicas2026.alejandroLO.ui.features.home.viewModel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.iberdrola.practicas2026.alejandroLO.data.repository.analyticsRepository.AnalyticsRepository
@@ -25,8 +24,6 @@ class HomeViewModel(
     private val connectivityRepository: ConnectivityRepository,
     private val analyticsRepository: AnalyticsRepository
 ) : ViewModel() {
-
-    val TAG = "HomeViewModel"
 
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
@@ -63,8 +60,7 @@ class HomeViewModel(
                     .onCompletion {
                         try {
                             electronicBillsRepository.refreshElectronicBillsOnline()
-                        } catch (e: Exception) {
-                            Log.e(TAG, "Error silencioso en onCompletion: ${e.message}")
+                        } catch (_: Exception) {
                         }
                     }
                     .collect { bills ->
@@ -80,26 +76,22 @@ class HomeViewModel(
                 if (isOnline) {
                     try {
                         directionRepository.refreshDirectionsOnline()
-                        delay(1000) // debido a que se carga demasiado rapido y ves aparecer las direcciones mientras se cargan
+                        delay(1000)
                         electronicBillsRepository.refreshElectronicBillsOnline()
                         delay(100)
                     } catch (e: Exception) {
                         if (e.message != "Error en refreshBillsOnline") {
-                            Log.e(TAG, "Error al conectar con Mockoon: ${e.message}")
                             _uiState.update { it.copy(errorMessage = e.message) }
-                        } else {
-                            Log.w(TAG, "Error de facturas electrónicas ignorado en Home")
                         }
                     }
                 }else {
                     directionRepository.insertMockDirectionsFromAssets()
-                    delay((1000 + (random() * 2000)).toLong()) // delay entre 1 y 3 seg
+                    delay((1000 + (random() * 2000)).toLong())
                     electronicBillsRepository.insertMockElectronicBillsFromAssets()
                     delay(100)
                 }
             } catch (e: Exception) {
                 if(e.message != "Error en refreshBillsOnline") {
-                    Log.e(TAG, "Error en el refresco: ${e.message}")
                     _uiState.update { it.copy(errorMessage = e.message) }
                 }
             } finally {
@@ -110,15 +102,10 @@ class HomeViewModel(
     }
 
     fun updateDirectionsOnline(isOnline: Boolean, clearFilters: (Boolean) -> Unit){
-        clearFilters(isOnline) // espera a que el valor de isOnline cambie y limpia los filtros
-        connectivityRepository.setOnlineMode(isOnline) // el collect se encarga de cambiar el valor del uiState
+        clearFilters(isOnline)
+        connectivityRepository.setOnlineMode(isOnline)
         refreshDirections()
     }
-
-    // ------------- analytics -------------
-    // -- funcionalidades reservadas para --
-    // -- indicar el flujo al analytics   --
-    // -------------------------------------
 
     fun logScreenView(screen: String) {
         analyticsRepository.logScreenView(screen)

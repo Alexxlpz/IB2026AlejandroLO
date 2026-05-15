@@ -1,6 +1,5 @@
 package com.iberdrola.practicas2026.alejandroLO.ui.common.components
 
-import android.util.Log
 import androidx.compose.animation.core.EaseOutCubic
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -56,6 +55,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -288,8 +288,6 @@ fun IberdrolaCustomBottomSheet(
         ),
         label = "sheetOffset"
     )
-    Log.d("animated offset", animatedOffset.toString())
-    Log.d("offsetY", offsetY.toString())
 
     var visible by remember { mutableStateOf(false) }
     val enterOffset by animateFloatAsState(
@@ -321,7 +319,8 @@ fun IberdrolaCustomBottomSheet(
                         scope.launch { sheetState.hide() }
                         onDismiss()
                     }
-                ),
+                )
+                .testTag("bottom_sheet"),
             contentAlignment = Alignment.BottomCenter
         ) {
             Box(

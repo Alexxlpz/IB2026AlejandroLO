@@ -10,7 +10,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 
 
-// Objeto para acceder al tema de forma "local"
 object IberdrolaTheme {
     val colors: IberdrolaColors
         @Composable
@@ -23,7 +22,6 @@ object IberdrolaTheme {
         get() = LocalIberdrolaTypography.current
 }
 
-// Estructura de Colores Propios
 data class IberdrolaColors(
     val primary: Color = IberdrolaGreen,
     val primaryLight: Color = IberdrolaGreenLight,
@@ -47,7 +45,6 @@ data class IberdrolaColors(
     val warningContainer: Color = IberdrolaYellow
 )
 
-// Estructura de Tipografía Propia
 data class IberdrolaTypography(
     val tituloPrincipal: TextStyle = Typography.headlineMedium,
     val tituloSecundario: TextStyle = Typography.headlineSmall,
