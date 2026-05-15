@@ -44,7 +44,7 @@ interface AppContainer {
 class AppDataContainer(private val context: Context) : AppContainer {
     // para redireccionamiento de puertos
     // %LOCALAPPDATA%\Android\Sdk\platform-tools\adb reverse tcp:3000 tcp:3000
-    private val deviceUrl = "https://localhost:3000/" // en dispositivo fisico
+    private val deviceUrl = "https://localhost:3000/" // en dispositivo físico
     private val emulatorUrl = "https://10.0.2.2:3000/" // url para conectarnos con mockoon en emulador
 //    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 
@@ -54,7 +54,7 @@ class AppDataContainer(private val context: Context) : AppContainer {
         .registerTypeAdapter(Date::class.java, JsonDeserializer { json, _, _ ->
             Date(json.asJsonPrimitive.asLong)
         })
-        .setLenient() // para que Gson sea mas tolerable con el json
+        .setLenient() // para que Gson sea más tolerable con el json
         .create()
 
     val usedUrl = if(isEmulator()) {

@@ -92,7 +92,7 @@ fun IberdrolaNavGraph(
             homeViewModel.logButtonClick("volver", pantallaAct.title)
             if(pantallaAct == IberdrolaScreens.MAIN) {
                 decrementarCont()
-                // no puedo ponerback porque si te da tiempo a pulsar varias
+                // no puedo poner back porque si te da tiempo a pulsar varias
                 // veces antes de que cambie de pantalla llegamos a la base de
                 // la pila de navController
             }

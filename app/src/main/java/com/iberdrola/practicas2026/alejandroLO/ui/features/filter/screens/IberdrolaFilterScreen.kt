@@ -117,9 +117,6 @@ fun IberdrolaFilterScreen(
     )
 }
 
-/**
- * Stateless version of IberdrolaFilterScreen for better testability and Preview support.
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IberdrolaFilterScreenContent(
@@ -499,8 +496,8 @@ fun IberdrolaDatePickerDialog(
     val selectableDates = remember(minDate, maxDate) {
         object : SelectableDates {
             override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                // normalizaoms el minimo y el maximo SI NO ES NULO a utc para una mejor
-                // comparacion con la fecha seleccionable
+                // normalizations el mínimo y el maximo SI NO ES NULO a utc para una mejor
+                // comparación con la fecha seleccionable
                 val minTime = minDate?.let {
                     val cal = getInstance(java.util.TimeZone.getTimeZone("UTC"))
                     cal.time = it

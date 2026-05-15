@@ -76,8 +76,8 @@ abstract class BillDatabase : RoomDatabase() {
     }
 }
 
-// voy a realizarla  de forma sincrona para que se añadan antes los tipos y status,
-// ya que si insertamos las facturas antes en el bill nos da violacion de claves foraneas
+// voy a realizarla de forma síncrona para que se añadan antes los tipos y status,
+// ya que si insertamos las facturas antes en el bill nos da violación de claves foráneas
 private class BillDatabaseCallback: RoomDatabase.Callback() {
 
     override fun onCreate(db: SupportSQLiteDatabase) {
@@ -99,45 +99,3 @@ private class BillDatabaseCallback: RoomDatabase.Callback() {
         }
     }
 }
-
-//private suspend fun verSiHayDatos() {
-//    val typeDao = BillDatabase.Instance?.billTypeDao()
-//    val statusDao = BillDatabase.Instance?.billStatusDao()
-//
-//    if (typeDao != null && statusDao != null) {
-//        val types = typeDao.getAllBillTypes()
-//        val statuses = statusDao.getAllBillStatus()
-//
-//        types.collect { types ->
-//            Log.d("BillDatabaseCallback", "Tipo: ${types}")
-//        }
-//
-//        statuses.collect { status ->
-//            Log.d("BillDatabaseCallback", "Status: ${status}")
-//        }
-//    }
-//}
-
-
-//private class BillDatabaseCallback( // cogera todos los valores que tenemos en el enum y los carga en base de datos
-//    private val scope: CoroutineScope
-//) : RoomDatabase.Callback() {
-//
-//    override fun onCreate(db: SupportSQLiteDatabase) {
-//        super.onCreate(db)
-//        BillDatabase.Instance?.let { database ->
-//            scope.launch(Dispatchers.IO) {
-//                val typeDao = database.billTypeDao()
-//                val statusDao = database.billStatusDao()
-//
-//                BillTypeEnum.entries.forEach { type ->
-//                    typeDao.insert(BillType(id = type.ordinal, type = type.title))
-//                }
-//
-//                BillStatusEnum.entries.forEach { status ->
-//                    statusDao.insert(BillStatus(id = status.ordinal, status = status.title))
-//                }
-//            }
-//        }
-//    }
-//}
