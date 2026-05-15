@@ -1,13 +1,15 @@
 package com.iberdrola.practicas2026.alejandroLO.data
 
 import android.content.Context
+import android.os.Build
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializer
-import com.iberdrola.practicas2026.alejandroLO.BuildConfig
 import com.iberdrola.practicas2026.alejandroLO.R
 import com.iberdrola.practicas2026.alejandroLO.data.network.bill.BillsApiService
 import com.iberdrola.practicas2026.alejandroLO.data.network.direction.DirectionApiService
 import com.iberdrola.practicas2026.alejandroLO.data.network.electronicBill.ElectronicBillApiService
+import com.iberdrola.practicas2026.alejandroLO.data.repository.analyticsRepository.AnalyticsRepository
+import com.iberdrola.practicas2026.alejandroLO.data.repository.analyticsRepository.OfflineAnalyticsRepository
 import com.iberdrola.practicas2026.alejandroLO.data.repository.bill.BillsRepository
 import com.iberdrola.practicas2026.alejandroLO.data.repository.bill.OfflineBillsRepository
 import com.iberdrola.practicas2026.alejandroLO.data.repository.conectivity.ConnectivityRepository
@@ -16,6 +18,8 @@ import com.iberdrola.practicas2026.alejandroLO.data.repository.direction.Directi
 import com.iberdrola.practicas2026.alejandroLO.data.repository.direction.OfflineDirectionRepository
 import com.iberdrola.practicas2026.alejandroLO.data.repository.electronicBill.ElectronicBillsRepository
 import com.iberdrola.practicas2026.alejandroLO.data.repository.electronicBill.OfflineElectronicBillsRepository
+import com.iberdrola.practicas2026.alejandroLO.data.repository.remoteConfig.OfflineRemoteConfigRepository
+import com.iberdrola.practicas2026.alejandroLO.data.repository.remoteConfig.RemoteConfigRepository
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -32,25 +36,32 @@ interface AppContainer {
     val directionsRepository: DirectionRepository
     val connectivityRepository: ConnectivityRepository
     val electronicBillsRepository: ElectronicBillsRepository
+    val remoteConfigRepository: RemoteConfigRepository
+    val analyticsRepository: AnalyticsRepository
 }
 
 class AppDataContainer(private val context: Context) : AppContainer {
-    private val baseUrl = BuildConfig.MOCKOON_URL // url para conectarnos con mockoon
-//    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
+    // %LOCALAPPDATA%\Android\Sdk\platform-tools\adb reverse tcp:3000 tcp:3000
+    private val deviceUrl = "https://localhost:3000/"
+    private val emulatorUrl = "https://10.0.2.2:3000/"
 
 
-    // convierte el json a bill aplicando las operaciones necesarias sobre el timestamp para convertirlo en date
     private val gson = GsonBuilder()
         .registerTypeAdapter(Date::class.java, JsonDeserializer { json, _, _ ->
             Date(json.asJsonPrimitive.asLong)
         })
-        .setLenient() // para que Gson sea mas tolerable con el json
+        .setLenient()
         .create()
+
+    val usedUrl = if(isEmulator()) {
+        emulatorUrl
+    } else {
+        deviceUrl
+    }
     private val retrofit: Retrofit = Retrofit.Builder()
-        .baseUrl(baseUrl)
+        .baseUrl(usedUrl)
         .client(getUnsafeOkHttpClient(context))
-        .addConverterFactory(GsonConverterFactory.create(gson)) // se lo pasamos para que lo use
-        // para crear los objetos bill
+        .addConverterFactory(GsonConverterFactory.create(gson))
         .build()
 
     private val billsRetrofitService: BillsApiService by lazy {
@@ -70,8 +81,7 @@ class AppDataContainer(private val context: Context) : AppContainer {
             billDao = BillDatabase.getDatabase(context).billDao(),
             apiService = billsRetrofitService,
             context = context,
-            gson = gson, // se lo pasamos para que no lo tenga que crear otra vez si carga los datos
-            // localmente
+            gson = gson,
             directionsRepository = directionsRepository
         )
     }
@@ -94,11 +104,16 @@ class AppDataContainer(private val context: Context) : AppContainer {
         )
     }
 
-    // patron de diseño "Shared Repository State"
-    // patron usado para centralizar la variable isOnline
-    override
-    val connectivityRepository: ConnectivityRepository by lazy {
+    override val connectivityRepository: ConnectivityRepository by lazy {
         OfflineConnectivityRepository()
+    }
+
+    override val remoteConfigRepository: RemoteConfigRepository by lazy {
+        OfflineRemoteConfigRepository()
+    }
+
+    override val analyticsRepository: AnalyticsRepository by lazy {
+        OfflineAnalyticsRepository(context)
     }
 
     private fun getUnsafeOkHttpClient(context: Context): OkHttpClient {
@@ -127,5 +142,22 @@ class AppDataContainer(private val context: Context) : AppContainer {
             )
             .hostnameVerifier { _, _ -> true }
             .build()
+    }
+
+    fun isEmulator(): Boolean {
+        val result = (Build.FINGERPRINT.startsWith("generic")
+                || Build.FINGERPRINT.startsWith("unknown")
+                || Build.MODEL.contains("google_sdk")
+                || Build.MODEL.contains("Emulator")
+                || Build.MODEL.contains("Android SDK built for x86")
+                || Build.MANUFACTURER.contains("Genymotion")
+                || Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic")
+                || Build.PRODUCT == "google_sdk"
+                || Build.HARDWARE.contains("goldfish")
+                || Build.HARDWARE.contains("ranchu")
+                || Build.PRODUCT.contains("sdk")
+                || Build.PRODUCT.contains("emulator"))
+
+        return result
     }
 }

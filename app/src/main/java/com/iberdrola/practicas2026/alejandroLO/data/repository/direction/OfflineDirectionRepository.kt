@@ -1,7 +1,6 @@
 package com.iberdrola.practicas2026.alejandroLO.data.repository.direction
 
 import android.content.Context
-import android.util.Log
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import com.iberdrola.practicas2026.alejandroLO.data.BillDatabase
@@ -17,8 +16,6 @@ class OfflineDirectionRepository(
     private val apiService: DirectionApiService,
     private val context: Context
 ) : DirectionRepository  {
-
-    val TAG = "OfflineDirectionRepository"
 
     override suspend fun insert(direction: Direction) = directionDao.insert(direction)
 
@@ -40,18 +37,9 @@ class OfflineDirectionRepository(
             val remoteDir = apiService.getDirections()
             withContext(Dispatchers.IO) {
                 database.clearDatabase()
-                Log.d(
-                    TAG,
-                    "refreshDirectionsOnline: vamos a insertar los datos en la base de datos: $remoteDir"
-                )
                 remoteDir.forEach { directionDao.insert(it) }
-                Log.d(
-                    TAG,
-                    "refreshDirectionsOnline: se han insertado los datos en la base de datos"
-                )
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Error al conectar con Mockoon: ${e.message}, COMPRUEBA SI LE HAS DADO AL PLAY")
             database.clearDatabase()
             throw e
         }
@@ -63,16 +51,10 @@ class OfflineDirectionRepository(
         val listType = object : TypeToken<List<Direction>>() {}.type
         val directions: List<Direction> = gson.fromJson(jsonString, listType)
 
-        // Limpiamos e insertamos
         withContext(Dispatchers.IO) {
             val database = BillDatabase.getDatabase(context)
-
-            Log.d(TAG, "Iniciando clearDatabase desde Assets...")
             database.clearDatabase()
-
-            Log.d(TAG, "insertMockDirectionsFromAssets: vamos a insertar los datos en la base de datos: $directions")
             directions.forEach { directionDao.insert(it) }
-            Log.d(TAG, "insertMockDirectionsFromAssets: se han insertado los datos en la base de datos")
         }
     }
 }

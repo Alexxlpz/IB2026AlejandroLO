@@ -1,5 +1,6 @@
 package com.iberdrola.practicas2026.alejandroLO.ui.features.electronicBills.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -46,10 +47,16 @@ import com.iberdrola.practicas2026.alejandroLO.R
 @Composable
 fun IberdrolaElectronicBillsScreen(
     onBackClick: () -> Unit,
-    onContratoClick: (Boolean) -> Unit,
+    onContratoClick: (Boolean, String) -> Unit,
     updateSelectedTypeBill: (BillTypeEnum) -> Unit,
-    electronicBillError: Boolean
+    electronicBillError: Boolean,
+    isGasEnabled: Boolean = true
 ) {
+
+    BackHandler {
+        onBackClick()
+    }
+
     Scaffold(
         topBar = {
             Box(
@@ -68,7 +75,8 @@ fun IberdrolaElectronicBillsScreen(
             modifier = Modifier.padding(paddingValues),
             onContratoClick = onContratoClick,
             updateSelectedTypeBill = updateSelectedTypeBill,
-            electronicBillError = electronicBillError
+            electronicBillError = electronicBillError,
+            isGasEnabled = isGasEnabled
         )
     }
 }
@@ -76,9 +84,10 @@ fun IberdrolaElectronicBillsScreen(
 @Composable
 fun FacturaElectronicaContent(
     modifier: Modifier = Modifier,
-    onContratoClick: (Boolean) -> Unit,
+    onContratoClick: (Boolean, String) -> Unit,
     updateSelectedTypeBill: (BillTypeEnum) -> Unit,
-    electronicBillError: Boolean
+    electronicBillError: Boolean,
+    isGasEnabled: Boolean
 ) {
     Column(
         modifier = modifier
@@ -104,11 +113,10 @@ fun FacturaElectronicaContent(
                 item {
                     ContratoItem(
                         titulo = "Contrato de Luz",
-                        estado = "Activa",
                         icon = Icons.Outlined.Lightbulb,
                         isActivo = true,
                         onClick = {
-                            onContratoClick(true)
+                            onContratoClick(true, "contrato_luz")
                             updateSelectedTypeBill(BillTypeEnum.LUZ)
                         }
                     )
@@ -120,25 +128,25 @@ fun FacturaElectronicaContent(
                         thickness = 1.5.dp
                     )
                 }
-
-                item {
-                    ContratoItem(
-                        titulo = "Contrato de Gas",
-                        estado = "Sin Activar",
-                        icon = Icons.Outlined.LocalFireDepartment,
-                        isActivo = false,
-                        onClick = {
-                            onContratoClick(false)
-                            updateSelectedTypeBill(BillTypeEnum.GAS)
-                        }
-                    )
-                }
-
-                item {
-                    HorizontalDivider(
-                        color = IberdrolaTheme.colors.border.copy(alpha = 0.95f),
-                        thickness = 1.5.dp
-                    )
+                
+                if (isGasEnabled) {
+                    item {
+                        ContratoItem(
+                            titulo = "Contrato de Gas",
+                            icon = Icons.Outlined.LocalFireDepartment,
+                            isActivo = false,
+                            onClick = {
+                                onContratoClick(false, "contrato_gas")
+                                updateSelectedTypeBill(BillTypeEnum.GAS)
+                            }
+                        )
+                    }
+                    item {
+                        HorizontalDivider(
+                            color = IberdrolaTheme.colors.border.copy(alpha = 0.95f),
+                            thickness = 1.5.dp
+                        )
+                    }
                 }
             }
         }
@@ -149,11 +157,12 @@ fun FacturaElectronicaContent(
 @Composable
 fun ContratoItem(
     titulo: String,
-    estado: String,
     icon: ImageVector,
     isActivo: Boolean,
     onClick: () -> Unit
 ) {
+    val estado = if (isActivo) stringResource(R.string.activa) else stringResource(R.string.sin_activar)
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -254,7 +263,7 @@ fun ErrorMessageShowing(error: String?) {
 fun PreviewIberdrolaElectronicBillsScreen() {
     IberdrolaElectronicBillsScreen(
         onBackClick = {},
-        onContratoClick = {},
+        onContratoClick = {_, _ ->},
         updateSelectedTypeBill = {},
         electronicBillError = false
     )
@@ -265,7 +274,7 @@ fun PreviewIberdrolaElectronicBillsScreen() {
 fun PreviewIberdrolaElectronicBillsScreenError() {
     IberdrolaElectronicBillsScreen(
         onBackClick = {},
-        onContratoClick = {},
+        onContratoClick = {_, _ ->},
         updateSelectedTypeBill = {},
         electronicBillError = true
     )

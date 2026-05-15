@@ -48,6 +48,7 @@ fun IberdrolaTopBar(selectedOption: BillTypeEnum,
                     options: List<BillTypeEnum>,
                     onOptionSelected: (BillTypeEnum) -> Unit,
                     onBackButtonClick: () -> Unit,
+                    isGasEnabled: Boolean,
                     modifier: Modifier = Modifier){
     Column(modifier = modifier
         .fillMaxWidth()
@@ -69,7 +70,8 @@ fun IberdrolaTopBar(selectedOption: BillTypeEnum,
             onOptionSelected = { selectedOptionTitle ->
                 val selectedOption = BillTypeEnum.entries.find { it.title == selectedOptionTitle } ?: BillTypeEnum.LUZ
                 onOptionSelected(selectedOption)
-            }
+            },
+            isGasEnabled = isGasEnabled
         )
     }
 }
@@ -98,7 +100,7 @@ fun IberdrolaBar(onBackButtonClick: () -> Unit) {
                 .clip(RoundedCornerShape(50))
                 .background(backgroundColor)
                 .clickable { onBackButtonClick() }
-                .padding(start = 8.dp, top = 8.dp, bottom = 8.dp, end = 10.dp)
+                .padding(start = 0.dp, top = 8.dp, bottom = 8.dp, end = 10.dp)
                 .testTag("main_back_button")
         ) {
             Icon(
@@ -144,19 +146,22 @@ fun IberdrolaTitleAndDescription(
 fun ServiceSelector(
     selectedOption: String,
     options: List<String>,
-    onOptionSelected: (String) -> Unit
+    onOptionSelected: (String) -> Unit,
+    isGasEnabled: Boolean
 ) {
     Row(modifier = Modifier
         .fillMaxWidth()
         .padding(horizontal = 10.dp)
     ) {
         for (option in options) {
-            ServiceOption(
-                text = option,
-                isSelected = selectedOption == option,
-                onClick = { onOptionSelected(option) }
-            )
-            Spacer(modifier = Modifier.width(10.dp))
+            if(isGasEnabled || option != "Gas") {
+                ServiceOption(
+                    text = option,
+                    isSelected = selectedOption == option,
+                    onClick = { onOptionSelected(option) }
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+            }
         }
     }
     Box(
@@ -190,7 +195,7 @@ fun ServiceOption(
 
     Column(
         modifier = Modifier
-            .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)) // Ripple recortado
+            .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = ripple(color = IberdrolaTheme.colors.onSurface),
@@ -227,6 +232,7 @@ fun PreviewIberdrolaTopBar() {
             options = BillTypeEnum.entries,
             onOptionSelected = { },
             onBackButtonClick = { },
+            isGasEnabled = true,
             modifier = Modifier
         )
     }

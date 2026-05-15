@@ -12,5 +12,7 @@ data class BillsUiState (
     val options: List<BillTypeEnum> = emptyList(),
     val directionId: Int = 0,
     val directionStreet: String = "",
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val isReturnFromFilter: Boolean = false,
+    val scrollInitializedPages: Set<Int> = emptySet()
 )

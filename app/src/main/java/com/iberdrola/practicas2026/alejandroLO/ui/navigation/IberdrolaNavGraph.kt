@@ -1,9 +1,9 @@
 package com.iberdrola.practicas2026.alejandroLO.ui.navigation
 
-import android.util.Log
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -17,6 +17,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.iberdrola.practicas2026.alejandroLO.data.model.ElectronicBill
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeEnum
@@ -46,38 +47,46 @@ fun IberdrolaNavGraph(
     innerPadding: PaddingValues,
     locale: Locale
 ) {
-    val TAG = "IberdrolaNavGraph"
 
     val billsViewModel: BillsViewModel = viewModel(factory = BillsViewModelFactory.Factory)
     val homeViewModel: HomeViewModel = viewModel(factory = HomeViewModelFactory.Factory)
     val electronicBillsViewModel: ElectronicBillsViewModel = viewModel(factory = ElectronicBillsViewModelFactory.Factory)
     val electronicBillsUiState = electronicBillsViewModel.uiState.collectAsState()
     val scope = rememberCoroutineScope()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    LaunchedEffect(currentRoute) {
+        currentRoute?.let { route ->
+            val screenName = IberdrolaScreens.entries
+                .firstOrNull { it.title == route }?.name
+                ?: route
+            homeViewModel.logScreenView(screenName)
+        }
+    }
+
 
     var cont by remember { mutableIntStateOf(1) }
     val setCont: (Int) -> Unit = { num ->
-        Log.d(TAG, "aumentarCont: cont = $num")
         cont = num
     }
     val mostrarSheet by remember {
         derivedStateOf {
-            Log.d(TAG, "Calculando mostrarSheet. cont es: $cont")
             cont == 0
         }
     }
     val decrementarCont: () -> Unit = {
         if (cont > 0) cont--
-        Log.d(TAG, "decrementarCont: cont = $cont")
+        if (cont == 0) {
+            homeViewModel.logOpenFeedbackSheet(true)
+        }
     }
 
     val backStackHandler: (IberdrolaScreens, IberdrolaScreens) -> Unit = { pantallaAct, pantallaDest ->
         if (navController.currentBackStackEntry?.destination?.route == pantallaAct.title) {
-
+            homeViewModel.logButtonClick("volver", pantallaAct.title)
             if(pantallaAct == IberdrolaScreens.MAIN) {
                 decrementarCont()
-                // no puedo ponerback porque si te da tiempo a pulsar varias
-                // veces antes de que cambie de pantalla llegamos a la base de
-                // la pila de navController
             }
 
             navController.navigate(pantallaDest.title) {
@@ -85,14 +94,11 @@ fun IberdrolaNavGraph(
                     inclusive = true
                 }
             }
-
-
         }
     }
 
     var selectedStreet by remember { mutableStateOf("") }
     val updateSelectedStreet: (String) -> Unit = {
-        Log.d(TAG, "updateSelectedStreet: $it")
         selectedStreet = it
     }
 
@@ -103,7 +109,6 @@ fun IberdrolaNavGraph(
 
     var electronicBills: ElectronicBill? by remember { mutableStateOf(ElectronicBill()) }
     val updateElectronicBills: (Int) -> Unit = { directionId ->
-        Log.d(TAG, "updateElectronicBills, directionid: $directionId")
         electronicBills = electronicBillsUiState.value.electronicBills.firstOrNull{ it.directionId == directionId }
     }
     val refreshElectronicBill:(String, BillTypeEnum) -> Unit = { email, type ->
@@ -116,7 +121,6 @@ fun IberdrolaNavGraph(
 
     var typeSelected by remember { mutableStateOf(BillTypeEnum.LUZ) }
     val updateSelectedTypeBill: (BillTypeEnum) -> Unit = {
-        Log.d(TAG, "updateSelectedTypeBill: $it")
         typeSelected = it
     }
 
@@ -126,9 +130,8 @@ fun IberdrolaNavGraph(
         updateElectronicBills(directionId)
     }
 
-    var newEmail: String? = null
+    var newEmail by remember { mutableStateOf<String?>(null) }
     val updateNewEmail: (String?) -> Unit = {
-        Log.d(TAG, "changeNewEmail: $it")
         newEmail = it
     }
 
@@ -138,17 +141,18 @@ fun IberdrolaNavGraph(
                 pantallaAct,
                 IberdrolaScreens.ELECTRONIC_BILLS
             )
+            billsViewModel.reviewIsGasEnabled()
             delay(300)
             updateNewEmail(null)
-            //electronicBillsViewModel.resetCounter()
         }
     }
 
     var isModificacion by remember { mutableStateOf(false) }
     val updateIsModificacion: (Boolean) -> Unit = {
-        Log.d(TAG, "updateIsModificacion: $it")
         isModificacion = it
     }
+
+    val isGasEnabled by billsViewModel.isGasEnabled.collectAsState()
 
     NavHost(
         navController = navController,
@@ -157,6 +161,7 @@ fun IberdrolaNavGraph(
         composable(IberdrolaScreens.HOME.title) {
             IberdrolaHomeScreen(
                 onAddressClick = { id, street ->
+                    homeViewModel.logSelectDirection(street)
                     billsViewModel.updateDirection(
                         directionId = id,
                         directionStreet = street
@@ -167,7 +172,7 @@ fun IberdrolaNavGraph(
                 mostrarSheet = mostrarSheet,
                 homeViewModel = homeViewModel,
                 changeMode = {
-                    // para reiniciar el filtro antes de cambiar de modo
+                    homeViewModel.logChangeMode(it)
                     billsViewModel.clearFilters(it)
                 }
             )
@@ -176,22 +181,30 @@ fun IberdrolaNavGraph(
             IberdrolaMainScreen(
                 locale = locale,
                 onBackButtonClick = {
-                    Log.d(TAG, "Back button clicked")
                     backStackHandler(
                         IberdrolaScreens.MAIN,
                         IberdrolaScreens.HOME
                     )
                     scope.launch {
-                        delay(500) // para que no se vea la limpieza del filtro
-                        billsViewModel.clearFilters() // para reiniciar el filtro al cambiar de calle
+                        delay(500)
+                        billsViewModel.clearFilters()
                     }
                 },
                 modifier = Modifier.padding(innerPadding),
                 billsViewModel = billsViewModel,
                 onFilterClick = {
+                    homeViewModel.logButtonClick("filtrar", IberdrolaScreens.MAIN.title)
+                    billsViewModel.onReturnFromFilter()
                     navController.navigate(IberdrolaScreens.FILTER.title)
                 },
-                onElectronicBillClick = onElectronicBillClick
+                onElectronicBillClick = { street, streetId ->
+                    billsViewModel.reviewIsGasEnabled()
+                    onElectronicBillClick(street, streetId)
+                },
+                onChangeBillType = { homeViewModel.logChangeBillType(it) },
+                onButtonClick = {
+                    homeViewModel.logButtonClick(it, IberdrolaScreens.MAIN.title)
+                }
             )
         }
         composable(IberdrolaScreens.FILTER.title) {
@@ -202,6 +215,8 @@ fun IberdrolaNavGraph(
                         IberdrolaScreens.MAIN
                     )
                 },
+                onFilter = { homeViewModel.logButtonClick("aplicarFiltro", IberdrolaScreens.FILTER.title) },
+                onClearFilter = { homeViewModel.logButtonClick("limpiarFiltro", IberdrolaScreens.FILTER.title) },
                 billsViewModel = billsViewModel,
                 locale = locale
             )
@@ -214,27 +229,34 @@ fun IberdrolaNavGraph(
                         IberdrolaScreens.MAIN
                     )
                 },
-                onContratoClick = {
-                    if (it) {
+                onContratoClick = { isModificacion, type ->
+                    homeViewModel.logButtonClick(type, IberdrolaScreens.ELECTRONIC_BILLS.title)
+                    if (isModificacion) {
                         navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS_MODIFY.title)
                     } else {
                         navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS_FILL.title)
                     }
                 },
                 updateSelectedTypeBill = updateSelectedTypeBill,
-                electronicBillError = electronicBills == null
+                electronicBillError = electronicBills == null,
+                isGasEnabled = isGasEnabled
             )
         }
         composable(IberdrolaScreens.ELECTRONIC_BILLS_MODIFY.title) {
             val emailToDisplay = if (typeSelected == BillTypeEnum.LUZ) {
-                electronicBills?.electricityBillEmail ?: ""
+                electronicBills?.electricityBillEmail ?: "esteEmailNoExiste@noExiste.com"
             } else {
-                electronicBills?.gasBillEmail ?: ""
+                electronicBills?.gasBillEmail ?: "esteEmailNoExiste@noExiste.com"
             }
             IberdrolaModifyElectronicBillsScreen(
-                onBackClick = { onCloseClick(IberdrolaScreens.ELECTRONIC_BILLS_MODIFY) },
+                onBackClick = {
+                    homeViewModel.logButtonClick("volver", IberdrolaScreens.ELECTRONIC_BILLS_MODIFY.title)
+                    onCloseClick(IberdrolaScreens.ELECTRONIC_BILLS_MODIFY)
+                },
                 onEditEmailClick = {
+                    homeViewModel.logButtonClick("ver_email_de_factura_activa", IberdrolaScreens.ELECTRONIC_BILLS_MODIFY.title)
                     navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS_MODIFING_EMAIL.title)
+                    updateNewEmail(emailToDisplay)
                 },
                 selectedStreet = selectedStreet,
                 email = emailToDisplay,
@@ -243,7 +265,10 @@ fun IberdrolaNavGraph(
         }
         composable(IberdrolaScreens.ELECTRONIC_BILLS_MODIFING_EMAIL.title) {
             IberdrolaModifyEmailElectronicBillScreen(
-                onCloseClick = { onCloseClick(IberdrolaScreens.ELECTRONIC_BILLS_MODIFING_EMAIL) },
+                onCloseClick = {
+                    homeViewModel.logButtonClick("cerrar", IberdrolaScreens.ELECTRONIC_BILLS_MODIFING_EMAIL.title)
+                    onCloseClick(IberdrolaScreens.ELECTRONIC_BILLS_MODIFING_EMAIL)
+                },
                 onBackClick = {
                     updateFromVerification(false)
                     backStackHandler(
@@ -253,6 +278,7 @@ fun IberdrolaNavGraph(
                     updateNewEmail(null)
                 },
                 onNextClick = { newEmail ->
+                    homeViewModel.logButtonClick("modificar_email", IberdrolaScreens.ELECTRONIC_BILLS_MODIFING_EMAIL.title)
                     navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS_VERIFICATION.title)
                     updateNewEmail(newEmail)
                     updateIsModificacion(true)
@@ -261,6 +287,13 @@ fun IberdrolaNavGraph(
                 email = if (newEmail != null) {
                     newEmail!!
                 } else if (typeSelected == BillTypeEnum.LUZ) {
+                    electronicBills?.electricityBillEmail!!
+                } else if (typeSelected == BillTypeEnum.GAS) {
+                    electronicBills?.gasBillEmail!!
+                } else {
+                    "esteEmailNoExiste@noExiste.com"
+                },
+                emailFromModificacion = if (typeSelected == BillTypeEnum.LUZ) {
                     electronicBills?.electricityBillEmail!!
                 } else {
                     electronicBills?.gasBillEmail!!
@@ -271,11 +304,16 @@ fun IberdrolaNavGraph(
         composable(IberdrolaScreens.ELECTRONIC_BILLS_FILL.title) {
             IberdrolaFillElectronicBillsScreen(
                 onBackClick = {
+                    homeViewModel.logButtonClick("volver", IberdrolaScreens.ELECTRONIC_BILLS_FILL.title)
                     updateFromVerification(false)
                     onCloseClick(IberdrolaScreens.ELECTRONIC_BILLS_FILL)
                 },
-                onCloseClick = { onCloseClick(IberdrolaScreens.ELECTRONIC_BILLS_FILL) },
+                onCloseClick = {
+                    homeViewModel.logButtonClick("cerrar", IberdrolaScreens.ELECTRONIC_BILLS_FILL.title)
+                    onCloseClick(IberdrolaScreens.ELECTRONIC_BILLS_FILL)
+                },
                 onNextClick = { newEmail ->
+                    homeViewModel.logButtonClick("rellenar_email", IberdrolaScreens.ELECTRONIC_BILLS_FILL.title)
                     navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS_VERIFICATION.title)
                     updateNewEmail(newEmail)
                     updateIsModificacion(false)
@@ -288,10 +326,13 @@ fun IberdrolaNavGraph(
         composable(IberdrolaScreens.ELECTRONIC_BILLS_VERIFICATION.title) {
             IberdrolaVerificationEmailElectronicBillsScreen(
                 onCloseClick = {
+                    homeViewModel.logButtonClick("cerrar", IberdrolaScreens.ELECTRONIC_BILLS_VERIFICATION.title)
                     updateFromVerification(false)
                     onCloseClick(IberdrolaScreens.ELECTRONIC_BILLS_VERIFICATION)
                 },
                 onBackClick = {
+                    homeViewModel.logButtonClick("volver", IberdrolaScreens.ELECTRONIC_BILLS_VERIFICATION.title)
+
                     if (isModificacion) {
                         backStackHandler(
                             IberdrolaScreens.ELECTRONIC_BILLS_VERIFICATION,
@@ -312,24 +353,44 @@ fun IberdrolaNavGraph(
                             type = typeSelected,
                             electronicBill = electronicBills!!
                         )
-                        // simula la recarga sin esperar a room
                         refreshElectronicBill(newEmail!!, typeSelected)
                     }
 
+                    homeViewModel.logElectronicBillEmailUpdated(
+                        contractType = typeSelected.name,
+                        isModification = isModificacion
+                    )
                     navController.navigate(IberdrolaScreens.ELECTRONIC_BILLS_THANKS.title)
                 },
                 electronicBillsUiState = electronicBillsViewModel.uiState.collectAsState().value,
-                updateCounter = { electronicBillsViewModel.updateCounter() },
+                updateCounter = {
+
+                    electronicBillsViewModel.updateCounterWithAnalyticsPost(
+                        {
+                            homeViewModel.logVerificationAttempt(
+                                typeSelected.name,
+                                it
+                            )
+                        }
+                    )
+                },
                 reviewCoolDown = { electronicBillsViewModel.reviewCooldown() },
-                resetTimerUpdate = { electronicBillsViewModel.resetTimerUpdate() }
+                resetTimerUpdate = { electronicBillsViewModel.resetTimerUpdate() },
+                isModificacion = isModificacion
             )
         }
         composable(IberdrolaScreens.ELECTRONIC_BILLS_THANKS.title) {
             IberdrolaThanksScreen(
                 email = newEmail?:"",
                 isModificacion = isModificacion,
-                onAcceptClick = { onCloseClick(IberdrolaScreens.ELECTRONIC_BILLS_THANKS) },
-                onCloseClick = { onCloseClick(IberdrolaScreens.ELECTRONIC_BILLS_THANKS) }
+                onAcceptClick = {
+                    homeViewModel.logButtonClick("aceptar", IberdrolaScreens.ELECTRONIC_BILLS_THANKS.title)
+                    onCloseClick(IberdrolaScreens.ELECTRONIC_BILLS_THANKS)
+                },
+                onCloseClick = {
+                    homeViewModel.logButtonClick("cerrar", IberdrolaScreens.ELECTRONIC_BILLS_THANKS.title)
+                    onCloseClick(IberdrolaScreens.ELECTRONIC_BILLS_THANKS)
+                }
             )
         }
     }

@@ -16,6 +16,9 @@
         android:name=".IberdrolaApplication"
         android:networkSecurityConfig="@xml/network_security"
         >
+        <meta-data
+            android:name="com.google.firebase.analytics.collection_enabled"
+            android:value="true" />
         <activity
             android:name=".MainActivity"
             android:screenOrientation="portrait"

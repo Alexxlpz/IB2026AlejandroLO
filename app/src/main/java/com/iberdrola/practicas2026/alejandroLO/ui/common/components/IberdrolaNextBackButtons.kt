@@ -25,7 +25,8 @@ import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
 fun IberdrolaNextBackButtons(
     isNextEnabled: Boolean,
     onBackClick: () -> Unit,
-    onNextClick: () -> Unit
+    onNextClick: () -> Unit,
+    falseDisable: Boolean = false
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         HorizontalDivider(
@@ -66,16 +67,16 @@ fun IberdrolaNextBackButtons(
                     .height(56.dp),
                 shape = RoundedCornerShape(28.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isNextEnabled)
+                    containerColor = if (isNextEnabled && !falseDisable)
                         IberdrolaTheme.colors.primaryDark
                     else
-                        IberdrolaTheme.colors.primary.copy(alpha = 0.3f)
+                        IberdrolaTheme.colors.onSurfaceVariant.copy(alpha = 0.25f)
                 )
             ) {
                 Text(
                     text = stringResource(id = R.string.siguiente),
                     style = IberdrolaTheme.typography.tituloPeque,
-                    color = if (isNextEnabled)
+                    color = if (isNextEnabled && !falseDisable)
                         IberdrolaTheme.colors.surfaceVariant
                     else
                         IberdrolaTheme.colors.primary.copy(alpha = 0.65f),

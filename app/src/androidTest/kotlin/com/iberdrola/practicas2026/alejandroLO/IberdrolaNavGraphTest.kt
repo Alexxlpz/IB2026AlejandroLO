@@ -42,7 +42,6 @@ class IberdrolaNavGraphTest {
             )
         }
 
-        // Esperamos a que el componente de carga desaparezca y se muestre la home
         composeTestRule.waitUntilAtLeastOneExists(hasTestTag("home_screen"), 5000)
 
         composeTestRule
@@ -65,7 +64,6 @@ class IberdrolaNavGraphTest {
             )
         }
 
-        // Esperamos a que el componente de carga desaparezca y se muestre la home
         composeTestRule.waitUntilAtLeastOneExists(hasTestTag("home_screen"), 5000)
 
         composeTestRule
@@ -89,7 +87,6 @@ class IberdrolaNavGraphTest {
             )
         }
 
-        // Esperamos a que el componente de carga desaparezca y se muestre la home
         composeTestRule.waitUntilAtLeastOneExists(hasTestTag("home_screen"), 5000)
         
         composeTestRule.onNodeWithTag("home_screen").assertIsDisplayed()
@@ -108,7 +105,6 @@ class IberdrolaNavGraphTest {
             )
         }
 
-        // Esperamos a que el componente de carga desaparezca y se muestre la home
         composeTestRule.waitUntilAtLeastOneExists(hasTestTag("home_screen"), 5000)
 
         composeTestRule

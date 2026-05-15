@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "571964124739",
+    "project_id": "ib2026alejandrolo",
+    "storage_bucket": "ib2026alejandrolo.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:571964124739:android:5d9507afe9c521330b2ef6",
+        "android_client_info": {
+          "package_name": "com.iberdrola.practicas2026.alejandroLO"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAvrM_EgfE2Sb8goyrjn6FBfl8NZJmN7cY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

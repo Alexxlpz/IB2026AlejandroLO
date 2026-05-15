@@ -14,10 +14,11 @@ object BillsViewModelFactory {
             val application = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as IberdrolaApplication)
             val repository = application.container.billsRepository
             val connectivityRepository = application.container.connectivityRepository
-
+            val remoteConfigRepository = application.container.remoteConfigRepository
             BillsViewModel(
                 billsRepository = repository,
-                connectivityRepository = connectivityRepository
+                connectivityRepository = connectivityRepository,
+                remoteConfigRepository = remoteConfigRepository
             )
         }
     }
