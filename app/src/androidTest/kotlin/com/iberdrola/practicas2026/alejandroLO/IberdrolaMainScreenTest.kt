@@ -1,49 +1,64 @@
 package com.iberdrola.practicas2026.alejandroLO
 
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsViewModel
-import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsViewModelFactory
-import com.iberdrola.practicas2026.alejandroLO.ui.features.main.screens.IberdrolaMainScreen
+import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.enums.BillTypeEnum
+import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsUiState
+import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.FilterUiState
+import com.iberdrola.practicas2026.alejandroLO.ui.features.main.screens.IberdrolaMainScreenContent
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IB2026AlejandroLOTheme
 import org.junit.Rule
 import org.junit.Test
+import java.util.Locale
 
 class IberdrolaMainScreenTest {
+
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    // -------------------------
-    // Función de ayuda para crear el ViewModel necesario en los tests
-    // -------------------------
-    @Composable
-    private fun createBillsViewModel(): BillsViewModel {
-        return viewModel(factory = BillsViewModelFactory.Factory)
-    }
-
-    // -------------------------
-    // mostrar main_screen
-    // -------------------------
-    @Test
-    fun givenMainScreen_whenLoaded_thenIsDisplayed() {
+    private fun defaultContent(
+        billsUiState: BillsUiState = BillsUiState(
+            directionStreet = "Calle de prueba",
+            options = BillTypeEnum.entries.toList()
+        ),
+        filterUiState: FilterUiState = FilterUiState(),
+        isGasEnabled: Boolean = true,
+        onBackButtonClick: () -> Unit = {},
+        onFilterClick: () -> Unit = {},
+        onChangeBillType: (String) -> Unit = {},
+        onButtonClick: (String) -> Unit = {}
+    ) {
         composeTestRule.setContent {
             IB2026AlejandroLOTheme {
-                val billsVm = createBillsViewModel()
-                IberdrolaMainScreen(
-                    onBackButtonClick = {},
-                    onFilterClick = {},
+                IberdrolaMainScreenContent(
+                    billsUiState = billsUiState,
+                    filterUiState = filterUiState,
+                    onBackButtonClick = onBackButtonClick,
+                    onFilterClick = onFilterClick,
+                    onOptionSelected = {},
+                    onRefresh = {},
+                    onClearFilterField = {},
                     onElectronicBillClick = { _, _ -> },
-                    billsViewModel = billsVm
+                    onChangeBillType = onChangeBillType,
+                    onButtonClick = onButtonClick,
+                    isGasEnabled = isGasEnabled,
+                    onPageScrollInitialized = {},
+                    locale = Locale.forLanguageTag("es-ES")
                 )
             }
         }
+    }
 
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun givenMainScreen_whenLoaded_thenIsDisplayed() {
+        defaultContent()
+
+        composeTestRule.waitUntilAtLeastOneExists(hasTestTag("main_screen"), 5000)
         composeTestRule.onNodeWithTag("main_screen").assertIsDisplayed()
     }
 
@@ -51,17 +66,7 @@ class IberdrolaMainScreenTest {
     fun givenMainScreen_whenBackButtonClicked_thenCallbackIsTriggered() {
         var backClicked = false
 
-        composeTestRule.setContent {
-            IB2026AlejandroLOTheme {
-                val billsVm = createBillsViewModel()
-                IberdrolaMainScreen(
-                    onBackButtonClick = { backClicked = true },
-                    onFilterClick = {},
-                    onElectronicBillClick = { _, _ -> },
-                    billsViewModel = billsVm
-                )
-            }
-        }
+        defaultContent(onBackButtonClick = { backClicked = true })
 
         composeTestRule.onNodeWithTag("main_back_button").performClick()
         assert(backClicked)
@@ -69,39 +74,35 @@ class IberdrolaMainScreenTest {
 
     @OptIn(ExperimentalTestApi::class)
     @Test
-    fun givenMainScreen_whenOptionSelected_thenPagerChanges() {
-        composeTestRule.setContent {
-            IB2026AlejandroLOTheme {
-                val billsVm = createBillsViewModel()
-                IberdrolaMainScreen(
-                    onBackButtonClick = {},
-                    onFilterClick = {},
-                    onElectronicBillClick = { _, _ -> },
-                    billsViewModel = billsVm
-                )
-            }
-        }
+    fun givenMainScreen_whenGasOptionSelected_thenPagerChanges() {
+        defaultContent(isGasEnabled = true)
 
         composeTestRule.waitUntilAtLeastOneExists(hasTestTag("bills_screen"), 5000)
         composeTestRule.onNodeWithTag("service_option_Gas").performClick()
         composeTestRule.onNodeWithTag("bills_screen").assertIsDisplayed()
     }
 
+    @OptIn(ExperimentalTestApi::class)
     @Test
-    fun givenMainScreen_thenRenderedCorrectly() {
-        composeTestRule.setContent {
-            IB2026AlejandroLOTheme {
-                val billsVm = createBillsViewModel()
-                IberdrolaMainScreen(
-                    onBackButtonClick = {},
-                    onFilterClick = {},
-                    onElectronicBillClick = { _, _ -> },
-                    billsViewModel = billsVm
-                )
-            }
-        }
+    fun givenMainScreen_whenGasDisabled_thenOnlyLuzPageExists() {
+        defaultContent(isGasEnabled = false)
 
-        // Verificamos que la pantalla principal se renderiza correctamente
-        composeTestRule.onNodeWithTag("main_screen").assertIsDisplayed()
+        composeTestRule.waitUntilAtLeastOneExists(hasTestTag("bills_screen"), 5000)
+        composeTestRule.onNodeWithTag("bills_screen").assertIsDisplayed()
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun givenMainScreen_whenLoading_thenSkeletonIsDisplayed() {
+        defaultContent(
+            billsUiState = BillsUiState(
+                directionStreet = "Calle de prueba",
+                options = BillTypeEnum.entries.toList(),
+                isLoading = true
+            )
+        )
+
+        composeTestRule.waitUntilAtLeastOneExists(hasTestTag("bills_skeleton"), 5000)
+        composeTestRule.onNodeWithTag("bills_skeleton").assertIsDisplayed()
     }
 }

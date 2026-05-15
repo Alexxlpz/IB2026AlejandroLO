@@ -7,8 +7,10 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import com.iberdrola.practicas2026.alejandroLO.fakes.FakeAnalyticsRepository
 import com.iberdrola.practicas2026.alejandroLO.fakes.FakeConnectivityRepository
 import com.iberdrola.practicas2026.alejandroLO.fakes.FakeDirectionRepository
+import com.iberdrola.practicas2026.alejandroLO.fakes.FakeElectronicBillsRepository
 import com.iberdrola.practicas2026.alejandroLO.ui.features.home.screens.IberdrolaHomeScreen
 import com.iberdrola.practicas2026.alejandroLO.ui.features.home.viewModel.HomeViewModel
 import org.junit.Rule
@@ -19,17 +21,12 @@ class IberdrolaHomeScreenTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-//    private fun setupNavController(): TestNavHostController {
-//        val context = ApplicationProvider.getApplicationContext<Context>()
-//        return TestNavHostController(context).apply {
-//            navigatorProvider.addNavigator(ComposeNavigator())
-//        }
-//    }
-
     private fun createHomeViewModel(): HomeViewModel {
         return HomeViewModel(
             directionRepository = FakeDirectionRepository(),
-            connectivityRepository = FakeConnectivityRepository()
+            connectivityRepository = FakeConnectivityRepository(),
+            electronicBillsRepository = FakeElectronicBillsRepository(),
+            analyticsRepository = FakeAnalyticsRepository()
         )
     }
 
@@ -41,8 +38,8 @@ class IberdrolaHomeScreenTest {
                 onAddressClick = { _, _ -> },
                 setCont = {},
                 mostrarSheet = false,
-                clearFilters = {}, // Corregido: parámetro según nueva firma
-                homeViewModel = createHomeViewModel()
+                homeViewModel = createHomeViewModel(),
+                changeMode = {}
             )
         }
 
@@ -59,14 +56,13 @@ class IberdrolaHomeScreenTest {
                 onAddressClick = { _, _ -> },
                 setCont = {},
                 mostrarSheet = false,
-                clearFilters = {}, // Corregido
-                homeViewModel = viewModel
+                homeViewModel = viewModel,
+                changeMode = {}
             )
         }
 
         composeTestRule.waitUntilAtLeastOneExists(hasTestTag("home_screen"), 5000)
 
-        // Verificamos que el switch existe (home_switch) y lo pulsamos
         composeTestRule.onNodeWithTag("home_switch").assertIsDisplayed()
         composeTestRule.onNodeWithTag("home_switch").performClick()
     }
@@ -81,8 +77,8 @@ class IberdrolaHomeScreenTest {
                 onAddressClick = { _, _ -> clicked = true },
                 setCont = {},
                 mostrarSheet = false,
-                clearFilters = {}, // Corregido
-                homeViewModel = createHomeViewModel()
+                homeViewModel = createHomeViewModel(),
+                changeMode = {}
             )
         }
 
@@ -101,10 +97,10 @@ class IberdrolaHomeScreenTest {
         composeTestRule.setContent {
             IberdrolaHomeScreen(
                 onAddressClick = { _, _ -> },
-                setCont = {  },
+                setCont = {},
                 mostrarSheet = true,
-                clearFilters = {}, // Corregido
-                homeViewModel = createHomeViewModel()
+                homeViewModel = createHomeViewModel(),
+                changeMode = {}
             )
         }
 
@@ -116,13 +112,12 @@ class IberdrolaHomeScreenTest {
     @Test
     fun givenHomeScreen_whenIsDisplayed_thenHeaderAndFooterAreDisplayed() {
         composeTestRule.setContent {
-            // Posición del <caret>
             IberdrolaHomeScreen(
                 onAddressClick = { _, _ -> },
                 setCont = {},
                 mostrarSheet = false,
-                clearFilters = {}, // Corregido
-                homeViewModel = createHomeViewModel()
+                homeViewModel = createHomeViewModel(),
+                changeMode = {}
             )
         }
 

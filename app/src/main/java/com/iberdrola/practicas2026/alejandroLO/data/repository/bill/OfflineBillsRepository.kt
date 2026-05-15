@@ -2,7 +2,6 @@ package com.iberdrola.practicas2026.alejandroLO.data.repository.bill
 
 import android.content.Context
 import android.database.sqlite.SQLiteConstraintException
-import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.iberdrola.practicas2026.alejandroLO.data.BillDatabase
@@ -22,8 +21,6 @@ class OfflineBillsRepository(
     private val gson: Gson,
     private val directionsRepository: DirectionRepository
 ) : BillsRepository {
-
-    val TAG: String = "OfflineBillsRepository"
 
     override fun getAllBills(): Flow<List<Bill>> = billDao.getAllBills()
     override fun getAllBillsByDirectionId(directionId: Int): Flow<List<Bill>> = billDao.getAllBillsByDirectionId(directionId)
@@ -45,10 +42,8 @@ class OfflineBillsRepository(
 
             try {
                 billDao.deleteAll()
-                Log.d(TAG, "Insertando facturas desde API...")
                 remoteBills.forEach { billDao.insert(it) }
             } catch (_: SQLiteConstraintException) {
-                Log.w(TAG, "Fallo de ForeignKey online. Refrescando direcciones desde API...")
                 directionsRepository.refreshDirectionsOnline()
 
                 BillTypeEnum.entries.forEach { type ->
@@ -60,11 +55,9 @@ class OfflineBillsRepository(
 
                 billDao.deleteAll()
                 remoteBills.forEach { billDao.insert(it) }
-                Log.d(TAG, "Reintento online exitoso")
             }
         } catch (e: Exception) {
             billDao.deleteAll()
-            Log.e(TAG, "Error en refreshBillsOnline: ${e.message}")
             throw e
         }
     }
@@ -76,10 +69,8 @@ class OfflineBillsRepository(
 
         try {
             billDao.deleteAll()
-            Log.d(TAG, "Insertando facturas mock...")
             bills?.forEach { billDao.insert(it) }
         } catch (_: SQLiteConstraintException) {
-            Log.w(TAG, "Fallo de ForeignKey en mock. Cargando direcciones locales...")
             directionsRepository.insertMockDirectionsFromAssets()
 
             BillTypeEnum.entries.forEach { type ->
@@ -91,7 +82,6 @@ class OfflineBillsRepository(
 
             billDao.deleteAll()
             bills?.forEach { billDao.insert(it) }
-            Log.d(TAG, "Base de datos reparada y facturas insertadas.")
         }
     }
 

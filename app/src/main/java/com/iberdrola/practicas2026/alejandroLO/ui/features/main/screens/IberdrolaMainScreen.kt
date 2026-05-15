@@ -1,6 +1,5 @@
 package com.iberdrola.practicas2026.alejandroLO.ui.features.main.screens
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -34,16 +33,14 @@ import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.screens.Iberdro
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsUiState
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsViewModel
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.BillsViewModelFactory
-import com.iberdrola.practicas2026.alejandroLO.ui.features.main.viewModel.ActiveFilterItem
 import com.iberdrola.practicas2026.alejandroLO.ui.features.bills.viewModel.FilterUiState
+import com.iberdrola.practicas2026.alejandroLO.ui.features.main.viewModel.ActiveFilterItem
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IB2026AlejandroLOTheme
 import com.iberdrola.practicas2026.alejandroLO.ui.theme.IberdrolaTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.util.Locale
-import kotlin.math.abs
 
-// hay que hacer una UI que almacene selectedOption
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -105,26 +102,15 @@ fun IberdrolaMainScreenContent(
     modifier: Modifier = Modifier,
     locale: Locale = Locale.forLanguageTag("es-ES")
 ) {
-    // usamos state para forzar a la pantalla a calcular el valor de filterUiState, asi detecta el cambio al borrar el chip
     val filterIsApplied = remember(filterUiState) {
         filterUiState.selectedDateFrom != null ||
                 filterUiState.selectedDateTo != null ||
                 filterUiState.priceRange != filterUiState.minPrice..filterUiState.maxPrice ||
                 filterUiState.selectedStates.size != BillStatusEnum.entries.size
-                // con comparar el tamaño basta, nos da igual porque este filtrando, solo si lo
-                // está haciendo o no
     }
 
     val billsToShow = if (filterIsApplied) billsUiState.filteredBillList else billsUiState.billsList
 
-
-    if (filterIsApplied) {
-        Log.d("FilterDebug", "Applied because -> Date: ${filterUiState.selectedDateFrom != null}, " +
-                "Status: ${filterUiState.selectedStates.size != BillStatusEnum.entries.size}, " +
-                "Price: ${abs(filterUiState.priceRange.start - filterUiState.minPrice) > 0.01f}")
-    }
-
-    // está deshabilitado si no hay filtros y no hay facturas
     val enableFilterButton = filterIsApplied || billsUiState.billsList.isNotEmpty()
 
     var showAlert by remember { mutableStateOf(false) }
@@ -154,7 +140,7 @@ fun IberdrolaMainScreenContent(
         onOptionSelected(option)
     }
 
-    BackHandler { // quiero que también cuente el contador si le das al botón back
+    BackHandler {
         onBackButtonClick()
     }
 
@@ -166,7 +152,6 @@ fun IberdrolaMainScreenContent(
             .fillMaxSize()
             .testTag("main_screen")
         ) {
-//            Log.d("MainScreen", "is sync enabled: ${billsUiState.value.isOnline}")
             IberdrolaTopBar(
                 selectedOption = billsUiState.selectedOption,
                 streetName = billsUiState.directionStreet,
@@ -187,7 +172,7 @@ fun IberdrolaMainScreenContent(
 
 
                 val filteredBills = billsToShow.filter {
-                    it.typeId == page // 0 = Luz, 1 = Gas
+                    it.typeId == page
                 }
 
                 val lastBill = billsUiState.billsList.filter {

@@ -12,7 +12,7 @@ interface DirectionRepository {
     fun getDirection(id: Int): Flow<Direction>
     fun getAllDirections(): Flow<List<Direction>>
 
-    suspend fun refreshDirectionsOnline() // Mete los datos de la API en la base de datos
-    suspend fun insertMockDirectionsFromAssets() // Mete los datos de un json que tenemos en local
+    suspend fun refreshDirectionsOnline()
+    suspend fun insertMockDirectionsFromAssets()
 
 }

@@ -1,6 +1,5 @@
 package com.iberdrola.practicas2026.alejandroLO.ui.navigation
 
-import android.util.Log
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -48,7 +47,6 @@ fun IberdrolaNavGraph(
     innerPadding: PaddingValues,
     locale: Locale
 ) {
-    val TAG = "IberdrolaNavGraph"
 
     val billsViewModel: BillsViewModel = viewModel(factory = BillsViewModelFactory.Factory)
     val homeViewModel: HomeViewModel = viewModel(factory = HomeViewModelFactory.Factory)
@@ -70,12 +68,10 @@ fun IberdrolaNavGraph(
 
     var cont by remember { mutableIntStateOf(1) }
     val setCont: (Int) -> Unit = { num ->
-        Log.d(TAG, "aumentarCont: cont = $num")
         cont = num
     }
     val mostrarSheet by remember {
         derivedStateOf {
-            Log.d(TAG, "Calculando mostrarSheet. cont es: $cont")
             cont == 0
         }
     }
@@ -84,7 +80,6 @@ fun IberdrolaNavGraph(
         if (cont == 0) {
             homeViewModel.logOpenFeedbackSheet(true)
         }
-        Log.d(TAG, "decrementarCont: cont = $cont")
     }
 
     val backStackHandler: (IberdrolaScreens, IberdrolaScreens) -> Unit = { pantallaAct, pantallaDest ->
@@ -92,9 +87,6 @@ fun IberdrolaNavGraph(
             homeViewModel.logButtonClick("volver", pantallaAct.title)
             if(pantallaAct == IberdrolaScreens.MAIN) {
                 decrementarCont()
-                // no puedo poner back porque si te da tiempo a pulsar varias
-                // veces antes de que cambie de pantalla llegamos a la base de
-                // la pila de navController
             }
 
             navController.navigate(pantallaDest.title) {
@@ -107,7 +99,6 @@ fun IberdrolaNavGraph(
 
     var selectedStreet by remember { mutableStateOf("") }
     val updateSelectedStreet: (String) -> Unit = {
-        Log.d(TAG, "updateSelectedStreet: $it")
         selectedStreet = it
     }
 
@@ -118,7 +109,6 @@ fun IberdrolaNavGraph(
 
     var electronicBills: ElectronicBill? by remember { mutableStateOf(ElectronicBill()) }
     val updateElectronicBills: (Int) -> Unit = { directionId ->
-        Log.d(TAG, "updateElectronicBills, directionid: $directionId")
         electronicBills = electronicBillsUiState.value.electronicBills.firstOrNull{ it.directionId == directionId }
     }
     val refreshElectronicBill:(String, BillTypeEnum) -> Unit = { email, type ->
@@ -131,7 +121,6 @@ fun IberdrolaNavGraph(
 
     var typeSelected by remember { mutableStateOf(BillTypeEnum.LUZ) }
     val updateSelectedTypeBill: (BillTypeEnum) -> Unit = {
-        Log.d(TAG, "updateSelectedTypeBill: $it")
         typeSelected = it
     }
 
@@ -143,7 +132,6 @@ fun IberdrolaNavGraph(
 
     var newEmail by remember { mutableStateOf<String?>(null) }
     val updateNewEmail: (String?) -> Unit = {
-        Log.d(TAG, "changeNewEmail: $it")
         newEmail = it
     }
 
@@ -156,13 +144,11 @@ fun IberdrolaNavGraph(
             billsViewModel.reviewIsGasEnabled()
             delay(300)
             updateNewEmail(null)
-            //electronicBillsViewModel.resetCounter()
         }
     }
 
     var isModificacion by remember { mutableStateOf(false) }
     val updateIsModificacion: (Boolean) -> Unit = {
-        Log.d(TAG, "updateIsModificacion: $it")
         isModificacion = it
     }
 
@@ -186,7 +172,6 @@ fun IberdrolaNavGraph(
                 mostrarSheet = mostrarSheet,
                 homeViewModel = homeViewModel,
                 changeMode = {
-                    // para reiniciar el filtro antes de cambiar de modo
                     homeViewModel.logChangeMode(it)
                     billsViewModel.clearFilters(it)
                 }
@@ -196,14 +181,13 @@ fun IberdrolaNavGraph(
             IberdrolaMainScreen(
                 locale = locale,
                 onBackButtonClick = {
-                    Log.d(TAG, "Back button clicked")
                     backStackHandler(
                         IberdrolaScreens.MAIN,
                         IberdrolaScreens.HOME
                     )
                     scope.launch {
-                        delay(500) // para que no se vea la limpieza del filtro
-                        billsViewModel.clearFilters() // para reiniciar el filtro al cambiar de calle
+                        delay(500)
+                        billsViewModel.clearFilters()
                     }
                 },
                 modifier = Modifier.padding(innerPadding),
@@ -369,7 +353,6 @@ fun IberdrolaNavGraph(
                             type = typeSelected,
                             electronicBill = electronicBills!!
                         )
-                        // simula la recarga sin esperar a room
                         refreshElectronicBill(newEmail!!, typeSelected)
                     }
 

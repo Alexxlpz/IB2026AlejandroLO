@@ -65,7 +65,7 @@ fun SkeletonBox(
     Box(
         modifier = modifier
             .size(width, height)
-            .background(Color(0x93E0E6E2), shape = shape) // Gris verdoso suave como la foto
+            .background(Color(0x93E0E6E2), shape = shape)
     )
 }
 
@@ -116,15 +116,15 @@ fun BillItemSkeleton() {
             verticalAlignment = CenterVertically
         ) {
             Column {
-                SkeletonBox(width = 100.dp, height = 17.dp, shape = RoundedCornerShape(8.dp)) // Cuadradito izquierda
+                SkeletonBox(width = 100.dp, height = 17.dp, shape = RoundedCornerShape(8.dp))
                 Spacer(Modifier.height(5.dp))
-                SkeletonBox(width = 70.dp, height = 15.dp, shape = RoundedCornerShape(8.dp)) // Cuadradito izquierda
+                SkeletonBox(width = 70.dp, height = 15.dp, shape = RoundedCornerShape(8.dp))
                 Spacer(Modifier.height(5.dp))
-                SkeletonBox(width = 57.dp, height = 23.dp, shape = RoundedCornerShape(8.dp)) // Cuadradito izquierda
+                SkeletonBox(width = 57.dp, height = 23.dp, shape = RoundedCornerShape(8.dp))
             }
 
             Row(verticalAlignment = CenterVertically) {
-                SkeletonBox(width = 50.dp, height = 20.dp, shape = RoundedCornerShape(4.dp)) // Flecha derecha
+                SkeletonBox(width = 50.dp, height = 20.dp, shape = RoundedCornerShape(4.dp))
                 Spacer(Modifier.width(15.dp))
                 SkeletonBox(width = 25.dp, height = 30.dp, shape = RoundedCornerShape(4.dp))
             }
@@ -190,7 +190,7 @@ fun shimmerTheme(): ShimmerTheme {
     return defaultShimmerTheme.copy(
         animationSpec = infiniteRepeatable(
             animation = tween(
-                durationMillis = 1000, // Velocidad del brillo
+                durationMillis = 1000,
                 easing = LinearEasing
             ),
             repeatMode = RepeatMode.Restart

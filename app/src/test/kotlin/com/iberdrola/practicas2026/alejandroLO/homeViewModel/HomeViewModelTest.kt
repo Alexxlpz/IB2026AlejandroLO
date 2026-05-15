@@ -5,6 +5,7 @@ import com.iberdrola.practicas2026.alejandroLO.MainDispatcherRule
 import com.iberdrola.practicas2026.alejandroLO.data.model.Direction
 import com.iberdrola.practicas2026.alejandroLO.ui.features.home.viewModel.HomeViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -20,31 +21,37 @@ class HomeViewModelTest {
 
     private lateinit var fakeDirectionRepository: FakeDirectionRepository
     private lateinit var fakeConnectivityRepository: FakeConnectivityRepository
+    private lateinit var fakeElectronicBillsRepository: FakeElectronicBillsRepository
+    private lateinit var fakeAnalyticsRepository: FakeAnalyticsRepository
     private lateinit var viewModel: HomeViewModel
 
     @Before
     fun setUp() {
         fakeDirectionRepository = FakeDirectionRepository()
         fakeConnectivityRepository = FakeConnectivityRepository()
+        fakeElectronicBillsRepository = FakeElectronicBillsRepository()
+        fakeAnalyticsRepository = FakeAnalyticsRepository()
         viewModel = HomeViewModel(
             directionRepository = fakeDirectionRepository,
-            connectivityRepository = fakeConnectivityRepository
+            connectivityRepository = fakeConnectivityRepository,
+            electronicBillsRepository = fakeElectronicBillsRepository,
+            analyticsRepository = fakeAnalyticsRepository
         )
     }
-
     @Test
     fun givenDirections_whenRefreshDirections_thenUiStateIsUpdated() = runTest {
-        // Arrange
+        
         val directions = listOf(
             Direction().apply { id = 1; street = "Calle 1" },
             Direction().apply { id = 2; street = "Calle 2" }
         )
 
-        // Act
-        fakeDirectionRepository.emit(directions)
+        
         viewModel.refreshDirections()
+        fakeDirectionRepository.emit(directions)
+        advanceUntilIdle()
 
-        // Assert
+        
         viewModel.uiState.test {
             val item = awaitItem()
             assertEquals(2, item.directionList.size)
@@ -55,11 +62,11 @@ class HomeViewModelTest {
 
     @Test
     fun givenConnectivityChange_whenConnectivityRepositoryEmits_thenUiStateIsOnlineUpdated() = runTest {
-        // Arrange
-        // Act
+        
+        
         fakeConnectivityRepository.setOnlineMode(true)
 
-        // Assert
+        
         viewModel.uiState.test {
             val item = awaitItem()
             assertTrue(item.isOnline)
@@ -69,13 +76,13 @@ class HomeViewModelTest {
 
     @Test
     fun givenIsOnline_whenUpdateDirectionsOnline_thenConnectivityRepositoryIsUpdated() = runTest {
-        // Arrange
+        
         val newOnlineStatus = true
 
-        // Act
+        
         viewModel.updateDirectionsOnline(newOnlineStatus, {})
 
-        // Assert
+        
         fakeConnectivityRepository.isOnline.test {
             val status = awaitItem()
             assertEquals(newOnlineStatus, status)
@@ -85,10 +92,10 @@ class HomeViewModelTest {
 
     @Test
     fun givenInit_whenViewModelCreated_thenIsLoadingIsInitiallyTrue() = runTest {
-        // Arrange
-        // Act
         
-        // Assert
+        
+        
+        
         viewModel.uiState.test {
             val item = awaitItem()
             assertTrue(item.isLoading)

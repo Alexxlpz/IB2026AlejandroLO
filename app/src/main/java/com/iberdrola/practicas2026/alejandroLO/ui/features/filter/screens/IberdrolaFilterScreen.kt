@@ -92,7 +92,7 @@ fun IberdrolaFilterScreen(
     onFilter: () -> Unit,
     onClearFilter: () -> Unit
 ) {
-    // Refactored to separate state collection from UI content to avoid ViewModel issues in Previews
+
     val filterUiState by billsViewModel.filterUiState.collectAsState()
 
     IberdrolaFilterScreenContent(
@@ -100,7 +100,6 @@ fun IberdrolaFilterScreen(
         onBack = onBack,
         locale = locale,
         onApplyFilters = { dateFrom, dateTo, priceRange, selectedStates ->
-            // Use the ViewModel's submit method (keeping typo sumbmitButtom for consistency)
             onFilter()
             billsViewModel.sumbmitButtom(
                 dateFrom = dateFrom,
@@ -283,7 +282,6 @@ fun IberdrolaFilterScreenContent(
 
             Spacer(Modifier.height(24.dp))
 
-            // Sección: Por fecha
             SectionTitle(stringResource(R.string.por_fecha))
             val fromDate:String = stringResource(R.string.desde)
             val toDate:String = stringResource(R.string.hasta)
@@ -311,7 +309,6 @@ fun IberdrolaFilterScreenContent(
 
             Spacer(Modifier.height(40.dp))
 
-            // Sección: Por un importe
             SectionTitle(stringResource(R.string.por_un_importe))
             PriceRangeSelector(
                 range = priceRange,
@@ -341,7 +338,6 @@ fun IberdrolaFilterScreenContent(
 
             Spacer(Modifier.height(40.dp))
 
-            // Sección: Por estado
             SectionTitle(stringResource(R.string.por_estado))
 
             BillStatusEnum.entries.forEach { state ->
@@ -385,7 +381,7 @@ fun DatePickerField(
     disable: Boolean,
     locale: Locale
 ) {
-    val disabledGrey = IberdrolaTheme.colors.onSurfaceVariant // Gris oscuro del tema
+    val disabledGrey = IberdrolaTheme.colors.onSurfaceVariant
     val backgroundColor = if (disable) IberdrolaTheme.colors.onSurface.copy(alpha = 0.05f) else Color.Transparent
 
     Column(
@@ -496,8 +492,6 @@ fun IberdrolaDatePickerDialog(
     val selectableDates = remember(minDate, maxDate) {
         object : SelectableDates {
             override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                // normalizations el mínimo y el maximo SI NO ES NULO a utc para una mejor
-                // comparación con la fecha seleccionable
                 val minTime = minDate?.let {
                     val cal = getInstance(java.util.TimeZone.getTimeZone("UTC"))
                     cal.time = it
@@ -707,7 +701,6 @@ fun FilterCheckboxItem(label: String, isSelected: Boolean, onClick: () -> Unit) 
 @Composable
 fun FilterScreenPreview() {
     IB2026AlejandroLOTheme {
-        // Use the stateless content version in Preview to avoid ViewModel instantiation errors
         IberdrolaFilterScreenContent(
             filterUiState = FilterUiState(
                 minPrice = 0f,

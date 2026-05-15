@@ -12,8 +12,6 @@ import com.iberdrola.practicas2026.alejandroLO.R
 val IberdrolaFontFamily = FontFamily(
     Font(R.font.iberdrola_font_regular, FontWeight.Normal),
     Font(R.font.iberdrola_font_bold, FontWeight.Bold),
-//    Font(R.font.iberdrola_font_black, FontWeight.Black),
-//    Font(R.font.iberdrola_font_light, FontWeight.Light)
 )
 
 val Typography = Typography(

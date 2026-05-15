@@ -1,7 +1,6 @@
 package com.iberdrola.practicas2026.alejandroLO.data
 
 import android.content.Context
-import android.util.Log
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -43,16 +42,12 @@ abstract class BillDatabase : RoomDatabase() {
 
     abstract fun electronicBillDao(): ElectronicBillsDao
 
-    val TAG: String = "BillDatabase"
 
     suspend fun clearDatabase() {
-        this.withTransaction { // todxo en una transicion para que si se borra algo que no sea a medias
-            Log.d(TAG, "clearDatabase: Iniciando limpieza de tablas...")
+        this.withTransaction {
             billDao().deleteAllSync()
-            Log.d(TAG, "clearDatabase: Bills eliminadas")
 
             directionDao().deleteAllSync()
-            Log.d(TAG, "clearDatabase: Direcciones eliminadas")
         }
     }
 
@@ -76,8 +71,6 @@ abstract class BillDatabase : RoomDatabase() {
     }
 }
 
-// voy a realizarla de forma síncrona para que se añadan antes los tipos y status,
-// ya que si insertamos las facturas antes en el bill nos da violación de claves foráneas
 private class BillDatabaseCallback: RoomDatabase.Callback() {
 
     override fun onCreate(db: SupportSQLiteDatabase) {

@@ -90,7 +90,6 @@ dependencies {
     implementation(libs.foundation)
     androidTestImplementation(libs.androidx.navigation.testing)
 
-    // DEPENDENCIAS PARA LOS TEST
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.mockk)
     testImplementation(libs.junit)
@@ -131,15 +130,31 @@ tasks.register("adbReverse") {
             ?: error("No se encontró el SDK de Android")
 
         val isWindows = System.getProperty("os.name").lowercase().contains("windows")
-        val adb = if (isWindows) "$sdkDir/platform-tools/adb.exe"
-        else "$sdkDir/platform-tools/adb"
+        val adb = if (isWindows) "$sdkDir/platform-tools/adb.exe" else "$sdkDir/platform-tools/adb"
 
-        val process = ProcessBuilder(adb, "reverse", "tcp:3000", "tcp:3000")
+        val devicesOutput = ProcessBuilder(adb, "devices")
             .redirectErrorStream(true)
             .start()
-        process.waitFor()
+            .inputStream.bufferedReader().readText()
 
-        println("ADB Reverse ejecutado correctamente en el puerto 3000")
+        val physicalDevices = devicesOutput.lines()
+            .drop(1)
+            .filter { it.isNotBlank() && it.contains("\tdevice") }
+            .map { it.substringBefore("\t").trim() }
+            .filter { !it.startsWith("emulator") }
+
+        if (physicalDevices.isEmpty()) {
+            println("no hay ningún dispositivo físico conectado")
+            return@doLast
+        }
+
+        physicalDevices.forEach { deviceId ->
+            val process = ProcessBuilder(adb, "-s", deviceId, "reverse", "tcp:3000", "tcp:3000")
+                .redirectErrorStream(true)
+                .start()
+            process.waitFor()
+            println("adb reverse ejecutado en $deviceId")
+        }
     }
 }
 
